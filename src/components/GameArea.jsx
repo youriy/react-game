@@ -1,6 +1,4 @@
 import React from 'react';
-import { styled } from '@mui/material/styles';
-import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import AcUnitIcon from '@mui/icons-material/AcUnit';
 import AdbIcon from '@mui/icons-material/Adb';
@@ -20,58 +18,54 @@ import MoodIcon from '@mui/icons-material/Mood';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import ParkIcon from '@mui/icons-material/Park';
 import SchoolIcon from '@mui/icons-material/School';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import { CardActionArea } from '@mui/material';
+import Grow from '@mui/material/Grow';
 
-
-const Item = styled(Paper)(({ theme }) => ({
-    ...theme.typography.body2,
-    padding: theme.spacing(1),
-    display: "flex",
-    alignItems: "center",
-    height: 100,
-    justifyContent: "center",
-    color: theme.palette.text.secondary,
-}));
 
 const nps = [
-    { id: 0, type: 1, icon: <AcUnitIcon sx={{ fontSize: 60 }}/>},
-    { id: 1, type: 1, icon: <AcUnitIcon sx={{ fontSize: 60 }}/>},
-    { id: 2, type: 2, icon: <AdbIcon sx={{ fontSize: 60 }}/>},
-    { id: 3, type: 2, icon: <AdbIcon sx={{ fontSize: 60 }}/>},
-    { id: 4, type: 3, icon: <AirplanemodeActiveIcon sx={{ fontSize: 60 }}/>},
-    { id: 5, type: 3, icon: <AirplanemodeActiveIcon sx={{ fontSize: 60 }}/>},
-    { id: 6, type: 4, icon: <Brightness7Icon sx={{ fontSize: 60 }}/>},
-    { id: 7, type: 4, icon: <Brightness7Icon sx={{ fontSize: 60 }}/>},
-    { id: 8, type: 5, icon: <BuildIcon sx={{ fontSize: 60 }}/>},
-    { id: 9, type: 5, icon: <BuildIcon sx={{ fontSize: 60 }}/>},
-    { id: 10, type: 6, icon: <CloudIcon sx={{ fontSize: 60 }}/>},
-    { id: 11, type: 6, icon: <CloudIcon sx={{ fontSize: 60 }}/>},
-    { id: 12, type: 7, icon: <ComputerIcon sx={{ fontSize: 60 }}/>},
-    { id: 13, type: 7, icon: <ComputerIcon sx={{ fontSize: 60 }}/>},
-    { id: 14, type: 8, icon: <DirectionsCarIcon sx={{ fontSize: 60 }}/>},
-    { id: 15, type: 8, icon: <DirectionsCarIcon sx={{ fontSize: 60 }}/>},
-    { id: 16, type: 9, icon: <DirectionsBoatIcon sx={{ fontSize: 60 }}/>},
-    { id: 17, type: 9, icon: <DirectionsBoatIcon sx={{ fontSize: 60 }}/>},
-    { id: 18, type: 10, icon: <ExtensionIcon sx={{ fontSize: 60 }}/>},
-    { id: 19, type: 10, icon: <ExtensionIcon sx={{ fontSize: 60 }}/>},
-    { id: 20, type: 11, icon: <FlashOnIcon sx={{ fontSize: 60 }}/>},
-    { id: 21, type: 11, icon: <FlashOnIcon sx={{ fontSize: 60 }}/>},
-    { id: 22, type: 12, icon: <LocalFireDepartmentIcon sx={{ fontSize: 60 }}/>},
-    { id: 23, type: 12, icon: <LocalFireDepartmentIcon sx={{ fontSize: 60 }}/>},
-    { id: 24, type: 13, icon: <LocalFloristIcon sx={{ fontSize: 60 }}/>},
-    { id: 25, type: 13, icon: <LocalFloristIcon sx={{ fontSize: 60 }}/>},
-    { id: 26, type: 14, icon: <LocalPostOfficeIcon sx={{ fontSize: 60 }}/>},
-    { id: 27, type: 14, icon: <LocalPostOfficeIcon sx={{ fontSize: 60 }}/>},
-    { id: 28, type: 15, icon: <MoodIcon sx={{ fontSize: 60 }}/>},
-    { id: 29, type: 15, icon: <MoodIcon sx={{ fontSize: 60 }}/>},
-    { id: 30, type: 16, icon: <NotificationsIcon sx={{ fontSize: 60 }}/>},
-    { id: 31, type: 16, icon: <NotificationsIcon sx={{ fontSize: 60 }}/>},
-    { id: 32, type: 17, icon: <ParkIcon sx={{ fontSize: 60 }}/>},
-    { id: 33, type: 17, icon: <ParkIcon sx={{ fontSize: 60 }}/>},
-    { id: 34, type: 18, icon: <SchoolIcon sx={{ fontSize: 60 }}/>},
-    { id: 35, type: 18, icon: <SchoolIcon sx={{ fontSize: 60 }}/>},
+    { id: 0, type: 1, icon: <AcUnitIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 1, type: 1, icon: <AcUnitIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 2, type: 2, icon: <AdbIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 3, type: 2, icon: <AdbIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 4, type: 3, icon: <AirplanemodeActiveIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 5, type: 3, icon: <AirplanemodeActiveIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 6, type: 4, icon: <Brightness7Icon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 7, type: 4, icon: <Brightness7Icon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 8, type: 5, icon: <BuildIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 9, type: 5, icon: <BuildIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 10, type: 6, icon: <CloudIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 11, type: 6, icon: <CloudIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 12, type: 7, icon: <ComputerIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 13, type: 7, icon: <ComputerIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 14, type: 8, icon: <DirectionsCarIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 15, type: 8, icon: <DirectionsCarIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 16, type: 9, icon: <DirectionsBoatIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 17, type: 9, icon: <DirectionsBoatIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 18, type: 10, icon: <ExtensionIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 19, type: 10, icon: <ExtensionIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 20, type: 11, icon: <FlashOnIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 21, type: 11, icon: <FlashOnIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 22, type: 12, icon: <LocalFireDepartmentIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 23, type: 12, icon: <LocalFireDepartmentIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 24, type: 13, icon: <LocalFloristIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 25, type: 13, icon: <LocalFloristIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 26, type: 14, icon: <LocalPostOfficeIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 27, type: 14, icon: <LocalPostOfficeIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 28, type: 15, icon: <MoodIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 29, type: 15, icon: <MoodIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 30, type: 16, icon: <NotificationsIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 31, type: 16, icon: <NotificationsIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 32, type: 17, icon: <ParkIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 33, type: 17, icon: <ParkIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 34, type: 18, icon: <SchoolIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
+    { id: 35, type: 18, icon: <SchoolIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
 ];
 
 export default function GameArea() {
+    const [items, setItems] = React.useState([]);
 
     function shuffle(array) {
         for (let i = array.length - 1; i > 0; i--) {
@@ -82,11 +76,32 @@ export default function GameArea() {
         return array;
     }
 
+    const handleClickOpenItem = (id) => (event) => {
+        setItems(prevState => {
+            prevState[id].open = true;
+            return [...prevState]
+        })
+    }
+
+    React.useEffect(() => {
+        setItems(shuffle(nps));
+    }, [])
+
     return (
         <Grid container spacing={2}>
-            {shuffle(nps).map((it) =>
-                    <Grid item xs={2}>
-                        <Item>{it.icon}</Item>
+            {items.map((it, index) =>
+                    <Grid item xs={2} key={it.id}>
+                        <Card onClick={handleClickOpenItem(index)}>
+                            <CardActionArea>
+                                <CardContent>
+                                    <Grow in={it.open}>
+                                        <Typography textAlign="center" variant="body1" color="text.secondary">
+                                            {it.icon}
+                                        </Typography>
+                                    </Grow>
+                                </CardContent>
+                            </CardActionArea>
+                        </Card>
                     </Grid>
                 )}
         </Grid>
