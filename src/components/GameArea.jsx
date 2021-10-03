@@ -21,7 +21,7 @@ import SchoolIcon from '@mui/icons-material/School';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
-import { CardActionArea } from '@mui/material';
+import {CardActionArea, Fade} from '@mui/material';
 import Grow from '@mui/material/Grow';
 
 
@@ -65,7 +65,7 @@ const nps = [
 ];
 
 export default function GameArea() {
-    const [items, setItems] = React.useState([]);
+    const [items, setItems] = React.useState(shuffle(nps));
 
     function shuffle(array) {
         for (let i = array.length - 1; i > 0; i--) {
@@ -76,34 +76,59 @@ export default function GameArea() {
         return array;
     }
 
-    const handleClickOpenItem = (id) => (event) => {
+    const handleClickOpenItem = (id) => () => {
         setItems(prevState => {
             prevState[id].open = true;
             return [...prevState]
-        })
+        });
     }
 
     React.useEffect(() => {
-        setItems(shuffle(nps));
-    }, [])
+      let arr = items.filter(it => it.open === true);
+
+      if (arr.length === 2) {
+          let index1 = items.indexOf(arr[0]);
+          let index2 = items.indexOf(arr[1]);
+
+          if (items[index1].type === items[index2].type) {
+              setItems(prevState => {
+                  prevState[index1].open = false;
+                  prevState[index1].delete = true
+                  prevState[index2].open = false;
+                  prevState[index2].delete = true
+                  return [...prevState]
+              });
+          } else {
+              setItems(prevState => {
+                  prevState[index1].open = false;
+                  prevState[index2].open = false;
+                  return [...prevState]
+              });
+          }
+      }
+    }, [items])
 
     return (
         <Grid container spacing={2}>
-            {items.map((it, index) =>
+            {
+                items.map((it, index) =>
                     <Grid item xs={2} key={it.id}>
-                        <Card onClick={handleClickOpenItem(index)}>
-                            <CardActionArea>
-                                <CardContent>
-                                    <Grow in={it.open}>
-                                        <Typography textAlign="center" variant="body1" color="text.secondary">
-                                            {it.icon}
-                                        </Typography>
-                                    </Grow>
-                                </CardContent>
-                            </CardActionArea>
-                        </Card>
+                        <Fade in={!it.delete}>
+                            <Card onClick={handleClickOpenItem(index)}>
+                                <CardActionArea>
+                                    <CardContent>
+                                        <Grow in={it.open}>
+                                            <Typography textAlign="center" variant="body1" color="text.secondary">
+                                                {it.icon}
+                                            </Typography>
+                                        </Grow>
+                                    </CardContent>
+                                </CardActionArea>
+                            </Card>
+                        </Fade>
                     </Grid>
-                )}
+                )
+            }
         </Grid>
     );
 }
