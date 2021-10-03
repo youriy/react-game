@@ -23,7 +23,9 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import {CardActionArea, Fade} from '@mui/material';
 import Grow from '@mui/material/Grow';
-
+import Helper from "../core/Helper.jsx";
+import Timer from "./Timer.jsx";
+import Stack from "@mui/material/Stack";
 
 const nps = [
     { id: 0, type: 1, icon: <AcUnitIcon sx={{ fontSize: 60 }}/>, open: false, delete: false},
@@ -65,70 +67,75 @@ const nps = [
 ];
 
 export default function GameArea() {
-    const [items, setItems] = React.useState(shuffle(nps));
-
-    function shuffle(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            let j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-
-        return array;
-    }
+    const [items, setItems] = React.useState(Helper.shuffle(nps));
+    let clickable = true;
 
     const handleClickOpenItem = (id) => () => {
-        setItems(prevState => {
-            prevState[id].open = true;
-            return [...prevState]
-        });
+        if (clickable) {
+            setItems(prevState => {
+                prevState[id].open = true;
+                return [...prevState]
+            });
+        }
     }
 
     React.useEffect(() => {
       let arr = items.filter(it => it.open === true);
 
       if (arr.length === 2) {
+          // eslint-disable-next-line react-hooks/exhaustive-deps
+          clickable = false;
           let index1 = items.indexOf(arr[0]);
           let index2 = items.indexOf(arr[1]);
 
           if (items[index1].type === items[index2].type) {
-              setItems(prevState => {
-                  prevState[index1].open = false;
-                  prevState[index1].delete = true
-                  prevState[index2].open = false;
-                  prevState[index2].delete = true
-                  return [...prevState]
-              });
+              setTimeout(() => {
+                  setItems(prevState => {
+                      prevState[index1].open = false;
+                      prevState[index1].delete = true
+                      prevState[index2].open = false;
+                      prevState[index2].delete = true
+                      return [...prevState]
+                  });
+                  clickable = true;
+              }, 600);
           } else {
-              setItems(prevState => {
-                  prevState[index1].open = false;
-                  prevState[index2].open = false;
-                  return [...prevState]
-              });
+              setTimeout(() => {
+                  setItems(prevState => {
+                      prevState[index1].open = false;
+                      prevState[index2].open = false;
+                      return [...prevState]
+                  });
+                  clickable = true;
+              }, 600);
           }
       }
     }, [items])
 
     return (
-        <Grid container spacing={2}>
-            {
-                items.map((it, index) =>
-                    <Grid item xs={2} key={it.id}>
-                        <Fade in={!it.delete}>
-                            <Card onClick={handleClickOpenItem(index)}>
-                                <CardActionArea>
-                                    <CardContent>
-                                        <Grow in={it.open}>
-                                            <Typography textAlign="center" variant="body1" color="text.secondary">
-                                                {it.icon}
-                                            </Typography>
-                                        </Grow>
-                                    </CardContent>
-                                </CardActionArea>
-                            </Card>
-                        </Fade>
-                    </Grid>
-                )
-            }
-        </Grid>
+        <Stack spacing={1}>
+            <Timer/>
+            <Grid container spacing={2}>
+                {
+                    items.map((it, index) =>
+                        <Grid item xs={2} key={it.id}>
+                            <Fade in={!it.delete}>
+                                <Card onClick={handleClickOpenItem(index)}>
+                                    <CardActionArea>
+                                        <CardContent>
+                                            <Grow in={it.open}>
+                                                <Typography textAlign="center" variant="body1" color="text.secondary">
+                                                    {it.icon}
+                                                </Typography>
+                                            </Grow>
+                                        </CardContent>
+                                    </CardActionArea>
+                                </Card>
+                            </Fade>
+                        </Grid>
+                    )
+                }
+            </Grid>
+        </Stack>
     );
 }
