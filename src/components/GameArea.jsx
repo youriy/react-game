@@ -3,7 +3,7 @@ import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
-import {CardActionArea, Fade} from '@mui/material';
+import {CardActionArea} from '@mui/material';
 import Grow from '@mui/material/Grow';
 import Timer from "./Timer.jsx";
 import Try from "./Try.jsx";
@@ -30,11 +30,20 @@ import ParkIcon from "@mui/icons-material/Park";
 import SchoolIcon from "@mui/icons-material/School";
 import {incrementTry} from "../store/gameSlice.jsx";
 import { makeStyles } from "@mui/styles";
+import Zoom from '@mui/material/Zoom';
 
 const useStyles = makeStyles((theme) => ({
     status: {
         justifyContent: "center",
+        "& .MuiTypography-root": {
+            width: 380,
+        }
     },
+    card:{
+        "&:hover": {
+            transform: "scale(1.07)!important",
+        }
+    }
 }));
 
 const icons = {
@@ -114,8 +123,8 @@ export default function GameArea() {
                 {
                     items.map((it, index) =>
                         <Grid item xs={2} key={it.id}>
-                            <Fade in={!it.delete}>
-                                <Card onClick={handleClickOpenItem(index)}>
+                            <Zoom in={!it.delete}>
+                                <Card className={classes.card} onClick={handleClickOpenItem(index)}>
                                     <CardActionArea>
                                         <CardContent>
                                             <Grow in={it.open}>
@@ -126,7 +135,7 @@ export default function GameArea() {
                                         </CardContent>
                                     </CardActionArea>
                                 </Card>
-                            </Fade>
+                            </Zoom>
                         </Grid>
                     )
                 }
