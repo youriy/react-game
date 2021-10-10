@@ -1,7 +1,6 @@
 import React from 'react';
 import Typography from '@mui/material/Typography';
 import { makeStyles } from "@mui/styles";
-import Helper from "../core/Helper.jsx";
 
 const useStyles = makeStyles((theme) => ({
     timer: {
@@ -26,9 +25,18 @@ export default function Timer() {
         }
     }, []);
 
+    const formatTime = (time) => {
+        const getSeconds = `0${(time % 60)}`.slice(-2)
+        const minutes = `${Math.floor(time / 60)}`
+        const getMinutes = `0${minutes % 60}`.slice(-2)
+        const getHours = `0${Math.floor(time / 3600)}`.slice(-2)
+
+        return `${getHours} : ${getMinutes} : ${getSeconds}`
+    }
+
     return (
         <Typography variant="h4" gutterBottom component="div" className={classes.timer} color="primary">
-            {time}
+            {formatTime(time)}
         </Typography>
     );
 }
