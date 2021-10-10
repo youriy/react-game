@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Try() {
     const classes = useStyles();
-    const count = useSelector(state => state.try.count);
+    const count = useSelector(state => state.game.count);
 
     return (
         <Typography variant="h4" gutterBottom component="div" className={classes.try} color="primary">

@@ -28,7 +28,7 @@ import MoodIcon from "@mui/icons-material/Mood";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import ParkIcon from "@mui/icons-material/Park";
 import SchoolIcon from "@mui/icons-material/School";
-import {increment} from "../store/trySlice.jsx";
+import {increment} from "../store/gameSlice.jsx";
 import { makeStyles } from "@mui/styles";
 
 const useStyles = makeStyles((theme) => ({

@@ -1,6 +1,6 @@
 import {createSlice} from "@reduxjs/toolkit";
 
-const trySlice = createSlice({
+const gameSlice = createSlice({
     name: "try",
     initialState: {
         count: 0,
@@ -27,5 +27,5 @@ const trySlice = createSlice({
     }
 });
 
-export default trySlice.reducer
-export const {increment, setNull, setTime, setGaming, setWin} = trySlice.actions
+export default gameSlice.reducer
+export const {increment, setNull, setTime, setGaming, setWin} = gameSlice.actions
