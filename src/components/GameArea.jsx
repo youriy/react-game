@@ -71,30 +71,37 @@ export default function GameArea() {
     }
 
     React.useEffect(() => {
-      let arr = items.filter(it => it.open === true);
+        let arr = items.filter(it => it.open === true);
 
-      if (arr.length === 2) {
-          // eslint-disable-next-line react-hooks/exhaustive-deps
-          clickable = false;
-          let index1 = items.indexOf(arr[0]);
-          let index2 = items.indexOf(arr[1]);
+        if (arr.length === 2) {
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+            clickable = false;
+            let index1 = items.indexOf(arr[0]);
+            let index2 = items.indexOf(arr[1]);
 
-          if (items[index1].type === items[index2].type) {
-              setTimeout(() => {
-                  dispatch(setDelete(index1));
-                  dispatch(setDelete(index2));
-                  clickable = true;
-              }, 600);
-          } else {
-              setTimeout(() => {
-                  dispatch(setClose(index1));
-                  dispatch(setClose(index2));
-                  clickable = true;
-              }, 600);
-          }
+            if (items[index1].type === items[index2].type) {
+                setTimeout(() => {
+                    dispatch(setDelete(index1));
+                    dispatch(setDelete(index2));
+                    clickable = true;
+                    }, 600);
+            } else {
+                setTimeout(() => {
+                    dispatch(setClose(index1));
+                    dispatch(setClose(index2));
+                    clickable = true;
+                    }, 600);
+            }
 
-          dispatch(increment())
-      }
+            dispatch(increment())
+        }
+
+        let arrClose = items.filter(it => it.delete === false);
+
+        if (arrClose.length === 0) {
+            console.log("Победа")
+        }
+
     }, [items])
 
     return (
