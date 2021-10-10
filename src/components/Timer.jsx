@@ -1,6 +1,9 @@
 import React from 'react';
 import Typography from '@mui/material/Typography';
 import { makeStyles } from "@mui/styles";
+import {useDispatch, useSelector} from "react-redux";
+import Helper from "../core/Helper.jsx";
+import {incrementTime} from "../store/gameSlice.jsx";
 
 const useStyles = makeStyles((theme) => ({
     timer: {
@@ -10,14 +13,13 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Timer() {
+    const dispatch = useDispatch();
+    const time = useSelector(state => state.game.time);
     const classes = useStyles();
-    const [time, setTime] = React.useState(0);
 
     React.useEffect(() => {
         let interval = setInterval(() => {
-            setTime(prevState => {
-                return prevState + 1;
-            })
+            dispatch(incrementTime());
         }, 1000);
 
         return () => {
@@ -25,18 +27,9 @@ export default function Timer() {
         }
     }, []);
 
-    const formatTime = (time) => {
-        const getSeconds = `0${(time % 60)}`.slice(-2)
-        const minutes = `${Math.floor(time / 60)}`
-        const getMinutes = `0${minutes % 60}`.slice(-2)
-        const getHours = `0${Math.floor(time / 3600)}`.slice(-2)
-
-        return `${getHours} : ${getMinutes} : ${getSeconds}`
-    }
-
     return (
         <Typography variant="h4" gutterBottom component="div" className={classes.timer} color="primary">
-            Время: {formatTime(time)}
+            Время: {Helper.formatTime(time)}
         </Typography>
     );
 }

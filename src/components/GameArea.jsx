@@ -28,7 +28,7 @@ import MoodIcon from "@mui/icons-material/Mood";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import ParkIcon from "@mui/icons-material/Park";
 import SchoolIcon from "@mui/icons-material/School";
-import {increment} from "../store/gameSlice.jsx";
+import {incrementTry} from "../store/gameSlice.jsx";
 import { makeStyles } from "@mui/styles";
 
 const useStyles = makeStyles((theme) => ({
@@ -93,7 +93,7 @@ export default function GameArea() {
                     }, 600);
             }
 
-            dispatch(increment())
+            dispatch(incrementTry())
         }
 
         let arrClose = items.filter(it => it.delete === false);
