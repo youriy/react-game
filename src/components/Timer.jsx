@@ -36,7 +36,7 @@ export default function Timer() {
 
     return (
         <Typography variant="h4" gutterBottom component="div" className={classes.timer} color="primary">
-            {formatTime(time)}
+            Время: {formatTime(time)}
         </Typography>
     );
 }

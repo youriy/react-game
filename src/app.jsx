@@ -1,12 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Game from './components/Game.jsx'
+import {store} from "./store/store.jsx";
+import { Provider } from 'react-redux'
 import './sass/main.scss'
 
 ReactDOM.render(
-    <React.StrictMode>
+    <Provider store={store}>
       <Game/>
-    </React.StrictMode>,
+    </Provider>,
     document.getElementById('root')
 );
 
