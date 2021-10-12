@@ -67,6 +67,16 @@ const icons = {
     SchoolIcon: <SchoolIcon sx={{ fontSize: 60 }}/>,
 };
 
+const as = () => {
+    return async dispatch => {
+        setTimeout(() => {
+            dispatch(setOpen(5));
+            console.log("test");
+        }, 2000);
+    }
+}
+
+
 export default function GameArea() {
     const classes = useStyles();
     const dispatch = useDispatch();
@@ -74,6 +84,7 @@ export default function GameArea() {
     let clickable = true;
 
     const handleClickOpenItem = (id) => () => {
+        dispatch(as());
         if (clickable) {
             dispatch(setOpen(id))
         }
