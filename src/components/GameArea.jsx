@@ -28,7 +28,7 @@ import MoodIcon from "@mui/icons-material/Mood";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import ParkIcon from "@mui/icons-material/Park";
 import SchoolIcon from "@mui/icons-material/School";
-import {incrementTry} from "../store/gameSlice.jsx";
+import {incrementTry, setClickable, setGaming, setWin} from "../store/gameSlice.jsx";
 import { makeStyles } from "@mui/styles";
 import Zoom from '@mui/material/Zoom';
 
@@ -67,25 +67,14 @@ const icons = {
     SchoolIcon: <SchoolIcon sx={{ fontSize: 60 }}/>,
 };
 
-const as = () => {
-    return async dispatch => {
-        setTimeout(() => {
-            dispatch(setOpen(5));
-            console.log("test");
-        }, 2000);
-    }
-}
-
-
 export default function GameArea() {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const items = useSelector(state => state.items);
-    let clickable = true;
+    const items = useSelector(state => state.items.items);
+    const game = useSelector(state => state.game);
 
     const handleClickOpenItem = (id) => () => {
-        dispatch(as());
-        if (clickable) {
+        if (game.clickable) {
             dispatch(setOpen(id))
         }
     }
@@ -94,8 +83,7 @@ export default function GameArea() {
         let arr = items.filter(it => it.open === true);
 
         if (arr.length === 2) {
-            // eslint-disable-next-line react-hooks/exhaustive-deps
-            clickable = false;
+            dispatch(setClickable(false));
             let index1 = items.indexOf(arr[0]);
             let index2 = items.indexOf(arr[1]);
 
@@ -103,13 +91,13 @@ export default function GameArea() {
                 setTimeout(() => {
                     dispatch(setDelete(index1));
                     dispatch(setDelete(index2));
-                    clickable = true;
+                    dispatch(setClickable(true));
                     }, 600);
             } else {
                 setTimeout(() => {
                     dispatch(setClose(index1));
                     dispatch(setClose(index2));
-                    clickable = true;
+                    dispatch(setClickable(true));
                     }, 600);
             }
 
@@ -119,7 +107,8 @@ export default function GameArea() {
         let arrClose = items.filter(it => it.delete === false);
 
         if (arrClose.length === 0) {
-            console.log("Победа")
+            dispatch(setGaming(false));
+            dispatch(setWin(true));
         }
 
     }, [items])

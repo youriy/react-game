@@ -42,20 +42,25 @@ const nps = [
 
 const itemsSlice = createSlice({
     name: "items",
-    initialState: Helper.shuffle(nps),
+    initialState: {
+        items: Helper.shuffle([...nps])
+    },
     reducers: {
         setOpen(state, action) {
-            state[action.payload].open = true;
+            state.items[action.payload].open = true;
         },
         setClose(state, action) {
-            state[action.payload].open = false;
+            state.items[action.payload].open = false;
         },
         setDelete(state, action) {
-            state[action.payload].delete = true;
-            state[action.payload].open = false;
+            state.items[action.payload].delete = true;
+            state.items[action.payload].open = false;
+        },
+        resetItems(state) {
+            state.items = Helper.shuffle([...nps]);
         }
     }
 });
 
 export default itemsSlice.reducer
-export const {setOpen, setClose, setDelete} = itemsSlice.actions
+export const {setOpen, setClose, setDelete, resetItems} = itemsSlice.actions

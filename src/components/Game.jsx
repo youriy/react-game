@@ -5,6 +5,8 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import { makeStyles } from "@mui/styles";
 import GameArea from "./GameArea.jsx";
+import {useSelector} from "react-redux";
+import StartGame from "./StartGame.jsx";
 
 const useStyles = makeStyles((theme) => ({
     box: {
@@ -15,6 +17,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Game() {
     const classes = useStyles();
+    const game = useSelector(state => state.game);
 
     return (
         <div>
@@ -22,7 +25,13 @@ export default function Game() {
             <CssBaseline />
             <Container fixed>
                 <Box className={classes.box}>
-                    <GameArea/>
+                    {
+                        game.gaming ? (
+                            <GameArea/>
+                        ) : (
+                            <StartGame/>
+                        )
+                    }
                 </Box>
             </Container>
         </div>
