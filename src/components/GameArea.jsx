@@ -31,6 +31,8 @@ import SchoolIcon from "@mui/icons-material/School";
 import {incrementTry, setClickable, setGaming, setWin} from "../store/gameSlice.jsx";
 import { makeStyles } from "@mui/styles";
 import Zoom from '@mui/material/Zoom';
+import moment from "moment";
+import Helper from "../core/Helper.jsx";
 
 const useStyles = makeStyles((theme) => ({
     status: {
@@ -79,6 +81,18 @@ export default function GameArea() {
         }
     }
 
+    const saveWin = () => {
+        const save = {
+            date: moment().format('YYYY-MM-DD HH:mm:ss'),
+            try: game.count,
+            time: Helper.formatTime(game.time)
+        }
+
+        let res = JSON.parse(localStorage.getItem("results")) || [];
+        res.push(save)
+        localStorage.setItem("results", JSON.stringify(res));
+    };
+
     React.useEffect(() => {
         let arr = items.filter(it => it.open === true);
 
@@ -106,7 +120,8 @@ export default function GameArea() {
 
         let arrClose = items.filter(it => it.delete === false);
 
-        if (arrClose.length === 0) {
+        if (arrClose.length === 34) {
+            saveWin();
             dispatch(setGaming(false));
             dispatch(setWin(true));
         }

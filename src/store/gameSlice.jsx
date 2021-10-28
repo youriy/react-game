@@ -13,9 +13,6 @@ const gameSlice = createSlice({
         incrementTry(state) {
             state.count++;
         },
-        setNull(state) {
-            state.count = 0;
-        },
         incrementTime(state) {
             state.time++;
         },
@@ -27,9 +24,13 @@ const gameSlice = createSlice({
         },
         setClickable(state, action) {
             state.clickable = action.payload;
+        },
+        resetGame(state) {
+            state.count = 0;
+            state.time = 0;
         }
     }
 });
 
 export default gameSlice.reducer
-export const {incrementTry, setNull, incrementTime, setGaming, setWin, setClickable} = gameSlice.actions
+export const {incrementTry, incrementTime, setGaming, setWin, setClickable, resetGame} = gameSlice.actions
