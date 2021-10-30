@@ -120,7 +120,7 @@ export default function GameArea() {
 
         let arrClose = items.filter(it => it.delete === false);
 
-        if (arrClose.length === 34) {
+        if (arrClose.length === 0) {
             saveWin();
             dispatch(setGaming(false));
             dispatch(setWin(true));
