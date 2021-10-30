@@ -108,7 +108,7 @@ export default function Grid() {
             <DataGrid
                 rowHeight={35}
                 getRowId={(row => row.date)}
-                rows={JSON.parse(localStorage.getItem("results"))}
+                rows={JSON.parse(localStorage.getItem("results")) || []}
                 columns={columns}
                 pageSize={10}
                 rowsPerPageOptions={[10]}
