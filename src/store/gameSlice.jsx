@@ -7,7 +7,8 @@ const gameSlice = createSlice({
         time: 0,
         gaming: false,
         win: false,
-        clickable: true
+        clickable: true,
+        language: localStorage.getItem("language") || "russian"
     },
     reducers: {
         incrementTry(state) {
@@ -28,9 +29,13 @@ const gameSlice = createSlice({
         resetGame(state) {
             state.count = 0;
             state.time = 0;
+        },
+        setLanguage(state, action) {
+            state.language = action.payload;
+            localStorage.setItem("language", action.payload);
         }
     }
 });
 
 export default gameSlice.reducer
-export const {incrementTry, incrementTime, setGaming, setWin, setClickable, resetGame} = gameSlice.actions
+export const {incrementTry, incrementTime, setGaming, setWin, setClickable, resetGame, setLanguage} = gameSlice.actions

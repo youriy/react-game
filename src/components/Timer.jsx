@@ -4,6 +4,7 @@ import { makeStyles } from "@mui/styles";
 import {useDispatch, useSelector} from "react-redux";
 import Helper from "../core/Helper.jsx";
 import {incrementTime} from "../store/gameSlice.jsx";
+import {languageList} from "../core/Language";
 
 const useStyles = makeStyles((theme) => ({
     timer: {
@@ -14,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Timer() {
     const dispatch = useDispatch();
-    const time = useSelector(state => state.game.time);
+    const {time, language} = useSelector(state => state.game);
     const classes = useStyles();
 
     React.useEffect(() => {
@@ -29,7 +30,7 @@ export default function Timer() {
 
     return (
         <Typography variant="h4" gutterBottom component="div" className={classes.timer} color="primary">
-            Время: {Helper.formatTime(time)}
+            {languageList[language].time}: {Helper.formatTime(time)}
         </Typography>
     );
 }

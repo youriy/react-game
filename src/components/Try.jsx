@@ -2,6 +2,7 @@ import React from 'react';
 import Typography from '@mui/material/Typography';
 import { makeStyles } from "@mui/styles";
 import {useSelector} from "react-redux";
+import {languageList} from "../core/Language";
 
 const useStyles = makeStyles((theme) => ({
     try: {
@@ -12,11 +13,11 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Try() {
     const classes = useStyles();
-    const count = useSelector(state => state.game.count);
+    const {count, language} = useSelector(state => state.game);
 
     return (
         <Typography variant="h4" gutterBottom component="div" className={classes.try} color="primary">
-            Попытки: {count}
+            {languageList[language].try}: {count}
         </Typography>
     );
 }

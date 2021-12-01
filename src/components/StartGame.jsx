@@ -8,6 +8,7 @@ import {resetItems} from "../store/itemsSlice.jsx";
 import Helper from "../core/Helper.jsx"
 import { makeStyles } from "@mui/styles";
 import Grid from "./Grid.jsx";
+import {languageList} from "../core/Language";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -22,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
 export default function StartGame() {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const {win, count, time} = useSelector(state => state.game);
+    const {win, count, time, language} = useSelector(state => state.game);
 
     const handleChangeGaming = () => {
         if (win) {
@@ -41,18 +42,18 @@ export default function StartGame() {
                     win &&
                     <Stack spacing={1}>
                         <Typography className={classes.text} variant="h1" component="div" gutterBottom color="primary">
-                            Победа!
+                            {languageList[language].win}
                         </Typography>
                         <Typography className={classes.text} variant="h5" component="div" gutterBottom color="primary">
-                            Ваше время: {Helper.formatTime(time)}
+                            {languageList[language].userTime}: {Helper.formatTime(time)}
                         </Typography>
                         <Typography className={classes.text} variant="h5" component="div" gutterBottom color="primary">
-                            Количество попыток: {count}
+                            {languageList[language].userTry}: {count}
                         </Typography>
                     </Stack>
                 }
                 <Button variant="contained" size="large" onClick={handleChangeGaming}>
-                    Начать игру
+                    {languageList[language].start}
                 </Button>
                 <Grid/>
             </Stack>

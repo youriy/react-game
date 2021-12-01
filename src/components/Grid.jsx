@@ -3,6 +3,8 @@ import { GridOverlay, DataGrid } from '@mui/x-data-grid';
 import { createTheme } from '@mui/material/styles';
 import { createStyles, makeStyles } from '@mui/styles';
 import {Paper} from "@mui/material";
+import {useSelector} from "react-redux";
+import {languageList} from "../core/Language";
 
 const defaultTheme = createTheme();
 const useStyles = makeStyles(
@@ -36,6 +38,7 @@ const useStyles = makeStyles(
 
 function CustomNoRowsOverlay() {
     const classes = useStyles();
+    const {language} = useSelector(state => state.game);
 
     return (
         <GridOverlay className={classes.root}>
@@ -78,31 +81,32 @@ function CustomNoRowsOverlay() {
                     </g>
                 </g>
             </svg>
-            <div className={classes.label}>Для просмотра статистики завершите хотя бы одну игру</div>
+            <div className={classes.label}>{languageList[language].info}</div>
         </GridOverlay>
     );
 }
 
-const columns = [
-    {
-        field: 'date',
-        headerName: 'Дата',
-        width: 250,
-    },
-    {
-        field: 'try',
-        headerName: 'Попытки',
-        width: 150,
-    },
-    {
-        field: 'time',
-        headerName: 'Время',
-        width: 150,
-    },
-];
-
 export default function Grid() {
-    console.log(JSON.parse(localStorage.getItem("results")))
+    const {language} = useSelector(state => state.game);
+
+    const columns = [
+        {
+            field: 'date',
+            headerName: languageList[language].date,
+            width: 250,
+        },
+        {
+            field: 'try',
+            headerName: languageList[language].try,
+            width: 150,
+        },
+        {
+            field: 'time',
+            headerName: languageList[language].time,
+            width: 150,
+        },
+    ];
+
     return (
         <Paper style={{ height: 476, width: "100%" }}>
             <DataGrid
