@@ -7,6 +7,8 @@ import { makeStyles } from "@mui/styles";
 import GameArea from "./GameArea.jsx";
 import {useSelector} from "react-redux";
 import StartGame from "./StartGame.jsx";
+import { ThemeProvider } from '@mui/material/styles';
+import { themes} from "../core/Themes"
 
 const useStyles = makeStyles((theme) => ({
     box: {
@@ -17,23 +19,25 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Game() {
     const classes = useStyles();
-    const game = useSelector(state => state.game);
+    const {gaming, theme} = useSelector(state => state.game);
 
     return (
         <div>
-            <DenseAppBar/>
-            <CssBaseline />
-            <Container fixed>
-                <Box className={classes.box}>
-                    {
-                        game.gaming ? (
-                            <GameArea/>
-                        ) : (
-                            <StartGame/>
-                        )
-                    }
-                </Box>
-            </Container>
+            <ThemeProvider theme={themes[theme]}>
+                <DenseAppBar/>
+                <CssBaseline />
+                <Container fixed>
+                    <Box className={classes.box}>
+                        {
+                            gaming ? (
+                                <GameArea/>
+                            ) : (
+                                <StartGame/>
+                            )
+                        }
+                    </Box>
+                </Container>
+            </ThemeProvider>
         </div>
     );
 }

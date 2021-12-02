@@ -8,7 +8,8 @@ const gameSlice = createSlice({
         gaming: false,
         win: false,
         clickable: true,
-        language: localStorage.getItem("language") || "russian"
+        language: localStorage.getItem("language") || "russian",
+        theme: localStorage.getItem("theme") || "indigoTheme"
     },
     reducers: {
         incrementTry(state) {
@@ -33,9 +34,13 @@ const gameSlice = createSlice({
         setLanguage(state, action) {
             state.language = action.payload;
             localStorage.setItem("language", action.payload);
+        },
+        setTheme(state, action) {
+            state.theme = action.payload;
+            localStorage.setItem("theme", action.payload);
         }
     }
 });
 
 export default gameSlice.reducer
-export const {incrementTry, incrementTime, setGaming, setWin, setClickable, resetGame, setLanguage} = gameSlice.actions
+export const {incrementTry, incrementTime, setGaming, setWin, setClickable, resetGame, setLanguage, setTheme} = gameSlice.actions
