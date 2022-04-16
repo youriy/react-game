@@ -3,13 +3,12 @@ const path = require("path");
 module.exports = {
     entry: ['babel-polyfill', "./src/app.jsx"],
     output: {
-        path: path.resolve(__dirname, "./public"),
-        publicPath: "/public/",
+        path: __dirname + "/public",
         filename: "bundle.js",
     },
     devServer: {
         historyApiFallback: true,
-        port: 8081,
+        port: 301,
         open: true,
     },
     module: {
