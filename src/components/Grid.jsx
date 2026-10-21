@@ -2,9 +2,10 @@ import React from 'react';
 import {GridOverlay, DataGrid} from '@mui/x-data-grid';
 import {styled} from '@mui/material/styles';
 import {Box, Paper} from "@mui/material";
-import {loadResults} from "../core/storage.js";
+import {loadSortedResults} from "../core/storage.js";
 import useTranslation from "../core/useTranslation.js";
 
+/** Контейнер заглушки «нет данных» с цветами картинки под светлую/тёмную тему. */
 const StyledGridOverlay = styled(GridOverlay)(({theme}) => {
     const light = theme.palette.mode === 'light';
 
@@ -29,7 +30,7 @@ const StyledGridOverlay = styled(GridOverlay)(({theme}) => {
     };
 });
 
-// Заглушка, когда в статистике ещё нет ни одной игры
+/** Заглушка, когда в статистике ещё нет ни одной игры. */
 function CustomNoRowsOverlay() {
     const t = useTranslation();
 
@@ -79,7 +80,10 @@ function CustomNoRowsOverlay() {
     );
 }
 
-// Таблица результатов прошлых игр
+/**
+ * Таблица статистики: дата, попытки, время и очки прошлых игр,
+ * отсортированные по очкам (лучшие сверху), по 10 на страницу.
+ */
 export default function Grid() {
     const t = useTranslation();
 
@@ -87,6 +91,8 @@ export default function Grid() {
         {field: 'date', headerName: t.date, width: 250},
         {field: 'try', headerName: t.try, width: 150},
         {field: 'time', headerName: t.time, width: 150},
+        // у результатов, сохранённых до появления очков, счёта нет
+        {field: 'score', headerName: t.score, width: 150, valueGetter: (params) => params.row.score ?? '—'},
     ];
 
     return (
@@ -94,7 +100,7 @@ export default function Grid() {
             <DataGrid
                 rowHeight={35}
                 getRowId={row => row.date}
-                rows={loadResults()}
+                rows={loadSortedResults()}
                 columns={columns}
                 pageSize={10}
                 rowsPerPageOptions={[10]}

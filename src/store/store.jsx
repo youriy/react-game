@@ -3,6 +3,10 @@ import itemsSlice from "./itemsSlice.jsx";
 import gameSlice from "./gameSlice.jsx";
 import {saveSetting} from "../core/storage.js";
 
+/**
+ * Redux-хранилище приложения.
+ * state.items — колода (itemsSlice.jsx), state.game — партия и настройки (gameSlice.jsx).
+ */
 const rootReducer = combineReducers({
     items: itemsSlice,
     game: gameSlice,

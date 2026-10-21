@@ -1,3 +1,8 @@
+/**
+ * Тексты интерфейса на всех языках: `languageList[язык][ключ]`.
+ * Чтобы добавить язык — добавьте объект со всеми ключами и пункт в languageOptions.
+ * Чтобы добавить текст — добавьте ключ во все языки. В компонентах тексты берутся через useTranslation().
+ */
 export const languageList = {
     russian: {
         win: "Победа!",
@@ -11,7 +16,26 @@ export const languageList = {
         pageTitle: "Игра \"Память\"",
         changeLanguage: "Изменить язык",
         info: "Для просмотра статистики завершите хотя бы одну игру",
-        theme: "Изменить тему"
+        theme: "Изменить тему",
+        score: "Очки",
+        streak: "Серия",
+        bestStreak: "Лучшая серия",
+        pairsPoints: "Очки за пары",
+        timeBonus: "Бонус за время",
+        accuracyBonus: "Бонус за точность",
+        totalScore: "Итоговый счёт",
+        restart: "Заново",
+        giveUp: "Сдаться",
+        pause: "Пауза",
+        resume: "Продолжить",
+        hint: "Подсказка",
+        hintPenalty: "Штраф за подсказку",
+        records: "Рекорды",
+        bestScore: "Лучший счёт",
+        bestTime: "Лучшее время",
+        newRecord: "🏆 Новый рекорд!",
+        giveUpConfirm: "Сдаться? Результат этой партии не сохранится.",
+        cancel: "Отмена"
     },
     english: {
         win: "Victory!",
@@ -25,7 +49,26 @@ export const languageList = {
         pageTitle: "Memory game",
         changeLanguage: "Change the language",
         info: "Finish at least one game to view statistics",
-        theme: "Change theme"
+        theme: "Change theme",
+        score: "Score",
+        streak: "Streak",
+        bestStreak: "Best streak",
+        pairsPoints: "Pair points",
+        timeBonus: "Time bonus",
+        accuracyBonus: "Accuracy bonus",
+        totalScore: "Total score",
+        restart: "Restart",
+        giveUp: "Give up",
+        pause: "Pause",
+        resume: "Resume",
+        hint: "Hint",
+        hintPenalty: "Hint penalty",
+        records: "Records",
+        bestScore: "Best score",
+        bestTime: "Best time",
+        newRecord: "🏆 New record!",
+        giveUpConfirm: "Give up? This game's result won't be saved.",
+        cancel: "Cancel"
     },
     chine: {
         win: "勝利!",
@@ -39,7 +82,26 @@ export const languageList = {
         pageTitle: "記憶遊戲",
         changeLanguage: "更改語言",
         info: "完成至少一場比賽以查看統計數據",
-        theme: "改變主題"
+        theme: "改變主題",
+        score: "分數",
+        streak: "連擊",
+        bestStreak: "最佳連擊",
+        pairsPoints: "配對得分",
+        timeBonus: "時間獎勵",
+        accuracyBonus: "準確獎勵",
+        totalScore: "總分",
+        restart: "重新開始",
+        giveUp: "放棄",
+        pause: "暫停",
+        resume: "繼續",
+        hint: "提示",
+        hintPenalty: "提示扣分",
+        records: "紀錄",
+        bestScore: "最高分",
+        bestTime: "最佳時間",
+        newRecord: "🏆 新紀錄!",
+        giveUpConfirm: "放棄？本局結果將不會保存。",
+        cancel: "取消"
     },
     arabe: {
         win: "فوز!",
@@ -53,7 +115,26 @@ export const languageList = {
         pageTitle: "لعبة الذاكرة",
         changeLanguage: "تغيير اللغة",
         info: "قم بإنهاء لعبة واحدة على الأقل لعرض الإحصائيات",
-        theme: "غير الخلفية"
+        theme: "غير الخلفية",
+        score: "النقاط",
+        streak: "سلسلة",
+        bestStreak: "أفضل سلسلة",
+        pairsPoints: "نقاط الأزواج",
+        timeBonus: "مكافأة الوقت",
+        accuracyBonus: "مكافأة الدقة",
+        totalScore: "النتيجة النهائية",
+        restart: "إعادة",
+        giveUp: "استسلام",
+        pause: "إيقاف مؤقت",
+        resume: "استمرار",
+        hint: "تلميح",
+        hintPenalty: "خصم التلميح",
+        records: "الأرقام القياسية",
+        bestScore: "أفضل نتيجة",
+        bestTime: "أفضل وقت",
+        newRecord: "🏆 رقم قياسي جديد!",
+        giveUpConfirm: "هل تريد الاستسلام؟ لن يتم حفظ نتيجة هذه اللعبة.",
+        cancel: "إلغاء"
     },
     german: {
         win: "Sieg!",
@@ -67,7 +148,26 @@ export const languageList = {
         pageTitle: "Memory-Spiel",
         changeLanguage: "Ändere die Sprache",
         info: "Beende mindestens ein Spiel, um Statistiken anzuzeigen",
-        theme: "Thema ändern"
+        theme: "Thema ändern",
+        score: "Punkte",
+        streak: "Serie",
+        bestStreak: "Beste Serie",
+        pairsPoints: "Punkte für Paare",
+        timeBonus: "Zeitbonus",
+        accuracyBonus: "Genauigkeitsbonus",
+        totalScore: "Gesamtpunktzahl",
+        restart: "Neu starten",
+        giveUp: "Aufgeben",
+        pause: "Pause",
+        resume: "Fortsetzen",
+        hint: "Tipp",
+        hintPenalty: "Tipp-Abzug",
+        records: "Rekorde",
+        bestScore: "Bester Punktestand",
+        bestTime: "Beste Zeit",
+        newRecord: "🏆 Neuer Rekord!",
+        giveUpConfirm: "Aufgeben? Das Ergebnis dieses Spiels wird nicht gespeichert.",
+        cancel: "Abbrechen"
     },
     spanish: {
         win: "Victoria!",
@@ -81,11 +181,33 @@ export const languageList = {
         pageTitle: "Juego de memoria",
         changeLanguage: "Cambia el idioma",
         info: "Termina al menos un juego para ver las estadísticas",
-        theme: "Cambiar de tema"
+        theme: "Cambiar de tema",
+        score: "Puntos",
+        streak: "Racha",
+        bestStreak: "Mejor racha",
+        pairsPoints: "Puntos por parejas",
+        timeBonus: "Bonus de tiempo",
+        accuracyBonus: "Bonus de precisión",
+        totalScore: "Puntuación total",
+        restart: "Reiniciar",
+        giveUp: "Rendirse",
+        pause: "Pausa",
+        resume: "Continuar",
+        hint: "Pista",
+        hintPenalty: "Penalización por pista",
+        records: "Récords",
+        bestScore: "Mejor puntuación",
+        bestTime: "Mejor tiempo",
+        newRecord: "🏆 ¡Nuevo récord!",
+        giveUpConfirm: "¿Rendirse? El resultado de esta partida no se guardará.",
+        cancel: "Cancelar"
     }
 }
 
-// Языки в меню выбора (в том порядке, в каком они показываются)
+/**
+ * Языки в меню выбора, в порядке показа.
+ * @type {Array<{code: string, label: string}>} code — ключ в languageList, label — название в меню.
+ */
 export const languageOptions = [
     {code: "russian", label: "Русский"},
     {code: "english", label: "English"},

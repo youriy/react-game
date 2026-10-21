@@ -21,7 +21,16 @@ const menuOrigin = {
     horizontal: 'right',
 };
 
-// Кнопка в шапке, открывающая меню выбора
+/**
+ * Кнопка-иконка в шапке, открывающая меню выбора.
+ * @param {Object} props
+ * @param {string} props.id - id меню (для aria-controls)
+ * @param {string} props.title - всплывающая подсказка
+ * @param {string} props.ariaLabel - подпись для экранных дикторов
+ * @param {React.ReactNode} props.icon - иконка кнопки
+ * @param {Array<{value: string, label: React.ReactNode}>} props.options - пункты меню
+ * @param {function(string): void} props.onSelect - вызывается со значением выбранного пункта
+ */
 function MenuButton({id, title, ariaLabel, icon, options, onSelect}) {
     const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -73,6 +82,7 @@ const themeMenuOptions = themeList.map(({name, color, label}) => ({
     label: <Avatar sx={{bgcolor: color}}>{label}</Avatar>,
 }));
 
+/** Шапка: название игры, выбор языка и выбор темы. */
 export default function DenseAppBar() {
     const dispatch = useDispatch();
     const t = useTranslation();

@@ -9,8 +9,12 @@ import GameArea from "./GameArea.jsx";
 import StartGame from "./StartGame.jsx";
 import {themes} from "../core/themes.js";
 
+/**
+ * Корневой компонент: тема оформления, шапка и либо игровое поле, либо стартовый экран.
+ * Игровое поле получает key={round}, чтобы при новой партии создаваться заново.
+ */
 export default function Game() {
-    const {gaming, theme} = useSelector(state => state.game);
+    const {gaming, theme, round} = useSelector(state => state.game);
 
     return (
         <ThemeProvider theme={themes[theme] || themes.indigoTheme}>
@@ -18,7 +22,8 @@ export default function Game() {
             <DenseAppBar/>
             <Container fixed>
                 <Box sx={{display: "flex", justifyContent: "center"}}>
-                    {gaming ? <GameArea/> : <StartGame/>}
+                    {/* key={round}: при новой партии поле создаётся заново (показ карточек, таймер) */}
+                    {gaming ? <GameArea key={round}/> : <StartGame/>}
                 </Box>
             </Container>
         </ThemeProvider>

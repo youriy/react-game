@@ -1,7 +1,10 @@
 import React from 'react';
 import Typography from '@mui/material/Typography';
 
-// Крупная надпись в строке статуса (время, попытки)
+/**
+ * Крупная надпись в строке статуса (время, попытки, очки).
+ * @param {{children: React.ReactNode}} props
+ */
 export default function StatusText({children}) {
     return (
         <Typography

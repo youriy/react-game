@@ -5,6 +5,11 @@ import {incrementTime} from "../store/gameSlice.jsx";
 import useTranslation from "../core/useTranslation.js";
 import StatusText from "./StatusText.jsx";
 
+/**
+ * Время партии. Пока `running`, каждую секунду увеличивает state.game.time.
+ * @param {Object} props
+ * @param {boolean} [props.running=true] - идёт ли отсчёт (false во время показа карточек и на паузе)
+ */
 export default function Timer({running = true}) {
     const dispatch = useDispatch();
     const time = useSelector(state => state.game.time);

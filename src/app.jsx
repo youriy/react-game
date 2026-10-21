@@ -1,3 +1,6 @@
+/**
+ * Точка входа приложения: подключает Redux-хранилище и монтирует игру в #root.
+ */
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Game from './components/Game.jsx'

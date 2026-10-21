@@ -17,8 +17,13 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import ParkIcon from "@mui/icons-material/Park";
 import SchoolIcon from "@mui/icons-material/School";
 
-// Иконки для карточек. Каждая иконка попадает в колоду дважды.
-// Чтобы добавить новую пару карточек, достаточно добавить иконку сюда.
+/**
+ * Иконки для карточек: имя → компонент иконки MUI.
+ * Каждая иконка попадает в колоду дважды (одна пара).
+ * Чтобы добавить новую пару карточек, достаточно импортировать иконку и добавить её сюда;
+ * число пар в подсчёте очков (PAIRS_COUNT) пересчитается автоматически.
+ * @type {Object<string, React.ComponentType>}
+ */
 export const cardIcons = {
     AcUnitIcon,
     AdbIcon,
