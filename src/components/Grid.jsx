@@ -1,47 +1,40 @@
-import * as React from 'react';
-import { GridOverlay, DataGrid } from '@mui/x-data-grid';
-import { createTheme } from '@mui/material/styles';
-import { createStyles, makeStyles } from '@mui/styles';
-import {Paper} from "@mui/material";
-import {useSelector} from "react-redux";
-import {languageList} from "../core/Language";
+import React from 'react';
+import {GridOverlay, DataGrid} from '@mui/x-data-grid';
+import {styled} from '@mui/material/styles';
+import {Box, Paper} from "@mui/material";
+import {loadResults} from "../core/storage.js";
+import useTranslation from "../core/useTranslation.js";
 
-const defaultTheme = createTheme();
-const useStyles = makeStyles(
-    (theme) =>
-        createStyles({
-            root: {
-                flexDirection: 'column',
-                '& .ant-empty-img-1': {
-                    fill: theme.palette.mode === 'light' ? '#aeb8c2' : '#262626',
-                },
-                '& .ant-empty-img-2': {
-                    fill: theme.palette.mode === 'light' ? '#f5f5f7' : '#595959',
-                },
-                '& .ant-empty-img-3': {
-                    fill: theme.palette.mode === 'light' ? '#dce0e6' : '#434343',
-                },
-                '& .ant-empty-img-4': {
-                    fill: theme.palette.mode === 'light' ? '#fff' : '#1c1c1c',
-                },
-                '& .ant-empty-img-5': {
-                    fillOpacity: theme.palette.mode === 'light' ? '0.8' : '0.08',
-                    fill: theme.palette.mode === 'light' ? '#f5f5f5' : '#fff',
-                },
-            },
-            label: {
-                marginTop: theme.spacing(1),
-            },
-        }),
-    { defaultTheme },
-);
+const StyledGridOverlay = styled(GridOverlay)(({theme}) => {
+    const light = theme.palette.mode === 'light';
 
+    return {
+        flexDirection: 'column',
+        '& .ant-empty-img-1': {
+            fill: light ? '#aeb8c2' : '#262626',
+        },
+        '& .ant-empty-img-2': {
+            fill: light ? '#f5f5f7' : '#595959',
+        },
+        '& .ant-empty-img-3': {
+            fill: light ? '#dce0e6' : '#434343',
+        },
+        '& .ant-empty-img-4': {
+            fill: light ? '#fff' : '#1c1c1c',
+        },
+        '& .ant-empty-img-5': {
+            fillOpacity: light ? '0.8' : '0.08',
+            fill: light ? '#f5f5f5' : '#fff',
+        },
+    };
+});
+
+// Заглушка, когда в статистике ещё нет ни одной игры
 function CustomNoRowsOverlay() {
-    const classes = useStyles();
-    const {language} = useSelector(state => state.game);
+    const t = useTranslation();
 
     return (
-        <GridOverlay className={classes.root}>
+        <StyledGridOverlay>
             <svg
                 width="120"
                 height="100"
@@ -81,43 +74,32 @@ function CustomNoRowsOverlay() {
                     </g>
                 </g>
             </svg>
-            <div className={classes.label}>{languageList[language].info}</div>
-        </GridOverlay>
+            <Box sx={{mt: 1}}>{t.info}</Box>
+        </StyledGridOverlay>
     );
 }
 
+// Таблица результатов прошлых игр
 export default function Grid() {
-    const {language} = useSelector(state => state.game);
+    const t = useTranslation();
 
     const columns = [
-        {
-            field: 'date',
-            headerName: languageList[language].date,
-            width: 250,
-        },
-        {
-            field: 'try',
-            headerName: languageList[language].try,
-            width: 150,
-        },
-        {
-            field: 'time',
-            headerName: languageList[language].time,
-            width: 150,
-        },
+        {field: 'date', headerName: t.date, width: 250},
+        {field: 'try', headerName: t.try, width: 150},
+        {field: 'time', headerName: t.time, width: 150},
     ];
 
     return (
-        <Paper style={{ height: 476, width: "100%" }}>
+        <Paper style={{height: 476, width: "100%"}}>
             <DataGrid
                 rowHeight={35}
-                getRowId={(row => row.date)}
-                rows={JSON.parse(localStorage.getItem("results")) || []}
+                getRowId={row => row.date}
+                rows={loadResults()}
                 columns={columns}
                 pageSize={10}
                 rowsPerPageOptions={[10]}
                 disableSelectionOnClick
-                disableColumnMenu={true}
+                disableColumnMenu
                 autoHeight={false}
                 components={{
                     NoRowsOverlay: CustomNoRowsOverlay,

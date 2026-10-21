@@ -1,36 +1,30 @@
 import React from 'react';
-import Typography from '@mui/material/Typography';
-import { makeStyles } from "@mui/styles";
 import {useDispatch, useSelector} from "react-redux";
 import Helper from "../core/Helper.jsx";
 import {incrementTime} from "../store/gameSlice.jsx";
-import {languageList} from "../core/Language";
+import useTranslation from "../core/useTranslation.js";
+import StatusText from "./StatusText.jsx";
 
-const useStyles = makeStyles((theme) => ({
-    timer: {
-        textAlign: "center",
-        marginTop: "20px!important",
-    },
-}));
-
-export default function Timer() {
+export default function Timer({running = true}) {
     const dispatch = useDispatch();
-    const {time, language} = useSelector(state => state.game);
-    const classes = useStyles();
+    const time = useSelector(state => state.game.time);
+    const t = useTranslation();
 
     React.useEffect(() => {
-        let interval = setInterval(() => {
+        if (!running) {
+            return;
+        }
+
+        const interval = setInterval(() => {
             dispatch(incrementTime());
         }, 1000);
 
-        return () => {
-            clearInterval(interval);
-        }
-    }, []);
+        return () => clearInterval(interval);
+    }, [running]);
 
     return (
-        <Typography variant="h4" gutterBottom component="div" className={classes.timer} color="primary">
-            {languageList[language].time}: {Helper.formatTime(time)}
-        </Typography>
+        <StatusText>
+            {t.time}: {Helper.formatTime(time)}
+        </StatusText>
     );
 }

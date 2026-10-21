@@ -84,3 +84,13 @@ export const languageList = {
         theme: "Cambiar de tema"
     }
 }
+
+// Языки в меню выбора (в том порядке, в каком они показываются)
+export const languageOptions = [
+    {code: "russian", label: "Русский"},
+    {code: "english", label: "English"},
+    {code: "chine", label: "中國人"},
+    {code: "arabe", label: "árabe"},
+    {code: "german", label: "German"},
+    {code: "spanish", label: "Español"},
+];

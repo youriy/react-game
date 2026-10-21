@@ -1,31 +1,29 @@
 import React from 'react';
 import {useDispatch, useSelector} from "react-redux";
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Stack from "@mui/material/Stack";
 import Typography from '@mui/material/Typography';
 import {resetGame, setGaming, setWin} from "../store/gameSlice.jsx";
 import {resetItems} from "../store/itemsSlice.jsx";
-import Helper from "../core/Helper.jsx"
-import { makeStyles } from "@mui/styles";
+import Helper from "../core/Helper.jsx";
+import useTranslation from "../core/useTranslation.js";
 import Grid from "./Grid.jsx";
-import {languageList} from "../core/Language";
 
-const useStyles = makeStyles((theme) => ({
-    root: {
-        marginTop:60,
-        minWidth: 600
-    },
-    text: {
-        textAlign: "center"
-    }
-}));
+function WinText({variant, children}) {
+    return (
+        <Typography sx={{textAlign: "center"}} variant={variant} component="div" gutterBottom color="primary">
+            {children}
+        </Typography>
+    );
+}
 
 export default function StartGame() {
-    const classes = useStyles();
     const dispatch = useDispatch();
-    const {win, count, time, language} = useSelector(state => state.game);
+    const {win, count, time} = useSelector(state => state.game);
+    const t = useTranslation();
 
-    const handleChangeGaming = () => {
+    const handleStart = () => {
         if (win) {
             dispatch(resetItems());
             dispatch(resetGame());
@@ -36,27 +34,21 @@ export default function StartGame() {
     };
 
     return (
-        <div className={classes.root}>
+        <Box sx={{marginTop: "60px", minWidth: 600}}>
             <Stack spacing={6}>
                 {
                     win &&
                     <Stack spacing={1}>
-                        <Typography className={classes.text} variant="h1" component="div" gutterBottom color="primary">
-                            {languageList[language].win}
-                        </Typography>
-                        <Typography className={classes.text} variant="h5" component="div" gutterBottom color="primary">
-                            {languageList[language].userTime}: {Helper.formatTime(time)}
-                        </Typography>
-                        <Typography className={classes.text} variant="h5" component="div" gutterBottom color="primary">
-                            {languageList[language].userTry}: {count}
-                        </Typography>
+                        <WinText variant="h1">{t.win}</WinText>
+                        <WinText variant="h5">{t.userTime}: {Helper.formatTime(time)}</WinText>
+                        <WinText variant="h5">{t.userTry}: {count}</WinText>
                     </Stack>
                 }
-                <Button variant="contained" size="large" onClick={handleChangeGaming}>
-                    {languageList[language].start}
+                <Button variant="contained" size="large" onClick={handleStart}>
+                    {t.start}
                 </Button>
                 <Grid/>
             </Stack>
-        </div>
+        </Box>
     );
 }

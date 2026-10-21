@@ -1,15 +1,16 @@
 import {createSlice} from "@reduxjs/toolkit";
+import {loadSetting} from "../core/storage.js";
 
 const gameSlice = createSlice({
-    name: "try",
+    name: "game",
     initialState: {
         count: 0,
         time: 0,
         gaming: false,
         win: false,
         clickable: true,
-        language: localStorage.getItem("language") || "russian",
-        theme: localStorage.getItem("theme") || "indigoTheme"
+        language: loadSetting("language", "russian"),
+        theme: loadSetting("theme", "indigoTheme")
     },
     reducers: {
         incrementTry(state) {
@@ -33,11 +34,9 @@ const gameSlice = createSlice({
         },
         setLanguage(state, action) {
             state.language = action.payload;
-            localStorage.setItem("language", action.payload);
         },
         setTheme(state, action) {
             state.theme = action.payload;
-            localStorage.setItem("theme", action.payload);
         }
     }
 });
