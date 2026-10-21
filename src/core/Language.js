@@ -35,7 +35,8 @@ export const languageList = {
         bestTime: "Лучшее время",
         newRecord: "🏆 Новый рекорд!",
         giveUpConfirm: "Сдаться? Результат этой партии не сохранится.",
-        cancel: "Отмена"
+        cancel: "Отмена",
+        restartConfirm: "Начать заново? Прогресс этой партии будет потерян."
     },
     english: {
         win: "Victory!",
@@ -68,7 +69,8 @@ export const languageList = {
         bestTime: "Best time",
         newRecord: "🏆 New record!",
         giveUpConfirm: "Give up? This game's result won't be saved.",
-        cancel: "Cancel"
+        cancel: "Cancel",
+        restartConfirm: "Restart? This game's progress will be lost."
     },
     chine: {
         win: "勝利!",
@@ -101,7 +103,8 @@ export const languageList = {
         bestTime: "最佳時間",
         newRecord: "🏆 新紀錄!",
         giveUpConfirm: "放棄？本局結果將不會保存。",
-        cancel: "取消"
+        cancel: "取消",
+        restartConfirm: "重新開始？本局進度將會遺失。"
     },
     arabe: {
         win: "فوز!",
@@ -134,7 +137,8 @@ export const languageList = {
         bestTime: "أفضل وقت",
         newRecord: "🏆 رقم قياسي جديد!",
         giveUpConfirm: "هل تريد الاستسلام؟ لن يتم حفظ نتيجة هذه اللعبة.",
-        cancel: "إلغاء"
+        cancel: "إلغاء",
+        restartConfirm: "إعادة البدء؟ سيتم فقدان تقدم هذه اللعبة."
     },
     german: {
         win: "Sieg!",
@@ -167,7 +171,8 @@ export const languageList = {
         bestTime: "Beste Zeit",
         newRecord: "🏆 Neuer Rekord!",
         giveUpConfirm: "Aufgeben? Das Ergebnis dieses Spiels wird nicht gespeichert.",
-        cancel: "Abbrechen"
+        cancel: "Abbrechen",
+        restartConfirm: "Neu starten? Der Fortschritt dieses Spiels geht verloren."
     },
     spanish: {
         win: "Victoria!",
@@ -200,7 +205,8 @@ export const languageList = {
         bestTime: "Mejor tiempo",
         newRecord: "🏆 ¡Nuevo récord!",
         giveUpConfirm: "¿Rendirse? El resultado de esta partida no se guardará.",
-        cancel: "Cancelar"
+        cancel: "Cancelar",
+        restartConfirm: "¿Reiniciar? Se perderá el progreso de esta partida."
     }
 }
 

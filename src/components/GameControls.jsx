@@ -18,7 +18,8 @@ import {HINT_PENALTY} from "../core/score.js";
 
 /**
  * Кнопки управления партией: «Пауза», «Подсказка», «Заново», «Сдаться».
- * Также: пауза по Esc, автопауза при скрытии вкладки, окно подтверждения перед «Сдаться».
+ * Также: пауза по Esc, автопауза при скрытии вкладки, окно подтверждения перед «Заново» и «Сдаться»
+ * (пока окно открыто, партия на паузе).
  *
  * @param {Object} props
  * @param {boolean} props.canPause - можно ли ставить паузу (false, пока карточки показываются)
@@ -29,12 +30,56 @@ export default function GameControls({canPause, canHint, onHint}) {
     const dispatch = useDispatch();
     const paused = useSelector(state => state.game.paused);
     const t = useTranslation();
-    const [confirmOpen, setConfirmOpen] = React.useState(false);
+    // Окно подтверждения: open — показано ли, action — для какой кнопки,
+    // wasPaused — стояла ли игра на паузе до открытия окна.
+    // action не сбрасывается при закрытии, чтобы текст не пропадал во время анимации.
+    const [confirm, setConfirm] = React.useState({open: false, action: "giveUp", wasPaused: false});
 
+    /**
+     * Открывает окно подтверждения и ставит партию на паузу (таймер стоит, поле скрыто).
+     * @param {'restart'|'giveUp'} action - для какой кнопки окно
+     */
+    const askConfirm = (action) => {
+        setConfirm({open: true, action, wasPaused: paused});
+
+        if (!paused) {
+            dispatch(setPaused(true));
+        }
+    };
+
+    /** «Отмена»: закрывает окно и возвращает паузу в состояние до его открытия. */
+    const cancelConfirm = () => {
+        setConfirm(prev => ({...prev, open: false}));
+
+        if (!confirm.wasPaused) {
+            dispatch(setPaused(false));
+        }
+    };
+
+    /** Новая партия: свежая колода и обнулённые счётчики. */
     const handleRestart = () => {
         dispatch(resetItems());
         dispatch(startNewRound());
     };
+
+    /** Что показывать и делать в окне подтверждения для каждой кнопки. */
+    const confirmActions = {
+        restart: {
+            title: t.restartConfirm,
+            label: t.restart,
+            icon: <ReplayIcon/>,
+            color: "primary",
+            onConfirm: handleRestart,
+        },
+        giveUp: {
+            title: t.giveUpConfirm,
+            label: t.giveUp,
+            icon: <FlagIcon/>,
+            color: "error",
+            onConfirm: () => dispatch(giveUp()),
+        },
+    };
+    const current = confirmActions[confirm.action];
 
     // Esc ставит/снимает паузу
     React.useEffect(() => {
@@ -88,21 +133,30 @@ export default function GameControls({canPause, canHint, onHint}) {
                     </Button>
                 </span>
             </Tooltip>
-            <Button variant="outlined" startIcon={<ReplayIcon/>} onClick={handleRestart}>
+            <Button variant="outlined" startIcon={<ReplayIcon/>} onClick={() => askConfirm("restart")}>
                 {t.restart}
             </Button>
-            <Button variant="outlined" color="error" startIcon={<FlagIcon/>} onClick={() => setConfirmOpen(true)}>
+            <Button variant="outlined" color="error" startIcon={<FlagIcon/>} onClick={() => askConfirm("giveUp")}>
                 {t.giveUp}
             </Button>
             {/* Подтверждение, чтобы не потерять партию случайным кликом */}
-            <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
-                <DialogTitle>{t.giveUpConfirm}</DialogTitle>
+            <Dialog open={confirm.open} onClose={cancelConfirm}>
+                <DialogTitle>{current.title}</DialogTitle>
                 <DialogActions>
-                    <Button onClick={() => setConfirmOpen(false)} autoFocus>
+                    <Button onClick={cancelConfirm} autoFocus>
                         {t.cancel}
                     </Button>
-                    <Button color="error" variant="contained" startIcon={<FlagIcon/>} onClick={() => dispatch(giveUp())}>
-                        {t.giveUp}
+                    <Button
+                        color={current.color}
+                        variant="contained"
+                        startIcon={current.icon}
+                        onClick={() => {
+                            // «Заново» и «Сдаться» сами снимают паузу
+                            setConfirm(prev => ({...prev, open: false}));
+                            current.onConfirm();
+                        }}
+                    >
+                        {current.label}
                     </Button>
                 </DialogActions>
             </Dialog>
