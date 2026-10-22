@@ -2,11 +2,11 @@
  * Уровни сложности.
  *
  * Чтобы добавить уровень — добавьте элемент сюда и подписи (ключ `labelKey`) во все языки
- * в core/languages.js. Число пар не может быть больше числа иконок в core/icons.js.
+ * в dictionary/languages.js. Число пар не может быть больше числа иконок в core/icons.js.
  *
  * @typedef {Object} Level
  * @property {string} key - идентификатор уровня (хранится в настройках и в результатах)
- * @property {string} labelKey - ключ подписи в languageList (core/languages.js)
+ * @property {string} labelKey - ключ подписи в languageList (dictionary/languages.js)
  * @property {number} pairs - сколько пар карточек на поле
  * @property {number} columns - сколько карточек в ряду
  * @property {number} mobileColumns - сколько карточек в ряду на телефоне (узкий экран, см. useIsMobile)

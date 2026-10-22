@@ -24,7 +24,7 @@ import SoundOffIcon from '@mui/icons-material/VolumeOff';
 import {setHowToPlay, setLanguage, setTheme, toggleDarkMode, toggleSound, toggleVibration} from "../store/gameSlice.js";
 import {canVibrate} from "../core/vibration.js";
 import {canPlaySound} from "../core/sound.js";
-import {languageOptions} from "../core/languages.js";
+import {languageOptions} from "../dictionary/languages.js";
 import {themeList} from "../core/themes.js";
 import useTranslation from "../hooks/useTranslation.js";
 
@@ -106,7 +106,7 @@ const appBarSx = {
 
 /**
  * Шапка: название игры, кнопка «?» (окно «Как играть»), выбор языка, цвета, светлой/тёмной темы, звука и вибрации.
- * Выбранный здесь язык сохраняется и важнее языка браузера (см. detectBrowserLanguage в core/languages.js).
+ * Выбранный здесь язык сохраняется и важнее языка браузера (см. detectBrowserLanguage в dictionary/languages.js).
  * Кнопка звука видна, если браузер умеет Web Audio (см. canPlaySound) — то есть почти всегда.
  * Кнопка вибрации видна только там, где вибрация возможна (телефон/планшет с Vibration API, см. canVibrate).
  */

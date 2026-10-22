@@ -2,7 +2,7 @@ import {createSlice} from "@reduxjs/toolkit";
 import {loadSetting} from "../core/storage.js";
 import {getMatchPoints} from "../core/score.js";
 import {DEFAULT_LEVEL} from "../core/levels.js";
-import {detectBrowserLanguage} from "../core/languages.js";
+import {detectBrowserLanguage} from "../dictionary/languages.js";
 
 /**
  * Срез Redux с состоянием партии и настройками интерфейса.
@@ -21,7 +21,7 @@ import {detectBrowserLanguage} from "../core/languages.js";
  * @property {string[]} newUnlocks - какие уровни открыла последняя победа (ключи уровней)
  * @property {boolean} win - последняя партия завершилась победой (показывается экран победы)
  * @property {boolean} clickable - можно ли сейчас открывать карточки (false, пока решается пара)
- * @property {string} language - ключ языка из core/languages.js (сохраняется в localStorage, когда игрок выбирает его
+ * @property {string} language - ключ языка из dictionary/languages.js (сохраняется в localStorage, когда игрок выбирает его
  *   в шапке; до этого берётся язык браузера, если он есть в игре, иначе русский)
  * @property {string} theme - имя темы из core/themes.js (сохраняется в localStorage)
  * @property {boolean} darkMode - тёмная тема (сохраняется в localStorage)

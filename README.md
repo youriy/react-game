@@ -145,8 +145,9 @@ src/
 │   ├── themes.js            цвета оформления и создание темы (светлая/тёмная)
 │   ├── vibration.js         вибрация телефона: узоры и безопасный вызов
 │   ├── sound.js             звуки игры: синтез через Web Audio API, без файлов
-│   ├── languages.js         тексты на всех языках
 │   └── utils.js             перемешивание, форматирование времени и даты
+├── dictionary/
+│   └── languages.js         тексты на всех языках, язык браузера
 ├── hooks/                   все хуки — каждый в своём файле
 │   ├── useMemoryGame.js     логика партии
 │   ├── useTranslation.js    тексты на выбранном языке
@@ -311,7 +312,7 @@ src/
   подставляется в `{penalty}` из `HINT_PENALTY` (`core/score.js`). Если окно открыли во время партии, оно ставит
   паузу и при закрытии снимает её (если паузы до этого не было). Чтобы снова увидеть окно как новый игрок —
   удалить `howToPlaySeen` из `localStorage`.
-- **Язык браузера** — `detectBrowserLanguage()` в `core/languages.js` (соответствие кодов — `browserLanguageCodes`).
+- **Язык браузера** — `detectBrowserLanguage()` в `dictionary/languages.js` (соответствие кодов — `browserLanguageCodes`).
   Вызывается только как значение по умолчанию в `gameSlice.js`: `loadSetting("language", detectBrowserLanguage() || "russian")`.
   Сам по себе язык браузера не сохраняется — в `localStorage` попадает только язык, выбранный в шапке, поэтому он важнее.
 
@@ -334,7 +335,7 @@ src/
 - **Новый уровень** — элемент в `levelList` в `src/core/levels.js` и подпись (`labelKey`) во все языки в `languages.js`.
   Там же пороги звёзд (`starScores`) и условие открытия (`unlockedBy` — ключ уровня, победа на котором открывает новый).
 - **Новая тема** — элемент в `themeList` в `src/core/themes.js`.
-- **Новый язык** — объект в `languageList`, пункт в `languageOptions` и код браузера в `browserLanguageCodes` в `src/core/languages.js`.
+- **Новый язык** — объект в `languageList`, пункт в `languageOptions` и код браузера в `browserLanguageCodes` в `src/dictionary/languages.js`.
 - **Новый хук** — отдельным файлом в `src/hooks/`.
 - **Новый звук** — элемент в `SOUNDS` в `src/core/sound.js` и вызов `playSound('имя')` там, где нужно (проверив `state.game.sound`).
 - **Новый текст интерфейса** — ключ во все языки в `languages.js`, в компоненте — `const t = useTranslation(); t.ключ` (`hooks/useTranslation.js`).
