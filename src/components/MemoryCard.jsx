@@ -6,6 +6,7 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Zoom from '@mui/material/Zoom';
 import {cardIcons} from "../core/icons.js";
+import PointsPopup from "./PointsPopup.jsx";
 
 /** Длительность переворота карточки, мс. */
 const FLIP_TIME = 400;
@@ -101,7 +102,8 @@ function CardFace({sx, Icon, iconSize, compact, hidden}) {
  *
  * Состоит из двух сторон (рубашка и лицо с иконкой) в 3D-контейнере.
  * При открытии переворачивается справа налево (rotateY до -180°), при закрытии — обратно.
- * Угаданная карточка исчезает через Zoom, оставаясь открытой.
+ * Угаданная карточка исчезает через Zoom, оставаясь открытой. Очки за пару (`popup`) всплывают
+ * поверх карточки и остаются видны, пока она исчезает: надпись лежит рядом с Zoom, а не внутри.
  *
  * Обёрнута в React.memo: перерисовывается, только когда меняются её пропсы. Поэтому обработчик
  * клика — общий `onOpen(index)` со стабильной ссылкой, а не новая стрелочная функция на каждую карточку.
@@ -112,29 +114,33 @@ function CardFace({sx, Icon, iconSize, compact, hidden}) {
  * @param {boolean} props.revealed - показывать лицевую сторону
  * @param {boolean} props.disabled - отключить клики и эффект наведения
  * @param {'match'|'mismatch'|null} props.highlight - подсветка пары
+ * @param {{points: number, streak: number}|null} [props.popup] - всплывающие очки над карточкой
  * @param {string} props.iconSize - CSS-размер иконки (на телефоне зависит от ширины экрана)
  * @param {boolean} props.compact - уменьшенные поля карточки (телефон)
  * @param {function(number): void} props.onOpen - открыть карточку по индексу
  */
-function MemoryCard({item, index, revealed, disabled, highlight, iconSize, compact, onOpen}) {
+function MemoryCard({item, index, revealed, disabled, highlight, popup, iconSize, compact, onOpen}) {
     const Icon = cardIcons[item.icon];
     // Угаданная пара исчезает открытой, не переворачиваясь обратно
     const flipped = revealed || item.delete;
 
     return (
-        <Zoom in={!item.delete}>
-            <Box
-                sx={sceneSx}
-                onClick={() => onOpen(index)}
-                style={disabled ? {pointerEvents: "none"} : undefined}
-            >
-                <Box sx={{...flipperSx, transform: flipped ? "rotateY(-180deg)" : "rotateY(0deg)"}}>
-                    {/* Рубашка: иконка скрыта, нужна только чтобы задать размер карточки */}
-                    <CardFace sx={faceSx} Icon={Icon} iconSize={iconSize} compact={compact} hidden/>
-                    <CardFace sx={{...frontFaceSx, ...getHighlightSx(highlight)}} Icon={Icon} iconSize={iconSize} compact={compact}/>
+        <Box sx={{position: "relative"}}>
+            <Zoom in={!item.delete}>
+                <Box
+                    sx={sceneSx}
+                    onClick={() => onOpen(index)}
+                    style={disabled ? {pointerEvents: "none"} : undefined}
+                >
+                    <Box sx={{...flipperSx, transform: flipped ? "rotateY(-180deg)" : "rotateY(0deg)"}}>
+                        {/* Рубашка: иконка скрыта, нужна только чтобы задать размер карточки */}
+                        <CardFace sx={faceSx} Icon={Icon} iconSize={iconSize} compact={compact} hidden/>
+                        <CardFace sx={{...frontFaceSx, ...getHighlightSx(highlight)}} Icon={Icon} iconSize={iconSize} compact={compact}/>
+                    </Box>
                 </Box>
-            </Box>
-        </Zoom>
+            </Zoom>
+            {popup && <PointsPopup points={popup.points} streak={popup.streak}/>}
+        </Box>
     );
 }
 

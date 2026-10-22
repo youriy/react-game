@@ -1,10 +1,11 @@
 import React from 'react';
-import {shallowEqual, useDispatch, useSelector} from "react-redux";
+import {shallowEqual, useDispatch, useSelector, useStore} from "react-redux";
 import {closePair, deletePair, setOpen} from "../store/itemsSlice.js";
 import {incrementTry, registerPair, setClickable, takeHint} from "../store/gameSlice.js";
 import {finishGame} from "../store/thunks.js";
 import {getOpenIndexes, isBoardCleared, isPairMatch} from "../core/rules.js";
 import {getLevel} from "../core/levels.js";
+import {getMatchPoints} from "../core/score.js";
 import {vibrate, VIBRATION} from "../core/vibration.js";
 
 /** Сколько открытая пара остаётся на экране перед удалением/закрытием, мс. */
@@ -22,6 +23,7 @@ export const HINT_TIME = 1000;
  *    пара подсвечивается (`getHighlight`) и через PAIR_DELAY мс удаляется или закрывается.
  *    На телефоне угаданная и неугаданная пара отличаются вибрацией (core/vibration.js),
  *    если она не выключена кнопкой в шапке (state.game.vibration).
+ *    Над последней открытой карточкой угаданной пары всплывают очки за неё (`getPopup`, PointsPopup.jsx).
  * 3. Раз за партию можно взять подсказку (`showHint`): все карточки открываются на HINT_TIME мс.
  * 4. Когда убраны все карточки — вибрация победы, thunk `finishGame` сохраняет результат и показывает победу.
  *
@@ -40,17 +42,22 @@ export const HINT_TIME = 1000;
  *   canHint: boolean,
  *   showHint: function(): void,
  *   openItem: function(number): void,
- *   getHighlight: function(number): ('match'|'mismatch'|null)
+ *   getHighlight: function(number): ('match'|'mismatch'|null),
+ *   getPopup: function(number): ({points: number, streak: number}|null)
  * }}
  * - items — колода; level — настройки уровня партии; preview — идёт показ в начале;
  *   hinting — идёт подсказка; paused — пауза;
  * - canHint / showHint — доступна ли подсказка и как её взять;
  * - openItem(index) — открыть карточку (игнорируется, если сейчас нельзя); ссылка на функцию
  *   меняется, только когда меняется возможность кликать, — карточки (React.memo) не перерисовываются зря;
- * - getHighlight(index) — как подсветить карточку: угадана, не угадана или никак.
+ * - getHighlight(index) — как подсветить карточку: угадана, не угадана или никак;
+ * - getPopup(index) — очки, которые всплывают над карточкой (только у последней открытой карточки
+ *   угаданной пары), иначе null. Объект один и тот же, пока пара на экране, — React.memo карточки не сбивается.
  */
 export default function useMemoryGame() {
     const dispatch = useDispatch();
+    // Для чтения серии сразу после registerPair, без подписки (серия меняется только вместе с колодой)
+    const store = useStore();
     const items = useSelector(state => state.items.items);
     const {clickable, paused, hintUsed, roundLevel, vibration} = useSelector(state => ({
         clickable: state.game.clickable,
@@ -62,13 +69,16 @@ export default function useMemoryGame() {
     const level = getLevel(roundLevel);
 
     const [preview, setPreview] = React.useState(true);
-    // Подсветка последней открытой пары: {indexes: [i, j], match: true/false}
+    // Подсветка последней открытой пары: {indexes: [i, j], match: true/false,
+    //   popupIndex — над какой карточкой всплывают очки, popup — {points, streak} (только у угаданной)}
     const [pairResult, setPairResult] = React.useState(null);
     // Отложенное закрытие/удаление пары; сбрасывается, если партию прервали
     const pairTimeout = React.useRef(null);
     // Подсказка: все карточки открыты на HINT_TIME
     const [hinting, setHinting] = React.useState(false);
     const hintTimeout = React.useRef(null);
+    // Последняя карточка, которую открыл игрок: над ней всплывают очки за пару
+    const lastOpened = React.useRef(null);
 
     // Показ карточек в начале партии; при размонтировании — очистка всех таймеров
     React.useEffect(() => {
@@ -86,6 +96,7 @@ export default function useMemoryGame() {
     /** Открывает карточку, если сейчас разрешено. @param {number} index */
     const openItem = React.useCallback((index) => {
         if (canOpen) {
+            lastOpened.current = index;
             dispatch(setOpen(index));
         }
     }, [canOpen, dispatch]);
@@ -117,7 +128,15 @@ export default function useMemoryGame() {
         dispatch(setClickable(false));
         dispatch(incrementTry());
         dispatch(registerPair(isMatch));
-        setPairResult({indexes: openIndexes, match: isMatch});
+
+        // dispatch синхронный: серия в сторе уже учитывает эту пару
+        const {streak} = store.getState().game;
+        setPairResult({
+            indexes: openIndexes,
+            match: isMatch,
+            popupIndex: openIndexes.includes(lastOpened.current) ? lastOpened.current : openIndexes[1],
+            popup: isMatch ? {points: getMatchPoints(streak), streak} : null,
+        });
         if (vibration) {
             vibrate(isMatch ? VIBRATION.match : VIBRATION.mismatch);
         }
@@ -156,5 +175,13 @@ export default function useMemoryGame() {
         return pairResult.match ? "match" : "mismatch";
     };
 
-    return {items, level, preview, hinting, paused, canHint, showHint, openItem, getHighlight};
+    /**
+     * Очки над карточкой.
+     * @param {number} index - позиция карточки
+     * @returns {{points: number, streak: number}|null}
+     */
+    const getPopup = (index) =>
+        pairResult && pairResult.popup && pairResult.popupIndex === index ? pairResult.popup : null;
+
+    return {items, level, preview, hinting, paused, canHint, showHint, openItem, getHighlight, getPopup};
 }

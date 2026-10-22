@@ -66,7 +66,7 @@ const getMobileIconSize = (columns) =>
  * мельче промежутки и иконки). Логика партии — в хуке useMemoryGame.
  */
 export default function GameArea() {
-    const {items, level, preview, hinting, paused, canHint, showHint, openItem, getHighlight} = useMemoryGame();
+    const {items, level, preview, hinting, paused, canHint, showHint, openItem, getHighlight, getPopup} = useMemoryGame();
     const isMobile = useIsMobile();
     const columns = isMobile ? level.mobileColumns : level.columns;
     const iconSize = isMobile ? getMobileIconSize(columns) : `${ICON_SIZE}px`;
@@ -106,6 +106,7 @@ export default function GameArea() {
                                 revealed={item.open || preview || hinting}
                                 disabled={preview || hinting || paused}
                                 highlight={getHighlight(index)}
+                                popup={getPopup(index)}
                                 onOpen={openItem}
                             />
                         )
