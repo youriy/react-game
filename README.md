@@ -96,6 +96,13 @@ npm run build      # сборка в public/bundle.js
 ## Структура проекта
 
 ```
+public/
+├── index.html               страница игры (viewport, значки вкладки)
+├── favicon.svg              значок вкладки: две карточки, одна со звездой
+├── favicon-32.png           он же в PNG — для браузеров без поддержки SVG-значков
+├── apple-touch-icon.png     иконка для главного экрана iPhone (180×180)
+└── bundle.js                собранная игра (npm run build)
+
 src/
 ├── app.jsx                  точка входа: Redux Provider + <Game/>
 ├── components/
