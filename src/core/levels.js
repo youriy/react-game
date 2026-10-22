@@ -24,18 +24,18 @@ export const levelList = [
         scoreMultiplier: 0.5, starScores: [2500, 3000], unlockedBy: null,
     },
     {
-        key: "medium", labelKey: "medium", pairs: 18, columns: 6, mobileColumns: 6, previewTime: 3000,
-        scoreMultiplier: 1, starScores: [5000, 8000], unlockedBy: null,
+        key: "medium", labelKey: "medium", pairs: 15, columns: 5, mobileColumns: 5, previewTime: 3000,
+        scoreMultiplier: 1, starScores: [5000, 7500], unlockedBy: null,
     },
     {
-        key: "hard", labelKey: "hard", pairs: 24, columns: 8, mobileColumns: 6, previewTime: 4000,
-        scoreMultiplier: 1.5, starScores: [7000, 11000], unlockedBy: "medium",
+        key: "hard", labelKey: "hard", pairs: 21, columns: 7, mobileColumns: 6, previewTime: 3500,
+        scoreMultiplier: 1.5, starScores: [7500, 10500], unlockedBy: "medium",
     },
 ];
 
 /**
  * Уровень по умолчанию. Им же считаются старые результаты, сохранённые до появления уровней:
- * тогда поле было 6×6, как сейчас на среднем уровне.
+ * тогда поле было 6×6 (18 пар); сейчас средний уровень — 5×6 (15 пар).
  */
 export const DEFAULT_LEVEL = "medium";
 

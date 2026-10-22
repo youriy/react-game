@@ -46,7 +46,7 @@ export const getMatchPoints = (streak) => MATCH_POINTS + STREAK_BONUS * (streak 
  *            multiplier: number, total: number}}
  * @example
  * calculateScore({score: 550, time: 120, count: 30, level: "medium"})
- * // → {pairsPoints: 550, timeBonus: 1800, accuracyBonus: 1400, hintPenalty: 0, multiplier: 1, total: 3750}
+ * // → {pairsPoints: 550, timeBonus: 1800, accuracyBonus: 1250, hintPenalty: 0, multiplier: 1, total: 3600}
  */
 export const calculateScore = ({score, time, count, hintUsed = false, level}) => {
     const {pairs, scoreMultiplier} = getLevel(level);

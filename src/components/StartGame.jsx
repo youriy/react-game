@@ -37,7 +37,7 @@ function WinText({variant, children}) {
  * Размер поля уровня для подписи, «колонки×ряды».
  * @param {import("../core/levels.js").Level} level
  * @param {boolean} isMobile - узкий экран: колонок mobileColumns
- * @returns {string} например, "8×6"
+ * @returns {string} например, "7×6"
  */
 const getFieldSize = (level, isMobile) => {
     const columns = isMobile ? level.mobileColumns : level.columns;
@@ -46,7 +46,7 @@ const getFieldSize = (level, isMobile) => {
 };
 
 /**
- * Переключатель уровня сложности: «Лёгкий 4×4», «Средний 6×6», «Сложный 8×6».
+ * Переключатель уровня сложности: «Лёгкий 4×4», «Средний 5×6», «Сложный 7×6» (на телефоне 6×7).
  * На кнопке — лучшие звёзды уровня; закрытый уровень недоступен, под переключателем написано,
  * как его открыть. На телефоне кнопки стоят столбиком во всю ширину.
  * Выбранный уровень сохраняется в state.game.level (и в localStorage).
