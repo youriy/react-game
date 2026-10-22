@@ -7,22 +7,25 @@ import {ThemeProvider} from '@mui/material/styles';
 import AppHeader from './AppHeader.jsx';
 import GameArea from "./GameArea.jsx";
 import StartGame from "./StartGame.jsx";
-import {themes} from "../core/themes.js";
+import {createAppTheme} from "../core/themes.js";
 
 /**
- * Корневой компонент: тема оформления, шапка и либо игровое поле, либо стартовый экран.
+ * Корневой компонент: тема оформления (цвет + светлый/тёмный режим), шапка и либо игровое поле, либо стартовый экран.
  * Игровое поле получает key={round}, чтобы при новой партии создаваться заново.
  */
 export default function Game() {
     // Только нужные поля: иначе приложение перерисовывалось бы целиком на каждый тик таймера
-    const {gaming, theme, round} = useSelector(state => ({
+    const {gaming, theme, darkMode, round} = useSelector(state => ({
         gaming: state.game.gaming,
         theme: state.game.theme,
+        darkMode: state.game.darkMode,
         round: state.game.round,
     }), shallowEqual);
+    // Тема пересоздаётся только при смене цвета или режима
+    const muiTheme = React.useMemo(() => createAppTheme(theme, darkMode), [theme, darkMode]);
 
     return (
-        <ThemeProvider theme={themes[theme] || themes.indigoTheme}>
+        <ThemeProvider theme={muiTheme}>
             <CssBaseline/>
             <AppHeader/>
             <Container fixed>

@@ -43,7 +43,9 @@ export const languageList = {
         hard: "Сложный",
         stars: "Звёзды",
         unlockAfter: "откроется после победы на уровне",
-        levelUnlocked: "🔓 Открыт новый уровень"
+        levelUnlocked: "🔓 Открыт новый уровень",
+        darkMode: "Тёмная тема",
+        lightMode: "Светлая тема"
     },
     english: {
         win: "Victory!",
@@ -84,7 +86,9 @@ export const languageList = {
         hard: "Hard",
         stars: "Stars",
         unlockAfter: "unlocks after a win on",
-        levelUnlocked: "🔓 New level unlocked"
+        levelUnlocked: "🔓 New level unlocked",
+        darkMode: "Dark theme",
+        lightMode: "Light theme"
     },
     chine: {
         win: "勝利!",
@@ -125,7 +129,9 @@ export const languageList = {
         hard: "困難",
         stars: "星級",
         unlockAfter: "在以下難度獲勝後解鎖",
-        levelUnlocked: "🔓 新難度已解鎖"
+        levelUnlocked: "🔓 新難度已解鎖",
+        darkMode: "深色主題",
+        lightMode: "淺色主題"
     },
     arabe: {
         win: "فوز!",
@@ -166,7 +172,9 @@ export const languageList = {
         hard: "صعب",
         stars: "النجوم",
         unlockAfter: "يُفتح بعد الفوز في مستوى",
-        levelUnlocked: "🔓 تم فتح مستوى جديد"
+        levelUnlocked: "🔓 تم فتح مستوى جديد",
+        darkMode: "الوضع الداكن",
+        lightMode: "الوضع الفاتح"
     },
     german: {
         win: "Sieg!",
@@ -207,7 +215,9 @@ export const languageList = {
         hard: "Schwer",
         stars: "Sterne",
         unlockAfter: "wird nach einem Sieg freigeschaltet auf",
-        levelUnlocked: "🔓 Neues Level freigeschaltet"
+        levelUnlocked: "🔓 Neues Level freigeschaltet",
+        darkMode: "Dunkles Design",
+        lightMode: "Helles Design"
     },
     spanish: {
         win: "Victoria!",
@@ -248,7 +258,9 @@ export const languageList = {
         hard: "Difícil",
         stars: "Estrellas",
         unlockAfter: "se desbloquea al ganar en",
-        levelUnlocked: "🔓 Nuevo nivel desbloqueado"
+        levelUnlocked: "🔓 Nuevo nivel desbloqueado",
+        darkMode: "Tema oscuro",
+        lightMode: "Tema claro"
     }
 }
 

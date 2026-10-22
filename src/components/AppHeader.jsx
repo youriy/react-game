@@ -1,5 +1,5 @@
 import React from 'react';
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import AppBar from '@mui/material/AppBar';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
@@ -11,7 +11,10 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import LanguageIcon from '@mui/icons-material/Language';
 import PaletteIcon from '@mui/icons-material/Palette';
-import {setLanguage, setTheme} from "../store/gameSlice.js";
+// Brightness4 — «луна» (включить тёмную тему), Brightness7 — «солнце» (включить светлую)
+import DarkModeIcon from '@mui/icons-material/Brightness4';
+import LightModeIcon from '@mui/icons-material/Brightness7';
+import {setLanguage, setTheme, toggleDarkMode} from "../store/gameSlice.js";
 import {languageOptions} from "../core/languages.js";
 import {themeList} from "../core/themes.js";
 import useTranslation from "../hooks/useTranslation.js";
@@ -82,14 +85,25 @@ const themeMenuOptions = themeList.map(({name, color, label}) => ({
     label: <Avatar sx={{bgcolor: color}}>{label}</Avatar>,
 }));
 
-/** Шапка: название игры, выбор языка и выбор темы. */
+/**
+ * Цвет шапки задаём явно: в тёмном режиме MUI по умолчанию красит AppBar в серый,
+ * а нам нужен основной цвет выбранной темы.
+ */
+const appBarSx = {
+    bgcolor: "primary.main",
+    color: "primary.contrastText",
+    backgroundImage: "none",
+};
+
+/** Шапка: название игры, выбор языка, цвета и светлой/тёмной темы. */
 export default function AppHeader() {
     const dispatch = useDispatch();
+    const darkMode = useSelector(state => state.game.darkMode);
     const t = useTranslation();
 
     return (
         <Box sx={{flexGrow: 1}}>
-            <AppBar position="static">
+            <AppBar position="static" sx={appBarSx}>
                 <Toolbar variant="dense">
                     <Typography variant="h6" color="inherit" component="div">
                         {t.title}
@@ -112,6 +126,17 @@ export default function AppHeader() {
                             options={themeMenuOptions}
                             onSelect={(theme) => dispatch(setTheme(theme))}
                         />
+                        <Tooltip title={darkMode ? t.lightMode : t.darkMode} arrow>
+                            <IconButton
+                                size="large"
+                                edge="end"
+                                aria-label="dark mode toggle"
+                                onClick={() => dispatch(toggleDarkMode())}
+                                color="inherit"
+                            >
+                                {darkMode ? <LightModeIcon/> : <DarkModeIcon/>}
+                            </IconButton>
+                        </Tooltip>
                     </Box>
                 </Toolbar>
             </AppBar>
