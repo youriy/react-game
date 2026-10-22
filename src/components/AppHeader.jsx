@@ -14,7 +14,11 @@ import PaletteIcon from '@mui/icons-material/Palette';
 // Brightness4 — «луна» (включить тёмную тему), Brightness7 — «солнце» (включить светлую)
 import DarkModeIcon from '@mui/icons-material/Brightness4';
 import LightModeIcon from '@mui/icons-material/Brightness7';
-import {setLanguage, setTheme, toggleDarkMode} from "../store/gameSlice.js";
+// Иконка вибрации показывает текущее состояние: телефон с волнами — включена, перечёркнутый — выключена
+import VibrationIcon from '@mui/icons-material/Vibration';
+import VibrationOffIcon from '@mui/icons-material/MobileOff';
+import {setLanguage, setTheme, toggleDarkMode, toggleVibration} from "../store/gameSlice.js";
+import {canVibrate} from "../core/vibration.js";
 import {languageOptions} from "../core/languages.js";
 import {themeList} from "../core/themes.js";
 import useTranslation from "../hooks/useTranslation.js";
@@ -95,10 +99,15 @@ const appBarSx = {
     backgroundImage: "none",
 };
 
-/** Шапка: название игры, выбор языка, цвета и светлой/тёмной темы. */
+/**
+ * Шапка: название игры, выбор языка, цвета, светлой/тёмной темы и вибрации.
+ * Кнопка вибрации видна только там, где вибрация возможна (телефон/планшет с Vibration API, см. canVibrate).
+ */
 export default function AppHeader() {
     const dispatch = useDispatch();
     const darkMode = useSelector(state => state.game.darkMode);
+    const vibration = useSelector(state => state.game.vibration);
+    const showVibration = React.useMemo(canVibrate, []);
     const t = useTranslation();
 
     return (
@@ -137,6 +146,20 @@ export default function AppHeader() {
                                 {darkMode ? <LightModeIcon/> : <DarkModeIcon/>}
                             </IconButton>
                         </Tooltip>
+                        {showVibration &&
+                            <Tooltip title={vibration ? t.vibrationOff : t.vibrationOn} arrow>
+                                <IconButton
+                                    size="large"
+                                    edge="end"
+                                    aria-label="vibration toggle"
+                                    aria-pressed={vibration}
+                                    onClick={() => dispatch(toggleVibration())}
+                                    color="inherit"
+                                >
+                                    {vibration ? <VibrationIcon/> : <VibrationOffIcon/>}
+                                </IconButton>
+                            </Tooltip>
+                        }
                     </Box>
                 </Toolbar>
             </AppBar>

@@ -17,7 +17,18 @@ export const VIBRATION = {
 };
 
 /**
- * Вибрирует, если устройство умеет.
+ * Есть ли смысл предлагать вибрацию: браузер поддерживает Vibration API и у устройства сенсорный экран.
+ * Проверка экрана нужна, потому что Chrome на компьютере тоже «умеет» vibrate, но вибромотора там нет.
+ * @returns {boolean}
+ */
+export const canVibrate = () =>
+    typeof navigator !== "undefined" && typeof navigator.vibrate === "function" &&
+    typeof window !== "undefined" && typeof window.matchMedia === "function" &&
+    window.matchMedia("(any-pointer: coarse)").matches;
+
+/**
+ * Вибрирует, если устройство умеет. Выключена ли вибрация в настройках, проверяет вызывающий код
+ * (useMemoryGame).
  * @param {number|number[]} pattern - один из VIBRATION
  */
 export const vibrate = (pattern) => {

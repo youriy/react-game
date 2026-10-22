@@ -20,7 +20,8 @@ export const HINT_TIME = 1000;
  *    клики заблокированы.
  * 2. Игрок открывает карточки (`openItem`). Когда открыты две, засчитывается попытка,
  *    пара подсвечивается (`getHighlight`) и через PAIR_DELAY мс удаляется или закрывается.
- *    На телефоне угаданная и неугаданная пара отличаются вибрацией (core/vibration.js).
+ *    На телефоне угаданная и неугаданная пара отличаются вибрацией (core/vibration.js),
+ *    если она не выключена кнопкой в шапке (state.game.vibration).
  * 3. Раз за партию можно взять подсказку (`showHint`): все карточки открываются на HINT_TIME мс.
  * 4. Когда убраны все карточки — вибрация победы, thunk `finishGame` сохраняет результат и показывает победу.
  *
@@ -51,11 +52,12 @@ export const HINT_TIME = 1000;
 export default function useMemoryGame() {
     const dispatch = useDispatch();
     const items = useSelector(state => state.items.items);
-    const {clickable, paused, hintUsed, roundLevel} = useSelector(state => ({
+    const {clickable, paused, hintUsed, roundLevel, vibration} = useSelector(state => ({
         clickable: state.game.clickable,
         paused: state.game.paused,
         hintUsed: state.game.hintUsed,
         roundLevel: state.game.roundLevel,
+        vibration: state.game.vibration,
     }), shallowEqual);
     const level = getLevel(roundLevel);
 
@@ -116,7 +118,9 @@ export default function useMemoryGame() {
         dispatch(incrementTry());
         dispatch(registerPair(isMatch));
         setPairResult({indexes: openIndexes, match: isMatch});
-        vibrate(isMatch ? VIBRATION.match : VIBRATION.mismatch);
+        if (vibration) {
+            vibrate(isMatch ? VIBRATION.match : VIBRATION.mismatch);
+        }
 
         pairTimeout.current = setTimeout(() => {
             // Неугаданная пара гаснет и переворачивается обратно, угаданная исчезает, оставаясь зелёной
@@ -132,7 +136,9 @@ export default function useMemoryGame() {
     // Все пары убраны — победа
     React.useEffect(() => {
         if (isBoardCleared(items)) {
-            vibrate(VIBRATION.win);
+            if (vibration) {
+                vibrate(VIBRATION.win);
+            }
             dispatch(finishGame());
         }
     }, [items, dispatch]);

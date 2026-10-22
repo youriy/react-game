@@ -45,7 +45,9 @@ export const languageList = {
         unlockAfter: "откроется после победы на уровне",
         levelUnlocked: "🔓 Открыт новый уровень",
         darkMode: "Тёмная тема",
-        lightMode: "Светлая тема"
+        lightMode: "Светлая тема",
+        vibrationOff: "Выключить вибрацию",
+        vibrationOn: "Включить вибрацию"
     },
     english: {
         win: "Victory!",
@@ -88,7 +90,9 @@ export const languageList = {
         unlockAfter: "unlocks after a win on",
         levelUnlocked: "🔓 New level unlocked",
         darkMode: "Dark theme",
-        lightMode: "Light theme"
+        lightMode: "Light theme",
+        vibrationOff: "Turn off vibration",
+        vibrationOn: "Turn on vibration"
     },
     chine: {
         win: "勝利!",
@@ -131,7 +135,9 @@ export const languageList = {
         unlockAfter: "在以下難度獲勝後解鎖",
         levelUnlocked: "🔓 新難度已解鎖",
         darkMode: "深色主題",
-        lightMode: "淺色主題"
+        lightMode: "淺色主題",
+        vibrationOff: "關閉震動",
+        vibrationOn: "開啟震動"
     },
     arabe: {
         win: "فوز!",
@@ -174,7 +180,9 @@ export const languageList = {
         unlockAfter: "يُفتح بعد الفوز في مستوى",
         levelUnlocked: "🔓 تم فتح مستوى جديد",
         darkMode: "الوضع الداكن",
-        lightMode: "الوضع الفاتح"
+        lightMode: "الوضع الفاتح",
+        vibrationOff: "إيقاف الاهتزاز",
+        vibrationOn: "تشغيل الاهتزاز"
     },
     german: {
         win: "Sieg!",
@@ -217,7 +225,9 @@ export const languageList = {
         unlockAfter: "wird nach einem Sieg freigeschaltet auf",
         levelUnlocked: "🔓 Neues Level freigeschaltet",
         darkMode: "Dunkles Design",
-        lightMode: "Helles Design"
+        lightMode: "Helles Design",
+        vibrationOff: "Vibration ausschalten",
+        vibrationOn: "Vibration einschalten"
     },
     spanish: {
         win: "Victoria!",
@@ -260,7 +270,9 @@ export const languageList = {
         unlockAfter: "se desbloquea al ganar en",
         levelUnlocked: "🔓 Nuevo nivel desbloqueado",
         darkMode: "Tema oscuro",
-        lightMode: "Tema claro"
+        lightMode: "Tema claro",
+        vibrationOff: "Desactivar vibración",
+        vibrationOn: "Activar vibración"
     }
 }
 

@@ -23,6 +23,7 @@ import {DEFAULT_LEVEL} from "../core/levels.js";
  * @property {string} language - ключ языка из core/languages.js (сохраняется в localStorage)
  * @property {string} theme - имя темы из core/themes.js (сохраняется в localStorage)
  * @property {boolean} darkMode - тёмная тема (сохраняется в localStorage)
+ * @property {boolean} vibration - вибрация на телефоне включена (сохраняется в localStorage)
  * @property {string} level - выбранный уровень сложности из core/levels.js (сохраняется в localStorage)
  * @property {string} roundLevel - уровень текущей/последней партии; фиксируется при старте,
  *   чтобы переключение уровня на стартовом экране не меняло результаты уже сыгранной партии
@@ -48,6 +49,7 @@ const gameSlice = createSlice({
         language: loadSetting("language", "russian"),
         theme: loadSetting("theme", "indigoTheme"),
         darkMode: loadSetting("darkMode", "false") === "true",
+        vibration: loadSetting("vibration", "true") === "true",
         level: loadSetting("level", DEFAULT_LEVEL),
         roundLevel: DEFAULT_LEVEL
     },
@@ -139,6 +141,10 @@ const gameSlice = createSlice({
         toggleDarkMode(state) {
             state.darkMode = !state.darkMode;
         },
+        /** Включает/выключает вибрацию. Сохраняется в localStorage (см. store.js). */
+        toggleVibration(state) {
+            state.vibration = !state.vibration;
+        },
         /** payload: ключ уровня, например 'hard'. Сохраняется в localStorage (см. store.js). */
         setLevel(state, action) {
             state.level = action.payload;
@@ -147,4 +153,4 @@ const gameSlice = createSlice({
 });
 
 export default gameSlice.reducer
-export const {incrementTry, registerPair, incrementTime, setGaming, setWin, setClickable, startNewRound, giveUp, setNewRecords, setNewUnlocks, takeHint, setPaused, setLanguage, setTheme, setLevel, toggleDarkMode} = gameSlice.actions
+export const {incrementTry, registerPair, incrementTime, setGaming, setWin, setClickable, startNewRound, giveUp, setNewRecords, setNewUnlocks, takeHint, setPaused, setLanguage, setTheme, setLevel, toggleDarkMode, toggleVibration} = gameSlice.actions
