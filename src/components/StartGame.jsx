@@ -73,31 +73,34 @@ export default function StartGame() {
     const recordLabels = {score: t.bestScore, time: t.bestTime, streak: t.bestStreak};
 
     return (
-        <Box sx={{marginTop: "60px", minWidth: 600}}>
+        <Box sx={{marginTop: "30px", minWidth: 600}}>
             <Stack spacing={6}>
-                {
-                    win &&
-                    <Stack spacing={1}>
-                        <WinText variant="h1">{t.win}</WinText>
-                        <WinText variant="h5">{t.difficulty}: {t[getLevel(roundLevel).labelKey]}</WinText>
-                        {
-                            newRecords.length > 0 &&
-                            <WinText variant="h4">
-                                {t.newRecord} ({newRecords.map(key => recordLabels[key]).join(", ")})
+                {/* Итоги партии и выбор уровня — в своей группе, с отступом меньше общего (32 px вместо 48) */}
+                <Stack spacing={4}>
+                    {
+                        win &&
+                        <Stack spacing={1}>
+                            <WinText variant="h1">{t.win}</WinText>
+                            <WinText variant="h5">{t.difficulty}: {t[getLevel(roundLevel).labelKey]}</WinText>
+                            {
+                                newRecords.length > 0 &&
+                                <WinText variant="h4">
+                                    {t.newRecord} ({newRecords.map(key => recordLabels[key]).join(", ")})
+                                </WinText>
+                            }
+                            <WinText variant="h5">{t.userTime}: {formatTime(time)}</WinText>
+                            <WinText variant="h5">{t.userTry}: {count}</WinText>
+                            <WinText variant="h5">{t.bestStreak}: {bestStreak}</WinText>
+                            <WinText variant="h6">
+                                {t.pairsPoints}: {result.pairsPoints} · {t.timeBonus}: {result.timeBonus} · {t.accuracyBonus}: {result.accuracyBonus}
+                                {hintUsed && <> · {t.hintPenalty}: −{result.hintPenalty}</>}
+                                {result.multiplier !== 1 && <> · ×{result.multiplier}</>}
                             </WinText>
-                        }
-                        <WinText variant="h5">{t.userTime}: {formatTime(time)}</WinText>
-                        <WinText variant="h5">{t.userTry}: {count}</WinText>
-                        <WinText variant="h5">{t.bestStreak}: {bestStreak}</WinText>
-                        <WinText variant="h6">
-                            {t.pairsPoints}: {result.pairsPoints} · {t.timeBonus}: {result.timeBonus} · {t.accuracyBonus}: {result.accuracyBonus}
-                            {hintUsed && <> · {t.hintPenalty}: −{result.hintPenalty}</>}
-                            {result.multiplier !== 1 && <> · ×{result.multiplier}</>}
-                        </WinText>
-                        <WinText variant="h3">{t.totalScore}: {result.total}</WinText>
-                    </Stack>
-                }
-                <LevelSelect/>
+                            <WinText variant="h3">{t.totalScore}: {result.total}</WinText>
+                        </Stack>
+                    }
+                    <LevelSelect/>
+                </Stack>
                 <Records records={records}/>
                 <Button variant="contained" size="large" onClick={() => dispatch(startNewGame())}>
                     {t.start}

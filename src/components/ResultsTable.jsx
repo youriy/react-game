@@ -81,9 +81,15 @@ function CustomNoRowsOverlay() {
     );
 }
 
+/** Сколько результатов на одной странице таблицы. */
+const RESULTS_PER_PAGE = 5;
+/** Высота таблицы, px: заголовок + RESULTS_PER_PAGE строк по 35 px + панель страниц. */
+const TABLE_HEIGHT = 317;
+
 /**
  * Таблица статистики выбранного уровня: дата, попытки, время и очки прошлых игр,
- * отсортированные по очкам (лучшие сверху), по 10 на страницу.
+ * отсортированные по очкам (лучшие сверху), по RESULTS_PER_PAGE на страницу.
+ * Высота таблицы подобрана так, чтобы страница помещалась без прокрутки внутри.
  */
 export default function ResultsTable() {
     const t = useTranslation();
@@ -98,14 +104,14 @@ export default function ResultsTable() {
     ];
 
     return (
-        <Paper style={{height: 476, width: "100%"}}>
+        <Paper style={{height: TABLE_HEIGHT, width: "100%"}}>
             <DataGrid
                 rowHeight={35}
                 getRowId={row => row.date}
                 rows={loadSortedResults(level)}
                 columns={columns}
-                pageSize={10}
-                rowsPerPageOptions={[10]}
+                pageSize={RESULTS_PER_PAGE}
+                rowsPerPageOptions={[RESULTS_PER_PAGE]}
                 disableSelectionOnClick
                 disableColumnMenu
                 autoHeight={false}
