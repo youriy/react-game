@@ -12,6 +12,7 @@ import {startNewGame} from "../store/thunks.js";
 import {formatTime} from "../core/utils.js";
 import useTranslation from "../hooks/useTranslation.js";
 import useIsMobile from "../hooks/useIsMobile.js";
+import useConfetti from "../hooks/useConfetti.js";
 import {calculateScore, calculateStars} from "../core/score.js";
 import {getRecords} from "../core/storage.js";
 import {DEFAULT_LEVEL, getLevel, levelList} from "../core/levels.js";
@@ -105,16 +106,25 @@ function LevelSelect() {
 }
 
 /**
- * Стартовый экран: результаты последней партии (если она выиграна: звёзды, открытые уровни, рекорды,
+ * Стартовый экран: результаты последней партии (если она выиграна: конфетти, звёзды, открытые уровни, рекорды,
  * разбивка счёта), выбор уровня, рекорды и статистика выбранного уровня, кнопка «Начать игру».
  */
 export default function StartGame() {
     const dispatch = useDispatch();
-    const {win, count, time, score, bestStreak, hintUsed, newRecords, newUnlocks, level, roundLevel} = useSelector(state => state.game);
+    const {win, count, time, score, bestStreak, hintUsed, newRecords, newUnlocks, level, roundLevel, round} = useSelector(state => state.game);
     const t = useTranslation();
     // Результат последней партии считается по её уровню, рекорды — по выбранному
     const result = calculateScore({score, time, count, hintUsed, level: roundLevel});
     const stars = calculateStars(result.total, roundLevel);
+    const fireConfetti = useConfetti();
+
+    // Конфетти при победе: большой залп — за новый рекорд или 3 звезды. Один раз на партию (round),
+    // а не при каждой перерисовке экрана (смена уровня, языка и т. п.)
+    React.useEffect(() => {
+        if (win) {
+            fireConfetti({big: stars === 3 || newRecords.length > 0});
+        }
+    }, [win, round]);
     const records = getRecords(getLevel(level).key);
     const recordLabels = {score: t.bestScore, time: t.bestTime, streak: t.bestStreak};
 
