@@ -20,15 +20,15 @@
 /** @type {Level[]} в порядке показа в переключателе */
 export const levelList = [
     {
-        key: "easy", labelKey: "easy", pairs: 8, columns: 4, mobileColumns: 4, previewTime: 1500,
+        key: "easy", labelKey: "easy", pairs: 8, columns: 4, mobileColumns: 4, previewTime: 2500,
         scoreMultiplier: 0.5, starScores: [2500, 3000], unlockedBy: null,
     },
     {
-        key: "medium", labelKey: "medium", pairs: 18, columns: 6, mobileColumns: 6, previewTime: 2000,
+        key: "medium", labelKey: "medium", pairs: 18, columns: 6, mobileColumns: 6, previewTime: 3000,
         scoreMultiplier: 1, starScores: [5000, 8000], unlockedBy: null,
     },
     {
-        key: "hard", labelKey: "hard", pairs: 24, columns: 8, mobileColumns: 6, previewTime: 3000,
+        key: "hard", labelKey: "hard", pairs: 24, columns: 8, mobileColumns: 6, previewTime: 4000,
         scoreMultiplier: 1.5, starScores: [7000, 11000], unlockedBy: "medium",
     },
 ];

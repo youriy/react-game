@@ -11,7 +11,7 @@ import {vibrate, VIBRATION} from "../core/vibration.js";
 /** Сколько открытая пара остаётся на экране перед удалением/закрытием, мс. */
 const PAIR_DELAY = 800;
 /** Сколько карточки показываются по подсказке, мс. */
-export const HINT_TIME = 1000;
+export const HINT_TIME = 2000;
 
 /**
  * Хук со всей игровой логикой одной партии.
