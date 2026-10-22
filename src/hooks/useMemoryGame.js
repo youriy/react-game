@@ -7,6 +7,7 @@ import {getOpenIndexes, isBoardCleared, isPairMatch} from "../core/rules.js";
 import {getLevel} from "../core/levels.js";
 import {getMatchPoints} from "../core/score.js";
 import {vibrate, VIBRATION} from "../core/vibration.js";
+import {playSound} from "../core/sound.js";
 
 /** Сколько открытая пара остаётся на экране перед удалением/закрытием, мс. */
 const PAIR_DELAY = 800;
@@ -23,9 +24,11 @@ export const HINT_TIME = 2000;
  *    пара подсвечивается (`getHighlight`) и через PAIR_DELAY мс удаляется или закрывается.
  *    На телефоне угаданная и неугаданная пара отличаются вибрацией (core/vibration.js),
  *    если она не выключена кнопкой в шапке (state.game.vibration).
+ *    Звуки (core/sound.js, выключаются кнопкой в шапке — state.game.sound): щелчок при перевороте карточки,
+ *    две ноты вверх за угаданную пару (с каждой парой серии — выше), две ноты вниз за промах.
  *    Над последней открытой карточкой угаданной пары всплывают очки за неё (`getPopup`, PointsPopup.jsx).
- * 3. Раз за партию можно взять подсказку (`showHint`): все карточки открываются на HINT_TIME мс.
- * 4. Когда убраны все карточки — вибрация победы, thunk `finishGame` сохраняет результат и показывает победу.
+ * 3. Раз за партию можно взять подсказку (`showHint`): все карточки открываются на HINT_TIME мс, со звуком.
+ * 4. Когда убраны все карточки — звук и вибрация победы, thunk `finishGame` сохраняет результат и показывает победу.
  *
  * Хук читает из стора только нужные поля — время партии (меняется каждую секунду) он не читает,
  * поэтому игровое поле не перерисовывается на каждый тик таймера.
@@ -59,12 +62,13 @@ export default function useMemoryGame() {
     // Для чтения серии сразу после registerPair, без подписки (серия меняется только вместе с колодой)
     const store = useStore();
     const items = useSelector(state => state.items.items);
-    const {clickable, paused, hintUsed, roundLevel, vibration} = useSelector(state => ({
+    const {clickable, paused, hintUsed, roundLevel, vibration, sound} = useSelector(state => ({
         clickable: state.game.clickable,
         paused: state.game.paused,
         hintUsed: state.game.hintUsed,
         roundLevel: state.game.roundLevel,
         vibration: state.game.vibration,
+        sound: state.game.sound,
     }), shallowEqual);
     const level = getLevel(roundLevel);
 
@@ -93,13 +97,20 @@ export default function useMemoryGame() {
 
     const canOpen = clickable && !preview && !hinting && !paused;
 
-    /** Открывает карточку, если сейчас разрешено. @param {number} index */
+    /**
+     * Открывает карточку, если сейчас разрешено. Звук щелчка играет прямо в обработчике клика —
+     * браузер включает звук только по действию игрока (см. core/sound.js).
+     * @param {number} index
+     */
     const openItem = React.useCallback((index) => {
         if (canOpen) {
             lastOpened.current = index;
+            if (sound) {
+                playSound("flip");
+            }
             dispatch(setOpen(index));
         }
-    }, [canOpen, dispatch]);
+    }, [canOpen, sound, dispatch]);
 
     // Подсказка доступна раз за партию и не во время показа, паузы или проверки пары
     const canHint = !hintUsed && !preview && !hinting && !paused && clickable;
@@ -111,6 +122,9 @@ export default function useMemoryGame() {
         }
 
         dispatch(takeHint());
+        if (sound) {
+            playSound("hint");
+        }
         setHinting(true);
         hintTimeout.current = setTimeout(() => setHinting(false), HINT_TIME);
     };
@@ -140,6 +154,9 @@ export default function useMemoryGame() {
         if (vibration) {
             vibrate(isMatch ? VIBRATION.match : VIBRATION.mismatch);
         }
+        if (sound) {
+            playSound(isMatch ? "match" : "mismatch", streak);
+        }
 
         pairTimeout.current = setTimeout(() => {
             // Неугаданная пара гаснет и переворачивается обратно, угаданная исчезает, оставаясь зелёной
@@ -157,6 +174,9 @@ export default function useMemoryGame() {
         if (isBoardCleared(items)) {
             if (vibration) {
                 vibrate(VIBRATION.win);
+            }
+            if (sound) {
+                playSound("win");
             }
             dispatch(finishGame());
         }

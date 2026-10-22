@@ -48,6 +48,8 @@ export const languageList = {
         lightMode: "Светлая тема",
         vibrationOff: "Выключить вибрацию",
         vibrationOn: "Включить вибрацию",
+        soundOff: "Выключить звук",
+        soundOn: "Включить звук",
         errorTitle: "Что-то пошло не так",
         errorText: "В игре произошла ошибка. Сохранённые результаты и настройки не пострадали.",
         errorRestart: "Начать заново"
@@ -96,6 +98,8 @@ export const languageList = {
         lightMode: "Light theme",
         vibrationOff: "Turn off vibration",
         vibrationOn: "Turn on vibration",
+        soundOff: "Turn off sound",
+        soundOn: "Turn on sound",
         errorTitle: "Something went wrong",
         errorText: "The game ran into an error. Your saved results and settings are safe.",
         errorRestart: "Start over"
@@ -144,6 +148,8 @@ export const languageList = {
         lightMode: "淺色主題",
         vibrationOff: "關閉震動",
         vibrationOn: "開啟震動",
+        soundOff: "關閉音效",
+        soundOn: "開啟音效",
         errorTitle: "出了點問題",
         errorText: "遊戲發生錯誤。已儲存的成績和設定不受影響。",
         errorRestart: "重新開始"
@@ -192,6 +198,8 @@ export const languageList = {
         lightMode: "الوضع الفاتح",
         vibrationOff: "إيقاف الاهتزاز",
         vibrationOn: "تشغيل الاهتزاز",
+        soundOff: "إيقاف الصوت",
+        soundOn: "تشغيل الصوت",
         errorTitle: "حدث خطأ ما",
         errorText: "حدث خطأ في اللعبة. نتائجك وإعداداتك المحفوظة لم تتأثر.",
         errorRestart: "ابدأ من جديد"
@@ -240,6 +248,8 @@ export const languageList = {
         lightMode: "Helles Design",
         vibrationOff: "Vibration ausschalten",
         vibrationOn: "Vibration einschalten",
+        soundOff: "Ton ausschalten",
+        soundOn: "Ton einschalten",
         errorTitle: "Etwas ist schiefgelaufen",
         errorText: "Im Spiel ist ein Fehler aufgetreten. Gespeicherte Ergebnisse und Einstellungen sind erhalten.",
         errorRestart: "Neu starten"
@@ -288,6 +298,8 @@ export const languageList = {
         lightMode: "Tema claro",
         vibrationOff: "Desactivar vibración",
         vibrationOn: "Activar vibración",
+        soundOff: "Desactivar sonido",
+        soundOn: "Activar sonido",
         errorTitle: "Algo salió mal",
         errorText: "Se produjo un error en el juego. Tus resultados y ajustes guardados no se han perdido.",
         errorRestart: "Empezar de nuevo"

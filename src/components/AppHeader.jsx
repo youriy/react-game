@@ -17,8 +17,12 @@ import LightModeIcon from '@mui/icons-material/Brightness7';
 // Иконка вибрации показывает текущее состояние: телефон с волнами — включена, перечёркнутый — выключена
 import VibrationIcon from '@mui/icons-material/Vibration';
 import VibrationOffIcon from '@mui/icons-material/MobileOff';
-import {setLanguage, setTheme, toggleDarkMode, toggleVibration} from "../store/gameSlice.js";
+// Иконка звука тоже показывает текущее состояние: динамик с волнами — включён, перечёркнутый — выключен
+import SoundIcon from '@mui/icons-material/VolumeUp';
+import SoundOffIcon from '@mui/icons-material/VolumeOff';
+import {setLanguage, setTheme, toggleDarkMode, toggleSound, toggleVibration} from "../store/gameSlice.js";
 import {canVibrate} from "../core/vibration.js";
+import {canPlaySound} from "../core/sound.js";
 import {languageOptions} from "../core/languages.js";
 import {themeList} from "../core/themes.js";
 import useTranslation from "../hooks/useTranslation.js";
@@ -100,14 +104,17 @@ const appBarSx = {
 };
 
 /**
- * Шапка: название игры, выбор языка, цвета, светлой/тёмной темы и вибрации.
+ * Шапка: название игры, выбор языка, цвета, светлой/тёмной темы, звука и вибрации.
+ * Кнопка звука видна, если браузер умеет Web Audio (см. canPlaySound) — то есть почти всегда.
  * Кнопка вибрации видна только там, где вибрация возможна (телефон/планшет с Vibration API, см. canVibrate).
  */
 export default function AppHeader() {
     const dispatch = useDispatch();
     const darkMode = useSelector(state => state.game.darkMode);
     const vibration = useSelector(state => state.game.vibration);
+    const sound = useSelector(state => state.game.sound);
     const showVibration = React.useMemo(canVibrate, []);
+    const showSound = React.useMemo(canPlaySound, []);
     const t = useTranslation();
 
     return (
@@ -146,6 +153,20 @@ export default function AppHeader() {
                                 {darkMode ? <LightModeIcon/> : <DarkModeIcon/>}
                             </IconButton>
                         </Tooltip>
+                        {showSound &&
+                            <Tooltip title={sound ? t.soundOff : t.soundOn} arrow>
+                                <IconButton
+                                    size="large"
+                                    edge="end"
+                                    aria-label="sound toggle"
+                                    aria-pressed={sound}
+                                    onClick={() => dispatch(toggleSound())}
+                                    color="inherit"
+                                >
+                                    {sound ? <SoundIcon/> : <SoundOffIcon/>}
+                                </IconButton>
+                            </Tooltip>
+                        }
                         {showVibration &&
                             <Tooltip title={vibration ? t.vibrationOff : t.vibrationOn} arrow>
                                 <IconButton
