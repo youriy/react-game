@@ -11,6 +11,7 @@ import {setLevel} from "../store/gameSlice.js";
 import {startNewGame} from "../store/thunks.js";
 import {formatTime} from "../core/utils.js";
 import useTranslation from "../core/useTranslation.js";
+import useIsMobile from "../core/useIsMobile.js";
 import {calculateScore, calculateStars} from "../core/score.js";
 import {getRecords} from "../core/storage.js";
 import {DEFAULT_LEVEL, getLevel, levelList} from "../core/levels.js";
@@ -32,15 +33,29 @@ function WinText({variant, children}) {
 }
 
 /**
+ * Размер поля уровня для подписи, «колонки×ряды».
+ * @param {import("../core/levels.js").Level} level
+ * @param {boolean} isMobile - узкий экран: колонок mobileColumns
+ * @returns {string} например, "8×6"
+ */
+const getFieldSize = (level, isMobile) => {
+    const columns = isMobile ? level.mobileColumns : level.columns;
+
+    return `${columns}×${level.pairs * 2 / columns}`;
+};
+
+/**
  * Переключатель уровня сложности: «Лёгкий 4×4», «Средний 6×6», «Сложный 8×6».
  * На кнопке — лучшие звёзды уровня; закрытый уровень недоступен, под переключателем написано,
- * как его открыть. Выбранный уровень сохраняется в state.game.level (и в localStorage).
+ * как его открыть. На телефоне кнопки стоят столбиком во всю ширину.
+ * Выбранный уровень сохраняется в state.game.level (и в localStorage).
  */
 function LevelSelect() {
     const dispatch = useDispatch();
     const level = useSelector(state => state.game.level);
     const t = useTranslation();
     const lockedLevels = levelList.filter(item => !isLevelUnlocked(item.key));
+    const isMobile = useIsMobile();
 
     // Если выбран закрытый уровень (например, сохранён в настройках раньше) — переключаемся на уровень по умолчанию
     React.useEffect(() => {
@@ -50,11 +65,13 @@ function LevelSelect() {
     }, [level]);
 
     return (
-        <Stack spacing={1} sx={{alignItems: "center"}}>
+        <Stack spacing={1} sx={{alignItems: "center", textAlign: "center"}}>
             <Typography variant="h6" color="text.secondary">{t.difficulty}</Typography>
             <ToggleButtonGroup
                 color="primary"
                 exclusive
+                orientation={isMobile ? "vertical" : "horizontal"}
+                fullWidth={isMobile}
                 value={getLevel(level).key}
                 // null приходит при повторном клике по уже выбранной кнопке — уровень не сбрасываем
                 onChange={(event, value) => value && dispatch(setLevel(value))}
@@ -67,7 +84,8 @@ function LevelSelect() {
                             <ToggleButton key={item.key} value={item.key} disabled={locked} sx={{px: 3, flexDirection: "column"}}>
                                 <span>
                                     {locked && <LockIcon fontSize="inherit" sx={{mr: 0.5, verticalAlign: "-2px"}}/>}
-                                    {t[item.labelKey]} {item.columns}×{item.pairs * 2 / item.columns}
+                                    {/* Размер поля — как на этом экране (на телефоне у сложного 6×8) */}
+                                    {t[item.labelKey]} {getFieldSize(item, isMobile)}
                                 </span>
                                 <Stars value={getBestStars(item.key)} size="small"/>
                             </ToggleButton>
@@ -101,10 +119,11 @@ export default function StartGame() {
     const recordLabels = {score: t.bestScore, time: t.bestTime, streak: t.bestStreak};
 
     return (
-        <Box sx={{marginTop: "30px", minWidth: 600}}>
-            <Stack spacing={6}>
+        // На телефоне — во всю ширину экрана, меньше отступы
+        <Box sx={{marginTop: {xs: "16px", sm: "30px"}, width: {xs: "100%", sm: "auto"}, minWidth: {xs: 0, sm: 600}}}>
+            <Stack spacing={{xs: 3, sm: 6}}>
                 {/* Итоги партии и выбор уровня — в своей группе, с отступом меньше общего (32 px вместо 48) */}
-                <Stack spacing={4}>
+                <Stack spacing={{xs: 2, sm: 4}}>
                     {
                         win &&
                         <Stack spacing={1}>

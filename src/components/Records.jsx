@@ -11,7 +11,7 @@ import useTranslation from "../core/useTranslation.js";
  */
 function RecordItem({label, value}) {
     return (
-        <Stack sx={{alignItems: "center", minWidth: 150}}>
+        <Stack sx={{alignItems: "center", minWidth: {xs: 0, sm: 150}, textAlign: "center"}}>
             <Typography variant="body2" color="text.secondary">{label}</Typography>
             <Typography variant="h5" color="primary">{value}</Typography>
         </Stack>
@@ -37,7 +37,7 @@ export default function Records({records}) {
     return (
         <Paper sx={{p: 2}}>
             <Typography variant="h6" sx={{textAlign: "center", mb: 1}}>🏆 {t.records}</Typography>
-            <Stack direction="row" spacing={4} sx={{justifyContent: "center"}}>
+            <Stack direction="row" spacing={{xs: 2, sm: 4}} sx={{justifyContent: "center"}}>
                 <RecordItem label={t.bestScore} value={show(score)}/>
                 <RecordItem label={t.bestTime} value={show(time, formatTime)}/>
                 <RecordItem label={t.bestStreak} value={show(streak)}/>

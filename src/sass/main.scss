@@ -1,4 +1,6 @@
 body {
   margin: 0!important;
+  // Телефон: без задержки нажатия и без увеличения страницы по двойному тапу по карточкам
+  touch-action: manipulation;
   background-color: whitesmoke!important;
 }

@@ -3,6 +3,7 @@ import {GridOverlay, DataGrid} from '@mui/x-data-grid';
 import {styled} from '@mui/material/styles';
 import {Box, Paper} from "@mui/material";
 import {useSelector} from "react-redux";
+import useIsMobile from "../core/useIsMobile.js";
 import {loadSortedResults} from "../core/storage.js";
 import {getResultStars} from "../core/progress.js";
 import {MAX_STARS} from "../core/score.js";
@@ -92,20 +93,22 @@ const TABLE_HEIGHT = 317;
  * Таблица статистики выбранного уровня: дата, попытки, время, очки и звёзды прошлых игр,
  * отсортированные по очкам (лучшие сверху), по RESULTS_PER_PAGE на страницу.
  * Высота таблицы подобрана так, чтобы страница помещалась без прокрутки внутри.
+ * Столбцы тянутся по ширине; на телефоне столбцы «Попытки» и «Время» скрыты, чтобы таблица помещалась.
  */
 export default function ResultsTable() {
     const t = useTranslation();
     const level = useSelector(state => state.game.level);
+    const isMobile = useIsMobile();
 
     const columns = [
-        {field: 'date', headerName: t.date, width: 250},
-        {field: 'try', headerName: t.try, width: 150},
-        {field: 'time', headerName: t.time, width: 150},
+        {field: 'date', headerName: t.date, flex: 2, minWidth: 150},
+        {field: 'try', headerName: t.try, flex: 1, minWidth: 90, hide: isMobile},
+        {field: 'time', headerName: t.time, flex: 1, minWidth: 110, hide: isMobile},
         // у результатов, сохранённых до появления очков, счёта нет
-        {field: 'score', headerName: t.score, width: 150, valueGetter: (params) => params.row.score ?? '—'},
+        {field: 'score', headerName: t.score, flex: 1, minWidth: 70, valueGetter: (params) => params.row.score ?? '—'},
         // у результатов до появления звёзд они считаются по счёту (см. core/progress.js)
         {
-            field: 'stars', headerName: t.stars, width: 120,
+            field: 'stars', headerName: t.stars, flex: 1, minWidth: 80,
             valueGetter: (params) => {
                 const stars = getResultStars(params.row, level);
                 return "★".repeat(stars) + "☆".repeat(MAX_STARS - stars);

@@ -1,4 +1,4 @@
-import {createTheme} from '@mui/material/styles';
+import {createTheme, responsiveFontSizes} from '@mui/material/styles';
 import {green, orange, purple, blue, yellow, deepOrange, indigo} from '@mui/material/colors';
 
 /**
@@ -19,15 +19,17 @@ export const themeList = [
 
 /**
  * Готовые темы MUI по имени: `themes.greenTheme` и т. д.
+ * `responsiveFontSizes` уменьшает крупные заголовки (h1–h6) на узких экранах,
+ * на широких размеры остаются стандартными.
  * @type {Object<string, import('@mui/material/styles').Theme>}
  */
 export const themes = Object.fromEntries(themeList.map(({name, color}) => [
     name,
-    createTheme({
+    responsiveFontSizes(createTheme({
         palette: {
             primary: {
                 main: color,
             },
         },
-    }),
+    })),
 ]));

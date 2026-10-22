@@ -2,7 +2,7 @@ import React from 'react';
 import Typography from '@mui/material/Typography';
 
 /**
- * Крупная надпись в строке статуса (время, попытки, очки).
+ * Крупная надпись в строке статуса (время, попытки, очки). На телефоне — мельче и с меньшим отступом.
  * @param {{children: React.ReactNode}} props
  */
 export default function StatusText({children}) {
@@ -12,7 +12,12 @@ export default function StatusText({children}) {
             gutterBottom
             component="div"
             color="primary"
-            sx={{textAlign: "center", marginTop: "20px!important"}}
+            sx={{
+                textAlign: "center",
+                marginTop: {xs: "4px!important", sm: "20px!important"},
+                fontSize: {xs: "1.1rem", sm: undefined},
+                whiteSpace: "nowrap",
+            }}
         >
             {children}
         </Typography>

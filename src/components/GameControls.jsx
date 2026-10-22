@@ -1,7 +1,7 @@
 import React from 'react';
 import {useDispatch, useSelector} from "react-redux";
 import Button from '@mui/material/Button';
-import Stack from "@mui/material/Stack";
+import Box from "@mui/material/Box";
 import ReplayIcon from '@mui/icons-material/Replay';
 import FlagIcon from '@mui/icons-material/Flag';
 import PauseIcon from '@mui/icons-material/Pause';
@@ -14,10 +14,12 @@ import DialogTitle from '@mui/material/DialogTitle';
 import {giveUp, setPaused} from "../store/gameSlice.js";
 import {startNewGame} from "../store/thunks.js";
 import useTranslation from "../core/useTranslation.js";
+import useIsMobile from "../core/useIsMobile.js";
 import {HINT_PENALTY} from "../core/score.js";
 
 /**
  * Кнопки управления партией: «Пауза», «Подсказка», «Заново», «Сдаться».
+ * На узком экране кнопки компактные и переносятся на вторую строку.
  * Также: пауза по Esc, автопауза при скрытии вкладки, окно подтверждения перед «Заново» и «Сдаться»
  * (пока окно открыто, партия на паузе).
  *
@@ -30,6 +32,8 @@ export default function GameControls({canPause, canHint, onHint}) {
     const dispatch = useDispatch();
     const paused = useSelector(state => state.game.paused);
     const t = useTranslation();
+    // На телефоне кнопки компактнее, чтобы все четыре помещались в две строки
+    const buttonSize = useIsMobile() ? "small" : "medium";
     // Окно подтверждения: open — показано ли, action — для какой кнопки,
     // wasPaused — стояла ли игра на паузе до открытия окна.
     // action не сбрасывается при закрытии, чтобы текст не пропадал во время анимации.
@@ -111,8 +115,10 @@ export default function GameControls({canPause, canHint, onHint}) {
     }, [canPause]);
 
     return (
-        <Stack direction="row" spacing={2} sx={{justifyContent: "center", pb: 2}}>
+        // flexWrap + gap: на узком экране кнопки переносятся на вторую строку
+        <Box sx={{display: "flex", flexWrap: "wrap", justifyContent: "center", gap: {xs: 1, sm: 2}, pb: {xs: 1, sm: 2}}}>
             <Button
+                size={buttonSize}
                 variant="outlined"
                 startIcon={paused ? <PlayArrowIcon/> : <PauseIcon/>}
                 onClick={() => dispatch(setPaused(!paused))}
@@ -123,15 +129,15 @@ export default function GameControls({canPause, canHint, onHint}) {
             <Tooltip title={`${t.hintPenalty}: −${HINT_PENALTY}`} arrow>
                 {/* span нужен, чтобы подсказка показывалась и у неактивной кнопки */}
                 <span>
-                    <Button variant="outlined" color="warning" startIcon={<LightbulbIcon/>} onClick={onHint} disabled={!canHint}>
+                    <Button size={buttonSize} variant="outlined" color="warning" startIcon={<LightbulbIcon/>} onClick={onHint} disabled={!canHint}>
                         {t.hint}
                     </Button>
                 </span>
             </Tooltip>
-            <Button variant="outlined" startIcon={<ReplayIcon/>} onClick={() => askConfirm("restart")}>
+            <Button size={buttonSize} variant="outlined" startIcon={<ReplayIcon/>} onClick={() => askConfirm("restart")}>
                 {t.restart}
             </Button>
-            <Button variant="outlined" color="error" startIcon={<FlagIcon/>} onClick={() => askConfirm("giveUp")}>
+            <Button size={buttonSize} variant="outlined" color="error" startIcon={<FlagIcon/>} onClick={() => askConfirm("giveUp")}>
                 {t.giveUp}
             </Button>
             {/* Подтверждение, чтобы не потерять партию случайным кликом */}
@@ -155,6 +161,6 @@ export default function GameControls({canPause, canHint, onHint}) {
                     </Button>
                 </DialogActions>
             </Dialog>
-        </Stack>
+        </Box>
     );
 }

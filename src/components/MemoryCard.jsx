@@ -10,11 +10,14 @@ import {cardIcons} from "../core/icons.js";
 /** Длительность переворота карточки, мс. */
 const FLIP_TIME = 400;
 
+// Увеличение при наведении — только для мыши: на телефоне «hover» залипает после касания
 const sceneSx = {
     perspective: "800px",
-    "&:hover": {
-        transform: "scale(1.07)!important",
-    }
+    "@media (hover: hover)": {
+        "&:hover": {
+            transform: "scale(1.07)!important",
+        },
+    },
 };
 
 const flipperSx = {
@@ -69,20 +72,23 @@ const getHighlightSx = (highlight) => {
  * @param {Object} props
  * @param {Object} props.sx - стили стороны
  * @param {React.ComponentType} props.Icon - компонент иконки
+ * @param {string} props.iconSize - CSS-размер иконки (например "60px")
+ * @param {boolean} [props.compact] - уменьшенные поля (телефон)
  * @param {boolean} [props.hidden] - скрыть иконку, сохранив размер (для рубашки)
  */
-function CardFace({sx, Icon, hidden}) {
+function CardFace({sx, Icon, iconSize, compact, hidden}) {
     return (
         <Card sx={sx}>
             <CardActionArea>
-                <CardContent>
+                {/* На телефоне поля меньше; у CardContent по умолчанию увеличенный нижний отступ — выравниваем */}
+                <CardContent sx={compact ? {p: 0.75, "&:last-child": {pb: 0.75}} : undefined}>
                     <Typography
                         textAlign="center"
                         variant="body1"
                         color="text.secondary"
                         sx={hidden ? {visibility: "hidden"} : undefined}
                     >
-                        <Icon sx={{fontSize: 60}}/>
+                        <Icon sx={{fontSize: iconSize, display: "block", mx: "auto"}}/>
                     </Typography>
                 </CardContent>
             </CardActionArea>
@@ -106,9 +112,11 @@ function CardFace({sx, Icon, hidden}) {
  * @param {boolean} props.revealed - показывать лицевую сторону
  * @param {boolean} props.disabled - отключить клики и эффект наведения
  * @param {'match'|'mismatch'|null} props.highlight - подсветка пары
+ * @param {string} props.iconSize - CSS-размер иконки (на телефоне зависит от ширины экрана)
+ * @param {boolean} props.compact - уменьшенные поля карточки (телефон)
  * @param {function(number): void} props.onOpen - открыть карточку по индексу
  */
-function MemoryCard({item, index, revealed, disabled, highlight, onOpen}) {
+function MemoryCard({item, index, revealed, disabled, highlight, iconSize, compact, onOpen}) {
     const Icon = cardIcons[item.icon];
     // Угаданная пара исчезает открытой, не переворачиваясь обратно
     const flipped = revealed || item.delete;
@@ -122,8 +130,8 @@ function MemoryCard({item, index, revealed, disabled, highlight, onOpen}) {
             >
                 <Box sx={{...flipperSx, transform: flipped ? "rotateY(-180deg)" : "rotateY(0deg)"}}>
                     {/* Рубашка: иконка скрыта, нужна только чтобы задать размер карточки */}
-                    <CardFace sx={faceSx} Icon={Icon} hidden/>
-                    <CardFace sx={{...frontFaceSx, ...getHighlightSx(highlight)}} Icon={Icon}/>
+                    <CardFace sx={faceSx} Icon={Icon} iconSize={iconSize} compact={compact} hidden/>
+                    <CardFace sx={{...frontFaceSx, ...getHighlightSx(highlight)}} Icon={Icon} iconSize={iconSize} compact={compact}/>
                 </Box>
             </Box>
         </Zoom>
