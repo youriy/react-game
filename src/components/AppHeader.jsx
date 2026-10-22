@@ -11,8 +11,8 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import LanguageIcon from '@mui/icons-material/Language';
 import PaletteIcon from '@mui/icons-material/Palette';
-import {setLanguage, setTheme} from "../store/gameSlice.jsx";
-import {languageOptions} from "../core/Language";
+import {setLanguage, setTheme} from "../store/gameSlice.js";
+import {languageOptions} from "../core/languages.js";
 import {themeList} from "../core/themes.js";
 import useTranslation from "../core/useTranslation.js";
 
@@ -83,7 +83,7 @@ const themeMenuOptions = themeList.map(({name, color, label}) => ({
 }));
 
 /** Шапка: название игры, выбор языка и выбор темы. */
-export default function DenseAppBar() {
+export default function AppHeader() {
     const dispatch = useDispatch();
     const t = useTranslation();
 

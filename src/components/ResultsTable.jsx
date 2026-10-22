@@ -85,7 +85,7 @@ function CustomNoRowsOverlay() {
  * Таблица статистики выбранного уровня: дата, попытки, время и очки прошлых игр,
  * отсортированные по очкам (лучшие сверху), по 10 на страницу.
  */
-export default function Grid() {
+export default function ResultsTable() {
     const t = useTranslation();
     const level = useSelector(state => state.game.level);
 

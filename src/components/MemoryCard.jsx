@@ -97,14 +97,18 @@ function CardFace({sx, Icon, hidden}) {
  * При открытии переворачивается справа налево (rotateY до -180°), при закрытии — обратно.
  * Угаданная карточка исчезает через Zoom, оставаясь открытой.
  *
+ * Обёрнута в React.memo: перерисовывается, только когда меняются её пропсы. Поэтому обработчик
+ * клика — общий `onOpen(index)` со стабильной ссылкой, а не новая стрелочная функция на каждую карточку.
+ *
  * @param {Object} props
- * @param {import("../store/itemsSlice.jsx").CardItem} props.item - данные карточки
+ * @param {import("../store/itemsSlice.js").CardItem} props.item - данные карточки
+ * @param {number} props.index - позиция карточки на поле
  * @param {boolean} props.revealed - показывать лицевую сторону
  * @param {boolean} props.disabled - отключить клики и эффект наведения
  * @param {'match'|'mismatch'|null} props.highlight - подсветка пары
- * @param {function(): void} props.onClick - обработчик клика
+ * @param {function(number): void} props.onOpen - открыть карточку по индексу
  */
-export default function MemoryCard({item, revealed, disabled, highlight, onClick}) {
+function MemoryCard({item, index, revealed, disabled, highlight, onOpen}) {
     const Icon = cardIcons[item.icon];
     // Угаданная пара исчезает открытой, не переворачиваясь обратно
     const flipped = revealed || item.delete;
@@ -113,7 +117,7 @@ export default function MemoryCard({item, revealed, disabled, highlight, onClick
         <Zoom in={!item.delete}>
             <Box
                 sx={sceneSx}
-                onClick={onClick}
+                onClick={() => onOpen(index)}
                 style={disabled ? {pointerEvents: "none"} : undefined}
             >
                 <Box sx={{...flipperSx, transform: flipped ? "rotateY(-180deg)" : "rotateY(0deg)"}}>
@@ -125,3 +129,5 @@ export default function MemoryCard({item, revealed, disabled, highlight, onClick
         </Zoom>
     );
 }
+
+export default React.memo(MemoryCard);

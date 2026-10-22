@@ -11,8 +11,8 @@ import Tooltip from '@mui/material/Tooltip';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogTitle from '@mui/material/DialogTitle';
-import {giveUp, setPaused, startNewRound} from "../store/gameSlice.jsx";
-import {resetItems} from "../store/itemsSlice.jsx";
+import {giveUp, setPaused} from "../store/gameSlice.js";
+import {startNewGame} from "../store/thunks.js";
 import useTranslation from "../core/useTranslation.js";
 import {HINT_PENALTY} from "../core/score.js";
 
@@ -29,7 +29,6 @@ import {HINT_PENALTY} from "../core/score.js";
 export default function GameControls({canPause, canHint, onHint}) {
     const dispatch = useDispatch();
     const paused = useSelector(state => state.game.paused);
-    const level = useSelector(state => state.game.level);
     const t = useTranslation();
     // Окно подтверждения: open — показано ли, action — для какой кнопки,
     // wasPaused — стояла ли игра на паузе до открытия окна.
@@ -57,12 +56,6 @@ export default function GameControls({canPause, canHint, onHint}) {
         }
     };
 
-    /** Новая партия на том же уровне: свежая колода и обнулённые счётчики. */
-    const handleRestart = () => {
-        dispatch(resetItems(level));
-        dispatch(startNewRound());
-    };
-
     /** Что показывать и делать в окне подтверждения для каждой кнопки. */
     const confirmActions = {
         restart: {
@@ -70,7 +63,8 @@ export default function GameControls({canPause, canHint, onHint}) {
             label: t.restart,
             icon: <ReplayIcon/>,
             color: "primary",
-            onConfirm: handleRestart,
+            // Новая партия на том же уровне: свежая колода и обнулённые счётчики
+            onConfirm: () => dispatch(startNewGame()),
         },
         giveUp: {
             title: t.giveUpConfirm,

@@ -1,11 +1,11 @@
 import {combineReducers, configureStore} from "@reduxjs/toolkit";
-import itemsSlice from "./itemsSlice.jsx";
-import gameSlice from "./gameSlice.jsx";
+import itemsSlice from "./itemsSlice.js";
+import gameSlice from "./gameSlice.js";
 import {saveSetting} from "../core/storage.js";
 
 /**
  * Redux-хранилище приложения.
- * state.items — колода (itemsSlice.jsx), state.game — партия и настройки (gameSlice.jsx).
+ * state.items — колода (itemsSlice.js), state.game — партия и настройки (gameSlice.js).
  * Язык, тема и уровень сохраняются в localStorage подпиской ниже.
  */
 const rootReducer = combineReducers({

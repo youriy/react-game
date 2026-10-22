@@ -1,7 +1,7 @@
 import React from 'react';
 import {useDispatch, useSelector} from "react-redux";
-import Helper from "../core/Helper.jsx";
-import {incrementTime} from "../store/gameSlice.jsx";
+import {formatTime} from "../core/utils.js";
+import {incrementTime} from "../store/gameSlice.js";
 import useTranslation from "../core/useTranslation.js";
 import StatusText from "./StatusText.jsx";
 
@@ -29,7 +29,7 @@ export default function Timer({running = true}) {
 
     return (
         <StatusText>
-            {t.time}: {Helper.formatTime(time)}
+            {t.time}: {formatTime(time)}
         </StatusText>
     );
 }

@@ -6,13 +6,13 @@ import Stack from "@mui/material/Stack";
 import Typography from '@mui/material/Typography';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import Timer from "./Timer.jsx";
-import Try from "./Try.jsx";
+import Attempts from "./Attempts.jsx";
 import Score from "./Score.jsx";
 import GameControls from "./GameControls.jsx";
 import MemoryCard from "./MemoryCard.jsx";
 import useMemoryGame from "../core/useMemoryGame.js";
 import useTranslation from "../core/useTranslation.js";
-import {setPaused} from "../store/gameSlice.jsx";
+import {setPaused} from "../store/gameSlice.js";
 
 const statusSx = {
     justifyContent: "center",
@@ -54,7 +54,7 @@ export default function GameArea() {
             <Stack sx={statusSx} spacing={6} direction="row">
                 {/* Таймер идёт только после показа карточек и не на паузе */}
                 <Timer running={!preview && !paused}/>
-                <Try/>
+                <Attempts/>
                 <Score/>
             </Stack>
             <GameControls canPause={!preview && !hinting} canHint={canHint} onHint={showHint}/>
@@ -76,10 +76,11 @@ export default function GameArea() {
                             <MemoryCard
                                 key={item.id}
                                 item={item}
+                                index={index}
                                 revealed={item.open || preview || hinting}
                                 disabled={preview || hinting || paused}
                                 highlight={getHighlight(index)}
-                                onClick={() => openItem(index)}
+                                onOpen={openItem}
                             />
                         )
                     }

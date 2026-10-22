@@ -2,11 +2,11 @@
  * Уровни сложности.
  *
  * Чтобы добавить уровень — добавьте элемент сюда и подписи (ключ `labelKey`) во все языки
- * в core/Language.js. Число пар не может быть больше числа иконок в core/icons.js.
+ * в core/languages.js. Число пар не может быть больше числа иконок в core/icons.js.
  *
  * @typedef {Object} Level
  * @property {string} key - идентификатор уровня (хранится в настройках и в результатах)
- * @property {string} labelKey - ключ подписи в languageList (core/Language.js)
+ * @property {string} labelKey - ключ подписи в languageList (core/languages.js)
  * @property {number} pairs - сколько пар карточек на поле
  * @property {number} columns - сколько карточек в ряду
  * @property {number} previewTime - сколько карточки показываются в начале партии, мс

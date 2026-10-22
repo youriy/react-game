@@ -6,15 +6,15 @@ import Stack from "@mui/material/Stack";
 import Typography from '@mui/material/Typography';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import {setLevel, startNewRound} from "../store/gameSlice.jsx";
-import {resetItems} from "../store/itemsSlice.jsx";
-import Helper from "../core/Helper.jsx";
+import {setLevel} from "../store/gameSlice.js";
+import {startNewGame} from "../store/thunks.js";
+import {formatTime} from "../core/utils.js";
 import useTranslation from "../core/useTranslation.js";
 import {calculateScore} from "../core/score.js";
 import {getRecords} from "../core/storage.js";
 import {getLevel, levelList} from "../core/levels.js";
 import Records from "./Records.jsx";
-import Grid from "./Grid.jsx";
+import ResultsTable from "./ResultsTable.jsx";
 
 /**
  * Строка текста на экране победы.
@@ -72,11 +72,6 @@ export default function StartGame() {
     const records = getRecords(getLevel(level).key);
     const recordLabels = {score: t.bestScore, time: t.bestTime, streak: t.bestStreak};
 
-    const handleStart = () => {
-        dispatch(resetItems(level));
-        dispatch(startNewRound());
-    };
-
     return (
         <Box sx={{marginTop: "60px", minWidth: 600}}>
             <Stack spacing={6}>
@@ -91,7 +86,7 @@ export default function StartGame() {
                                 {t.newRecord} ({newRecords.map(key => recordLabels[key]).join(", ")})
                             </WinText>
                         }
-                        <WinText variant="h5">{t.userTime}: {Helper.formatTime(time)}</WinText>
+                        <WinText variant="h5">{t.userTime}: {formatTime(time)}</WinText>
                         <WinText variant="h5">{t.userTry}: {count}</WinText>
                         <WinText variant="h5">{t.bestStreak}: {bestStreak}</WinText>
                         <WinText variant="h6">
@@ -104,10 +99,10 @@ export default function StartGame() {
                 }
                 <LevelSelect/>
                 <Records records={records}/>
-                <Button variant="contained" size="large" onClick={handleStart}>
+                <Button variant="contained" size="large" onClick={() => dispatch(startNewGame())}>
                     {t.start}
                 </Button>
-                <Grid/>
+                <ResultsTable/>
             </Stack>
         </Box>
     );

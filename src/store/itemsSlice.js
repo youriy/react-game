@@ -1,5 +1,5 @@
 import {createSlice} from "@reduxjs/toolkit";
-import Helper from "../core/Helper.jsx";
+import {shuffle} from "../core/utils.js";
 import {cardIcons} from "../core/icons.js";
 import {DEFAULT_LEVEL, getLevel} from "../core/levels.js";
 
@@ -25,7 +25,7 @@ import {DEFAULT_LEVEL, getLevel} from "../core/levels.js";
  */
 const createDeck = (levelKey) => {
     const {pairs} = getLevel(levelKey);
-    const icons = Helper.shuffle(Object.keys(cardIcons)).slice(0, pairs);
+    const icons = shuffle(Object.keys(cardIcons)).slice(0, pairs);
     const deck = icons.flatMap((icon, index) => [0, 1].map(copy => ({
         id: index * 2 + copy,
         type: index + 1,
@@ -34,7 +34,7 @@ const createDeck = (levelKey) => {
         delete: false,
     })));
 
-    return Helper.shuffle(deck);
+    return shuffle(deck);
 };
 
 const itemsSlice = createSlice({

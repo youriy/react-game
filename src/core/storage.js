@@ -1,5 +1,4 @@
-import moment from "moment";
-import Helper from "./Helper.jsx";
+import {formatDate, formatTime} from "./utils.js";
 import {calculateScore} from "./score.js";
 import {DEFAULT_LEVEL} from "./levels.js";
 
@@ -118,9 +117,9 @@ export const saveResult = ({count, time, score, hintUsed, bestStreak, level}) =>
     const results = loadResults();
 
     results.push({
-        date: moment().format('YYYY-MM-DD HH:mm:ss'),
+        date: formatDate(),
         try: count,
-        time: Helper.formatTime(time),
+        time: formatTime(time),
         seconds: time,
         bestStreak,
         level,

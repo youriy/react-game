@@ -2,7 +2,7 @@ import React from 'react';
 import Paper from '@mui/material/Paper';
 import Stack from "@mui/material/Stack";
 import Typography from '@mui/material/Typography';
-import Helper from "../core/Helper.jsx";
+import {formatTime} from "../core/utils.js";
 import useTranslation from "../core/useTranslation.js";
 
 /**
@@ -39,7 +39,7 @@ export default function Records({records}) {
             <Typography variant="h6" sx={{textAlign: "center", mb: 1}}>🏆 {t.records}</Typography>
             <Stack direction="row" spacing={4} sx={{justifyContent: "center"}}>
                 <RecordItem label={t.bestScore} value={show(score)}/>
-                <RecordItem label={t.bestTime} value={show(time, Helper.formatTime)}/>
+                <RecordItem label={t.bestTime} value={show(time, formatTime)}/>
                 <RecordItem label={t.bestStreak} value={show(streak)}/>
             </Stack>
         </Paper>

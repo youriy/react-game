@@ -19,7 +19,7 @@ import {DEFAULT_LEVEL} from "../core/levels.js";
  * @property {Array<'score'|'time'|'streak'>} newRecords - какие рекорды побиты в последней партии
  * @property {boolean} win - последняя партия завершилась победой (показывается экран победы)
  * @property {boolean} clickable - можно ли сейчас открывать карточки (false, пока решается пара)
- * @property {string} language - ключ языка из core/Language.js (сохраняется в localStorage)
+ * @property {string} language - ключ языка из core/languages.js (сохраняется в localStorage)
  * @property {string} theme - имя темы из core/themes.js (сохраняется в localStorage)
  * @property {string} level - выбранный уровень сложности из core/levels.js (сохраняется в localStorage)
  * @property {string} roundLevel - уровень текущей/последней партии; фиксируется при старте,
@@ -118,15 +118,15 @@ const gameSlice = createSlice({
         setPaused(state, action) {
             state.paused = action.payload;
         },
-        /** payload: ключ языка, например 'english'. Сохраняется в localStorage (см. store.jsx). */
+        /** payload: ключ языка, например 'english'. Сохраняется в localStorage (см. store.js). */
         setLanguage(state, action) {
             state.language = action.payload;
         },
-        /** payload: имя темы, например 'greenTheme'. Сохраняется в localStorage (см. store.jsx). */
+        /** payload: имя темы, например 'greenTheme'. Сохраняется в localStorage (см. store.js). */
         setTheme(state, action) {
             state.theme = action.payload;
         },
-        /** payload: ключ уровня, например 'hard'. Сохраняется в localStorage (см. store.jsx). */
+        /** payload: ключ уровня, например 'hard'. Сохраняется в localStorage (см. store.js). */
         setLevel(state, action) {
             state.level = action.payload;
         }
