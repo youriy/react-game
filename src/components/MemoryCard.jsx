@@ -5,15 +5,63 @@ import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Zoom from '@mui/material/Zoom';
+import {alpha} from '@mui/material/styles';
+import {keyframes} from '@emotion/react';
 import {cardIcons} from "../core/icons.js";
+import {PAIR_SOUND_DELAY} from "../core/sound.js";
 import PointsPopup from "./PointsPopup.jsx";
 
 /** Длительность переворота карточки, мс. */
 const FLIP_TIME = 400;
+/**
+ * Через сколько после открытия второй карточки начинаются встряска / вспышка пары, мс:
+ * когда лицо карточки уже видно. Звук пары (core/sound.js) звучит в тот же момент.
+ * Встряска и вспышка должны закончиться до закрытия пары (PAIR_DELAY = 800 мс в useMemoryGame.js).
+ */
+const PAIR_EFFECT_DELAY = PAIR_SOUND_DELAY;
+
+const reducedMotion = "@media (prefers-reduced-motion: reduce)";
+
+// Карточка при перевороте чуть «приподнимается» к игроку. Два одинаковых keyframes с разными
+// именами: при смене открыта/закрыта меняется имя анимации, и браузер проигрывает её заново
+const liftOpen = keyframes`
+    0%, 100% {transform: scale(1);}
+    50% {transform: scale(1.08);}
+`;
+const liftClose = keyframes`
+    0%, 100% {transform: scale(1);}
+    50% {transform: scale(1.08);}
+`;
+
+// Промах: карточка качается из стороны в сторону, затухая
+const shake = keyframes`
+    0%, 100% {transform: translateX(0) rotate(0);}
+    15% {transform: translateX(-7px) rotate(-3deg);}
+    35% {transform: translateX(6px) rotate(2.5deg);}
+    55% {transform: translateX(-4px) rotate(-1.5deg);}
+    75% {transform: translateX(2px) rotate(0.5deg);}
+`;
+
+// Угаданная пара: карточка «подпрыгивает»…
+const pop = keyframes`
+    0%, 100% {transform: scale(1);}
+    40% {transform: scale(1.12);}
+`;
+
+// …а поверх неё вспыхивает и расходится свечение
+const flash = keyframes`
+    0% {opacity: 0; transform: scale(0.7);}
+    30% {opacity: 1;}
+    100% {opacity: 0; transform: scale(1.35);}
+`;
+
+// При «уменьшить движение» — только вспышка на месте, без движения
+const flashFade = keyframes`
+    0%, 100% {opacity: 0;} 30% {opacity: 0.8;}
+`;
 
 // Увеличение при наведении — только для мыши: на телефоне «hover» залипает после касания
 const sceneSx = {
-    perspective: "800px",
     "@media (hover: hover)": {
         "&:hover": {
             transform: "scale(1.07)!important",
@@ -21,10 +69,64 @@ const sceneSx = {
     },
 };
 
+// Слой эффектов пары (встряска, прыжок, вспышка). Отдельный от переворота, чтобы анимации transform не спорили
+const effectSx = {
+    position: "relative",
+};
+
+/**
+ * Стили слоя эффектов пары: встряска при промахе, прыжок и вспышка цвета `success` темы при угаданной паре.
+ * Анимация стартует, когда у карточки появляется подсветка, — один раз на каждую пару.
+ * @param {'match'|'mismatch'|null} highlight
+ * @returns {Object} объект sx
+ */
+const getEffectSx = (highlight) => {
+    if (highlight === "mismatch") {
+        return {
+            ...effectSx,
+            animation: `${shake} 400ms ease-out ${PAIR_EFFECT_DELAY}ms`,
+            [reducedMotion]: {animation: "none"},
+        };
+    }
+
+    if (highlight === "match") {
+        return {
+            ...effectSx,
+            animation: `${pop} 400ms ease-out ${PAIR_EFFECT_DELAY}ms`,
+            "&::after": {
+                content: '""',
+                position: "absolute",
+                inset: -10,
+                zIndex: 1,
+                pointerEvents: "none",
+                borderRadius: "50%",
+                background: (theme) =>
+                    `radial-gradient(circle, ${alpha(theme.palette.common.white, 0.9)} 0%, `
+                    + `${alpha(theme.palette.success.light, 0.7)} 35%, ${alpha(theme.palette.success.main, 0)} 70%)`,
+                opacity: 0,
+                animation: `${flash} 450ms ease-out ${PAIR_EFFECT_DELAY}ms`,
+            },
+            [reducedMotion]: {
+                animation: "none",
+                "&::after": {animation: `${flashFade} 450ms linear ${PAIR_EFFECT_DELAY}ms`},
+            },
+        };
+    }
+
+    return effectSx;
+};
+
+// Сцена переворота: perspective задаёт глубину 3D для flipper'а
+const liftSx = {
+    perspective: "800px",
+};
+
+// Переворот с лёгким «перелётом» в конце (cubic-bezier выше 1) — карточка как будто пружинит
 const flipperSx = {
     position: "relative",
     transformStyle: "preserve-3d",
-    transition: `transform ${FLIP_TIME}ms ease-in-out`,
+    transition: `transform ${FLIP_TIME}ms cubic-bezier(0.34, 1.35, 0.64, 1)`,
+    [reducedMotion]: {transition: "none"},
 };
 
 const faceSx = {
@@ -101,8 +203,10 @@ function CardFace({sx, Icon, iconSize, compact, hidden}) {
  * Одна карточка игрового поля.
  *
  * Состоит из двух сторон (рубашка и лицо с иконкой) в 3D-контейнере.
- * При открытии переворачивается справа налево (rotateY до -180°), при закрытии — обратно.
- * Угаданная карточка исчезает через Zoom, оставаясь открытой. Очки за пару (`popup`) всплывают
+ * При открытии переворачивается справа налево (rotateY до -180°), при закрытии — обратно;
+ * на перевороте чуть приподнимается и в конце пружинит. Неугаданная пара встряхивается,
+ * угаданная подпрыгивает со вспышкой (getEffectSx), затем исчезает через Zoom, оставаясь открытой.
+ * При «уменьшить движение» переворот мгновенный, без встряски и прыжка, вспышка — только на месте. Очки за пару (`popup`) всплывают
  * поверх карточки и остаются видны, пока она исчезает: надпись лежит рядом с Zoom, а не внутри.
  *
  * Обёрнута в React.memo: перерисовывается, только когда меняются её пропсы. Поэтому обработчик
@@ -132,10 +236,20 @@ function MemoryCard({item, index, revealed, disabled, highlight, popup, iconSize
                     onClick={() => onOpen(index)}
                     style={disabled ? {pointerEvents: "none"} : undefined}
                 >
-                    <Box sx={{...flipperSx, transform: flipped ? "rotateY(-180deg)" : "rotateY(0deg)"}}>
-                        {/* Рубашка: иконка скрыта, нужна только чтобы задать размер карточки */}
-                        <CardFace sx={faceSx} Icon={Icon} iconSize={iconSize} compact={compact} hidden/>
-                        <CardFace sx={{...frontFaceSx, ...getHighlightSx(highlight)}} Icon={Icon} iconSize={iconSize} compact={compact}/>
+                    <Box sx={getEffectSx(highlight)}>
+                        <Box
+                            sx={{
+                                ...liftSx,
+                                animation: `${flipped ? liftOpen : liftClose} ${FLIP_TIME}ms ease-in-out`,
+                                [reducedMotion]: {animation: "none"},
+                            }}
+                        >
+                            <Box sx={{...flipperSx, transform: flipped ? "rotateY(-180deg)" : "rotateY(0deg)"}}>
+                                {/* Рубашка: иконка скрыта, нужна только чтобы задать размер карточки */}
+                                <CardFace sx={faceSx} Icon={Icon} iconSize={iconSize} compact={compact} hidden/>
+                                <CardFace sx={{...frontFaceSx, ...getHighlightSx(highlight)}} Icon={Icon} iconSize={iconSize} compact={compact}/>
+                            </Box>
+                        </Box>
                     </Box>
                 </Box>
             </Zoom>
