@@ -1,7 +1,9 @@
 const path = require("path");
 
 module.exports = {
-    entry: ['babel-polyfill', "./src/app.jsx"],
+    // Полифилы не нужны: MUI v5 работает только в современных браузерах (Chrome 90+, Safari 14+, Firefox 78+),
+    // где всё, что использует наш код, есть встроенным
+    entry: "./src/app.jsx",
     output: {
         path: path.resolve(__dirname, "public"),
         filename: "bundle.js",

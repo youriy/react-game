@@ -1,20 +1,34 @@
 import React from 'react';
-import {GridOverlay, DataGrid} from '@mui/x-data-grid';
-import {styled} from '@mui/material/styles';
-import {Box, Paper} from "@mui/material";
 import {useSelector} from "react-redux";
+import {styled} from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TablePagination from '@mui/material/TablePagination';
+import TableRow from '@mui/material/TableRow';
+import TableSortLabel from '@mui/material/TableSortLabel';
 import useIsMobile from "../hooks/useIsMobile.js";
-import {loadSortedResults} from "../core/storage.js";
+import useTranslation from "../hooks/useTranslation.js";
+import {getResultSeconds, loadSortedResults} from "../core/storage.js";
 import {getResultStars} from "../core/progress.js";
 import {MAX_STARS} from "../core/score.js";
-import useTranslation from "../hooks/useTranslation.js";
 
 /** Контейнер заглушки «нет данных» с цветами картинки под светлую/тёмную тему. */
-const StyledGridOverlay = styled(GridOverlay)(({theme}) => {
+const EmptyOverlay = styled('div')(({theme}) => {
     const light = theme.palette.mode === 'light';
 
     return {
+        display: 'flex',
         flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100%',
+        padding: theme.spacing(2),
+        textAlign: 'center',
         '& .ant-empty-img-1': {
             fill: light ? '#aeb8c2' : '#262626',
         },
@@ -34,12 +48,12 @@ const StyledGridOverlay = styled(GridOverlay)(({theme}) => {
     };
 });
 
-/** Заглушка, когда в статистике ещё нет ни одной игры. */
-function CustomNoRowsOverlay() {
+/** Заглушка, когда на уровне ещё нет ни одной игры. */
+function EmptyResults() {
     const t = useTranslation();
 
     return (
-        <StyledGridOverlay>
+        <EmptyOverlay>
             <svg
                 width="120"
                 height="100"
@@ -80,57 +94,141 @@ function CustomNoRowsOverlay() {
                 </g>
             </svg>
             <Box sx={{mt: 1}}>{t.info}</Box>
-        </StyledGridOverlay>
+        </EmptyOverlay>
     );
 }
 
 /** Сколько результатов на одной странице таблицы. */
 const RESULTS_PER_PAGE = 5;
-/** Высота таблицы, px: заголовок + RESULTS_PER_PAGE строк по 35 px + панель страниц. */
+/** Высота таблицы, px: заголовок + RESULTS_PER_PAGE строк + панель страниц (страница помещается без прокрутки). */
 const TABLE_HEIGHT = 317;
 
 /**
- * Таблица статистики выбранного уровня: дата, попытки, время, очки и звёзды прошлых игр,
- * отсортированные по очкам (лучшие сверху), по RESULTS_PER_PAGE на страницу.
- * Высота таблицы подобрана так, чтобы страница помещалась без прокрутки внутри.
- * Столбцы тянутся по ширине; на телефоне столбцы «Попытки» и «Время» скрыты, чтобы таблица помещалась.
+ * Столбцы таблицы.
+ * - id — ключ столбца (для сортировки), labelKey — подпись из languages.js;
+ * - getValue(row, level) — что показать в ячейке; getSortValue(row, level) — по чему сортировать;
+ * - hideOnMobile — скрыть на узком экране, чтобы таблица помещалась.
+ * У старых результатов может не быть очков и звёзд: очков нет — «—» и в конце при сортировке,
+ * звёзды считаются по счёту (см. core/progress.js).
+ */
+const columns = [
+    {id: "date", labelKey: "date", getValue: row => row.date, getSortValue: row => row.date},
+    {id: "try", labelKey: "try", hideOnMobile: true, getValue: row => row.try, getSortValue: row => row.try ?? 0},
+    {
+        id: "time", labelKey: "time", hideOnMobile: true,
+        getValue: row => row.time, getSortValue: row => getResultSeconds(row) ?? Infinity,
+    },
+    {id: "score", labelKey: "score", getValue: row => row.score ?? "—", getSortValue: row => row.score ?? -1},
+    {
+        id: "stars", labelKey: "stars",
+        getValue: (row, level) => {
+            const stars = getResultStars(row, level);
+            return "★".repeat(stars) + "☆".repeat(MAX_STARS - stars);
+        },
+        getSortValue: (row, level) => getResultStars(row, level),
+    },
+];
+
+/**
+ * Сравнение двух результатов по столбцу (для Array.sort).
+ * @param {Object} column - столбец из columns
+ * @param {'asc'|'desc'} order - направление сортировки
+ * @param {string} level - ключ уровня
+ */
+const compareBy = (column, order, level) => (a, b) => {
+    const x = column.getSortValue(a, level);
+    const y = column.getSortValue(b, level);
+    const result = x < y ? -1 : x > y ? 1 : 0;
+
+    return order === "asc" ? result : -result;
+};
+
+/**
+ * Таблица статистики выбранного уровня: дата, попытки, время, очки и звёзды прошлых игр.
+ * По умолчанию отсортирована по очкам (лучшие сверху); клик по заголовку меняет сортировку.
+ * По RESULTS_PER_PAGE строк на странице. На телефоне столбцы «Попытки» и «Время» скрыты.
+ * Сделана на обычных компонентах MUI (Table) — без тяжёлой библиотеки @mui/x-data-grid.
  */
 export default function ResultsTable() {
     const t = useTranslation();
     const level = useSelector(state => state.game.level);
     const isMobile = useIsMobile();
+    const [sort, setSort] = React.useState({by: "score", order: "desc"});
+    const [page, setPage] = React.useState(0);
 
-    const columns = [
-        {field: 'date', headerName: t.date, flex: 2, minWidth: 150},
-        {field: 'try', headerName: t.try, flex: 1, minWidth: 90, hide: isMobile},
-        {field: 'time', headerName: t.time, flex: 1, minWidth: 110, hide: isMobile},
-        // у результатов, сохранённых до появления очков, счёта нет
-        {field: 'score', headerName: t.score, flex: 1, minWidth: 70, valueGetter: (params) => params.row.score ?? '—'},
-        // у результатов до появления звёзд они считаются по счёту (см. core/progress.js)
-        {
-            field: 'stars', headerName: t.stars, flex: 1, minWidth: 80,
-            valueGetter: (params) => {
-                const stars = getResultStars(params.row, level);
-                return "★".repeat(stars) + "☆".repeat(MAX_STARS - stars);
-            },
-        },
-    ];
+    // Другой уровень — другая статистика: начинаем с первой страницы
+    React.useEffect(() => setPage(0), [level]);
+
+    const visibleColumns = columns.filter(column => !(isMobile && column.hideOnMobile));
+    const sortColumn = columns.find(column => column.id === sort.by);
+    const rows = React.useMemo(
+        () => [...loadSortedResults(level)].sort(compareBy(sortColumn, sort.order, level)),
+        [level, sort]
+    );
+    const pageRows = rows.slice(page * RESULTS_PER_PAGE, (page + 1) * RESULTS_PER_PAGE);
+
+    /** Клик по заголовку: тот же столбец — сменить направление, другой — сортировать по нему (сначала большие). */
+    const handleSort = (id) => {
+        setSort(current => ({
+            by: id,
+            order: current.by === id && current.order === "desc" ? "asc" : "desc",
+        }));
+        setPage(0);
+    };
 
     return (
-        <Paper style={{height: TABLE_HEIGHT, width: "100%"}}>
-            <DataGrid
-                rowHeight={35}
-                getRowId={row => row.date}
-                rows={loadSortedResults(level)}
-                columns={columns}
-                pageSize={RESULTS_PER_PAGE}
-                rowsPerPageOptions={[RESULTS_PER_PAGE]}
-                disableSelectionOnClick
-                disableColumnMenu
-                autoHeight={false}
-                components={{
-                    NoRowsOverlay: CustomNoRowsOverlay,
-                }}
+        <Paper sx={{height: TABLE_HEIGHT, width: "100%", display: "flex", flexDirection: "column", overflow: "hidden"}}>
+            {
+                rows.length === 0
+                    ? <EmptyResults/>
+                    : (
+                        <TableContainer sx={{flexGrow: 1}}>
+                            <Table size="small" stickyHeader>
+                                <TableHead>
+                                    <TableRow>
+                                        {
+                                            visibleColumns.map(column =>
+                                                <TableCell key={column.id} sortDirection={sort.by === column.id ? sort.order : false}>
+                                                    <TableSortLabel
+                                                        active={sort.by === column.id}
+                                                        direction={sort.by === column.id ? sort.order : "desc"}
+                                                        onClick={() => handleSort(column.id)}
+                                                    >
+                                                        {t[column.labelKey]}
+                                                    </TableSortLabel>
+                                                </TableCell>
+                                            )
+                                        }
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {
+                                        pageRows.map(row =>
+                                            <TableRow key={row.date} hover>
+                                                {
+                                                    visibleColumns.map(column =>
+                                                        <TableCell key={column.id} sx={{whiteSpace: "nowrap"}}>
+                                                            {column.getValue(row, level)}
+                                                        </TableCell>
+                                                    )
+                                                }
+                                            </TableRow>
+                                        )
+                                    }
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    )
+            }
+            <TablePagination
+                component="div"
+                count={rows.length}
+                page={page}
+                onPageChange={(event, newPage) => setPage(newPage)}
+                rowsPerPage={RESULTS_PER_PAGE}
+                rowsPerPageOptions={[]}
+                // без слов, чтобы не переводить: «1–5 / 12»
+                labelDisplayedRows={({from, to, count}) => `${from}–${to} / ${count}`}
             />
         </Paper>
     );

@@ -53,7 +53,7 @@ export const loadResults = () => {
  * @param {GameResult} result
  * @returns {number|undefined}
  */
-const getSeconds = (result) => {
+export const getResultSeconds = (result) => {
     if (typeof result.seconds === "number") {
         return result.seconds;
     }
@@ -99,7 +99,7 @@ export const getRecords = (level) => {
 
     return {
         score: pick(results.map(result => result.score), Math.max),
-        time: pick(results.map(getSeconds), Math.min),
+        time: pick(results.map(getResultSeconds), Math.min),
         streak: pick(results.map(result => result.bestStreak), Math.max),
     };
 };
