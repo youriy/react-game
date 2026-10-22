@@ -24,7 +24,7 @@ export const levelList = [
         scoreMultiplier: 0.5, starScores: [2500, 3000], unlockedBy: null,
     },
     {
-        key: "medium", labelKey: "medium", pairs: 18, columns: 6, mobileColumns: 4, previewTime: 2000,
+        key: "medium", labelKey: "medium", pairs: 18, columns: 6, mobileColumns: 6, previewTime: 2000,
         scoreMultiplier: 1, starScores: [5000, 8000], unlockedBy: null,
     },
     {
