@@ -5,6 +5,7 @@ import {incrementTry, registerPair, setClickable, takeHint} from "../store/gameS
 import {finishGame} from "../store/thunks.js";
 import {getOpenIndexes, isBoardCleared, isPairMatch} from "../core/rules.js";
 import {getLevel} from "../core/levels.js";
+import {vibrate, VIBRATION} from "../core/vibration.js";
 
 /** Сколько открытая пара остаётся на экране перед удалением/закрытием, мс. */
 const PAIR_DELAY = 800;
@@ -19,8 +20,9 @@ export const HINT_TIME = 1000;
  *    клики заблокированы.
  * 2. Игрок открывает карточки (`openItem`). Когда открыты две, засчитывается попытка,
  *    пара подсвечивается (`getHighlight`) и через PAIR_DELAY мс удаляется или закрывается.
+ *    На телефоне угаданная и неугаданная пара отличаются вибрацией (core/vibration.js).
  * 3. Раз за партию можно взять подсказку (`showHint`): все карточки открываются на HINT_TIME мс.
- * 4. Когда убраны все карточки — thunk `finishGame` сохраняет результат и показывает победу.
+ * 4. Когда убраны все карточки — вибрация победы, thunk `finishGame` сохраняет результат и показывает победу.
  *
  * Хук читает из стора только нужные поля — время партии (меняется каждую секунду) он не читает,
  * поэтому игровое поле не перерисовывается на каждый тик таймера.
@@ -114,6 +116,7 @@ export default function useMemoryGame() {
         dispatch(incrementTry());
         dispatch(registerPair(isMatch));
         setPairResult({indexes: openIndexes, match: isMatch});
+        vibrate(isMatch ? VIBRATION.match : VIBRATION.mismatch);
 
         pairTimeout.current = setTimeout(() => {
             // Неугаданная пара гаснет и переворачивается обратно, угаданная исчезает, оставаясь зелёной
@@ -129,6 +132,7 @@ export default function useMemoryGame() {
     // Все пары убраны — победа
     React.useEffect(() => {
         if (isBoardCleared(items)) {
+            vibrate(VIBRATION.win);
             dispatch(finishGame());
         }
     }, [items, dispatch]);
