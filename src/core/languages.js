@@ -47,7 +47,10 @@ export const languageList = {
         darkMode: "Тёмная тема",
         lightMode: "Светлая тема",
         vibrationOff: "Выключить вибрацию",
-        vibrationOn: "Включить вибрацию"
+        vibrationOn: "Включить вибрацию",
+        errorTitle: "Что-то пошло не так",
+        errorText: "В игре произошла ошибка. Сохранённые результаты и настройки не пострадали.",
+        errorRestart: "Начать заново"
     },
     english: {
         win: "Victory!",
@@ -92,7 +95,10 @@ export const languageList = {
         darkMode: "Dark theme",
         lightMode: "Light theme",
         vibrationOff: "Turn off vibration",
-        vibrationOn: "Turn on vibration"
+        vibrationOn: "Turn on vibration",
+        errorTitle: "Something went wrong",
+        errorText: "The game ran into an error. Your saved results and settings are safe.",
+        errorRestart: "Start over"
     },
     chine: {
         win: "勝利!",
@@ -137,7 +143,10 @@ export const languageList = {
         darkMode: "深色主題",
         lightMode: "淺色主題",
         vibrationOff: "關閉震動",
-        vibrationOn: "開啟震動"
+        vibrationOn: "開啟震動",
+        errorTitle: "出了點問題",
+        errorText: "遊戲發生錯誤。已儲存的成績和設定不受影響。",
+        errorRestart: "重新開始"
     },
     arabe: {
         win: "فوز!",
@@ -182,7 +191,10 @@ export const languageList = {
         darkMode: "الوضع الداكن",
         lightMode: "الوضع الفاتح",
         vibrationOff: "إيقاف الاهتزاز",
-        vibrationOn: "تشغيل الاهتزاز"
+        vibrationOn: "تشغيل الاهتزاز",
+        errorTitle: "حدث خطأ ما",
+        errorText: "حدث خطأ في اللعبة. نتائجك وإعداداتك المحفوظة لم تتأثر.",
+        errorRestart: "ابدأ من جديد"
     },
     german: {
         win: "Sieg!",
@@ -227,7 +239,10 @@ export const languageList = {
         darkMode: "Dunkles Design",
         lightMode: "Helles Design",
         vibrationOff: "Vibration ausschalten",
-        vibrationOn: "Vibration einschalten"
+        vibrationOn: "Vibration einschalten",
+        errorTitle: "Etwas ist schiefgelaufen",
+        errorText: "Im Spiel ist ein Fehler aufgetreten. Gespeicherte Ergebnisse und Einstellungen sind erhalten.",
+        errorRestart: "Neu starten"
     },
     spanish: {
         win: "Victoria!",
@@ -272,7 +287,10 @@ export const languageList = {
         darkMode: "Tema oscuro",
         lightMode: "Tema claro",
         vibrationOff: "Desactivar vibración",
-        vibrationOn: "Activar vibración"
+        vibrationOn: "Activar vibración",
+        errorTitle: "Algo salió mal",
+        errorText: "Se produjo un error en el juego. Tus resultados y ajustes guardados no se han perdido.",
+        errorRestart: "Empezar de nuevo"
     }
 }
 
