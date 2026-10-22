@@ -17,6 +17,7 @@ import {DEFAULT_LEVEL} from "../core/levels.js";
  * @property {boolean} paused - партия на паузе
  * @property {boolean} hintUsed - подсказка в этой партии уже использована
  * @property {Array<'score'|'time'|'streak'>} newRecords - какие рекорды побиты в последней партии
+ * @property {string[]} newUnlocks - какие уровни открыла последняя победа (ключи уровней)
  * @property {boolean} win - последняя партия завершилась победой (показывается экран победы)
  * @property {boolean} clickable - можно ли сейчас открывать карточки (false, пока решается пара)
  * @property {string} language - ключ языка из core/languages.js (сохраняется в localStorage)
@@ -40,6 +41,7 @@ const gameSlice = createSlice({
         hintUsed: false,
         // Какие рекорды побиты в последней партии: 'score' | 'time' | 'streak'
         newRecords: [],
+        newUnlocks: [],
         win: false,
         clickable: true,
         language: loadSetting("language", "russian"),
@@ -97,6 +99,7 @@ const gameSlice = createSlice({
             state.paused = false;
             state.hintUsed = false;
             state.newRecords = [];
+            state.newUnlocks = [];
             state.gaming = true;
             state.round++;
         },
@@ -109,6 +112,10 @@ const gameSlice = createSlice({
         /** payload: список побитых рекордов, например ['score', 'time']. */
         setNewRecords(state, action) {
             state.newRecords = action.payload;
+        },
+        /** payload: ключи уровней, которые открыла последняя победа, например ['hard']. */
+        setNewUnlocks(state, action) {
+            state.newUnlocks = action.payload;
         },
         /** Отмечает, что подсказка в этой партии использована. */
         takeHint(state) {
@@ -134,4 +141,4 @@ const gameSlice = createSlice({
 });
 
 export default gameSlice.reducer
-export const {incrementTry, registerPair, incrementTime, setGaming, setWin, setClickable, startNewRound, giveUp, setNewRecords, takeHint, setPaused, setLanguage, setTheme, setLevel} = gameSlice.actions
+export const {incrementTry, registerPair, incrementTime, setGaming, setWin, setClickable, startNewRound, giveUp, setNewRecords, setNewUnlocks, takeHint, setPaused, setLanguage, setTheme, setLevel} = gameSlice.actions

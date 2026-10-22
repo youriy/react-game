@@ -1,5 +1,5 @@
 import {formatDate, formatTime} from "./utils.js";
-import {calculateScore} from "./score.js";
+import {calculateScore, calculateStars} from "./score.js";
 import {DEFAULT_LEVEL} from "./levels.js";
 
 /**
@@ -14,6 +14,7 @@ import {DEFAULT_LEVEL} from "./levels.js";
  * @property {number} [bestStreak] - лучшая серия партии (нет у старых результатов)
  * @property {number} [score] - итоговый счёт (нет у результатов до появления очков)
  * @property {string} [level] - ключ уровня (нет у результатов до появления уровней — они считаются средним)
+ * @property {number} [stars] - звёзды за партию, 1–3 (нет у результатов до появления звёзд)
  */
 
 const RESULTS_KEY = "results";
@@ -72,7 +73,7 @@ const getSeconds = (result) => {
  * @param {string} level - ключ уровня
  * @returns {GameResult[]}
  */
-const loadLevelResults = (level) => loadResults().filter(result => (result.level || DEFAULT_LEVEL) === level);
+export const loadLevelResults = (level) => loadResults().filter(result => (result.level || DEFAULT_LEVEL) === level);
 
 /**
  * Результаты уровня, отсортированные по очкам от лучшего; игры без очков — в конце.
@@ -115,6 +116,7 @@ export const getRecords = (level) => {
  */
 export const saveResult = ({count, time, score, hintUsed, bestStreak, level}) => {
     const results = loadResults();
+    const total = calculateScore({score, time, count, hintUsed, level}).total;
 
     results.push({
         date: formatDate(),
@@ -123,7 +125,8 @@ export const saveResult = ({count, time, score, hintUsed, bestStreak, level}) =>
         seconds: time,
         bestStreak,
         level,
-        score: calculateScore({score, time, count, hintUsed, level}).total
+        score: total,
+        stars: calculateStars(total, level),
     });
 
     localStorage.setItem(RESULTS_KEY, JSON.stringify(results));

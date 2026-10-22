@@ -6,6 +6,8 @@
  *
  * Итоговый счёт = (очки за пары + бонус за время + бонус за точность − штраф за подсказку)
  * × множитель уровня (core/levels.js), округлённый и не меньше нуля.
+ *
+ * Звёзды за партию (1–3) — по итоговому счёту и порогам уровня (starScores в core/levels.js).
  */
 import {getLevel} from "./levels.js";
 
@@ -61,4 +63,25 @@ export const calculateScore = ({score, time, count, hintUsed = false, level}) =>
         multiplier: scoreMultiplier,
         total: Math.max(0, Math.round((score + timeBonus + accuracyBonus - hintPenalty) * scoreMultiplier)),
     };
+};
+
+/** Максимум звёзд за партию. */
+export const MAX_STARS = 3;
+
+/**
+ * Звёзды за выигранную партию: 1 — за победу, 2 и 3 — если итоговый счёт достиг порогов уровня.
+ * @param {number} total - итоговый счёт (calculateScore(...).total)
+ * @param {string} [level] - ключ уровня (по умолчанию — средний)
+ * @returns {number} 1, 2 или 3
+ * @example
+ * calculateStars(6000, "medium") // → 2 (порог 2 звёзд на среднем — 5000)
+ */
+export const calculateStars = (total, level) => {
+    const [twoStars, threeStars] = getLevel(level).starScores;
+
+    if (total >= threeStars) {
+        return 3;
+    }
+
+    return total >= twoStars ? 2 : 1;
 };

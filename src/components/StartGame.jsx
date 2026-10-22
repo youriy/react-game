@@ -6,13 +6,16 @@ import Stack from "@mui/material/Stack";
 import Typography from '@mui/material/Typography';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import LockIcon from '@mui/icons-material/Lock';
 import {setLevel} from "../store/gameSlice.js";
 import {startNewGame} from "../store/thunks.js";
 import {formatTime} from "../core/utils.js";
 import useTranslation from "../core/useTranslation.js";
-import {calculateScore} from "../core/score.js";
+import {calculateScore, calculateStars} from "../core/score.js";
 import {getRecords} from "../core/storage.js";
-import {getLevel, levelList} from "../core/levels.js";
+import {DEFAULT_LEVEL, getLevel, levelList} from "../core/levels.js";
+import {getBestStars, isLevelUnlocked} from "../core/progress.js";
+import Stars from "./Stars.jsx";
 import Records from "./Records.jsx";
 import ResultsTable from "./ResultsTable.jsx";
 
@@ -30,12 +33,21 @@ function WinText({variant, children}) {
 
 /**
  * Переключатель уровня сложности: «Лёгкий 4×4», «Средний 6×6», «Сложный 8×6».
- * Выбранный уровень сохраняется в state.game.level (и в localStorage).
+ * На кнопке — лучшие звёзды уровня; закрытый уровень недоступен, под переключателем написано,
+ * как его открыть. Выбранный уровень сохраняется в state.game.level (и в localStorage).
  */
 function LevelSelect() {
     const dispatch = useDispatch();
     const level = useSelector(state => state.game.level);
     const t = useTranslation();
+    const lockedLevels = levelList.filter(item => !isLevelUnlocked(item.key));
+
+    // Если выбран закрытый уровень (например, сохранён в настройках раньше) — переключаемся на уровень по умолчанию
+    React.useEffect(() => {
+        if (!isLevelUnlocked(level)) {
+            dispatch(setLevel(DEFAULT_LEVEL));
+        }
+    }, [level]);
 
     return (
         <Stack spacing={1} sx={{alignItems: "center"}}>
@@ -48,27 +60,43 @@ function LevelSelect() {
                 onChange={(event, value) => value && dispatch(setLevel(value))}
             >
                 {
-                    levelList.map(item =>
-                        <ToggleButton key={item.key} value={item.key} sx={{px: 3}}>
-                            {t[item.labelKey]} {item.columns}×{item.pairs * 2 / item.columns}
-                        </ToggleButton>
-                    )
+                    levelList.map(item => {
+                        const locked = lockedLevels.includes(item);
+
+                        return (
+                            <ToggleButton key={item.key} value={item.key} disabled={locked} sx={{px: 3, flexDirection: "column"}}>
+                                <span>
+                                    {locked && <LockIcon fontSize="inherit" sx={{mr: 0.5, verticalAlign: "-2px"}}/>}
+                                    {t[item.labelKey]} {item.columns}×{item.pairs * 2 / item.columns}
+                                </span>
+                                <Stars value={getBestStars(item.key)} size="small"/>
+                            </ToggleButton>
+                        );
+                    })
                 }
             </ToggleButtonGroup>
+            {
+                lockedLevels.map(item =>
+                    <Typography key={item.key} variant="body2" color="text.secondary">
+                        🔒 {t[item.labelKey]} — {t.unlockAfter} «{t[getLevel(item.unlockedBy).labelKey]}»
+                    </Typography>
+                )
+            }
         </Stack>
     );
 }
 
 /**
- * Стартовый экран: результаты последней партии (если она выиграна), выбор уровня,
- * рекорды и статистика выбранного уровня, кнопка «Начать игру».
+ * Стартовый экран: результаты последней партии (если она выиграна: звёзды, открытые уровни, рекорды,
+ * разбивка счёта), выбор уровня, рекорды и статистика выбранного уровня, кнопка «Начать игру».
  */
 export default function StartGame() {
     const dispatch = useDispatch();
-    const {win, count, time, score, bestStreak, hintUsed, newRecords, level, roundLevel} = useSelector(state => state.game);
+    const {win, count, time, score, bestStreak, hintUsed, newRecords, newUnlocks, level, roundLevel} = useSelector(state => state.game);
     const t = useTranslation();
     // Результат последней партии считается по её уровню, рекорды — по выбранному
     const result = calculateScore({score, time, count, hintUsed, level: roundLevel});
+    const stars = calculateStars(result.total, roundLevel);
     const records = getRecords(getLevel(level).key);
     const recordLabels = {score: t.bestScore, time: t.bestTime, streak: t.bestStreak};
 
@@ -81,6 +109,15 @@ export default function StartGame() {
                         win &&
                         <Stack spacing={1}>
                             <WinText variant="h1">{t.win}</WinText>
+                            <Box sx={{display: "flex", justifyContent: "center"}}>
+                                <Stars value={stars} size="large"/>
+                            </Box>
+                            {
+                                newUnlocks.length > 0 &&
+                                <WinText variant="h5">
+                                    {t.levelUnlocked}: {newUnlocks.map(key => `«${t[getLevel(key).labelKey]}»`).join(", ")}
+                                </WinText>
+                            }
                             <WinText variant="h5">{t.difficulty}: {t[getLevel(roundLevel).labelKey]}</WinText>
                             {
                                 newRecords.length > 0 &&

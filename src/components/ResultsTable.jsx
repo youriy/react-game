@@ -4,6 +4,8 @@ import {styled} from '@mui/material/styles';
 import {Box, Paper} from "@mui/material";
 import {useSelector} from "react-redux";
 import {loadSortedResults} from "../core/storage.js";
+import {getResultStars} from "../core/progress.js";
+import {MAX_STARS} from "../core/score.js";
 import useTranslation from "../core/useTranslation.js";
 
 /** Контейнер заглушки «нет данных» с цветами картинки под светлую/тёмную тему. */
@@ -87,7 +89,7 @@ const RESULTS_PER_PAGE = 5;
 const TABLE_HEIGHT = 317;
 
 /**
- * Таблица статистики выбранного уровня: дата, попытки, время и очки прошлых игр,
+ * Таблица статистики выбранного уровня: дата, попытки, время, очки и звёзды прошлых игр,
  * отсортированные по очкам (лучшие сверху), по RESULTS_PER_PAGE на страницу.
  * Высота таблицы подобрана так, чтобы страница помещалась без прокрутки внутри.
  */
@@ -101,6 +103,14 @@ export default function ResultsTable() {
         {field: 'time', headerName: t.time, width: 150},
         // у результатов, сохранённых до появления очков, счёта нет
         {field: 'score', headerName: t.score, width: 150, valueGetter: (params) => params.row.score ?? '—'},
+        // у результатов до появления звёзд они считаются по счёту (см. core/progress.js)
+        {
+            field: 'stars', headerName: t.stars, width: 120,
+            valueGetter: (params) => {
+                const stars = getResultStars(params.row, level);
+                return "★".repeat(stars) + "☆".repeat(MAX_STARS - stars);
+            },
+        },
     ];
 
     return (

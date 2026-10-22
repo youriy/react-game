@@ -11,13 +11,25 @@
  * @property {number} columns - сколько карточек в ряду
  * @property {number} previewTime - сколько карточки показываются в начале партии, мс
  * @property {number} scoreMultiplier - множитель итогового счёта (сложнее — больше очков)
+ * @property {[number, number]} starScores - итоговый счёт для 2 и 3 звёзд (1 звезда — за любую победу).
+ *   Пороги подобраны по формуле очков для типичной и хорошей игры; их можно подкрутить
+ * @property {string|null} unlockedBy - уровень, победа на котором открывает этот; null — открыт сразу
  */
 
 /** @type {Level[]} в порядке показа в переключателе */
 export const levelList = [
-    {key: "easy", labelKey: "easy", pairs: 8, columns: 4, previewTime: 1500, scoreMultiplier: 0.5},
-    {key: "medium", labelKey: "medium", pairs: 18, columns: 6, previewTime: 2000, scoreMultiplier: 1},
-    {key: "hard", labelKey: "hard", pairs: 24, columns: 8, previewTime: 3000, scoreMultiplier: 1.5},
+    {
+        key: "easy", labelKey: "easy", pairs: 8, columns: 4, previewTime: 1500,
+        scoreMultiplier: 0.5, starScores: [2500, 3000], unlockedBy: null,
+    },
+    {
+        key: "medium", labelKey: "medium", pairs: 18, columns: 6, previewTime: 2000,
+        scoreMultiplier: 1, starScores: [5000, 8000], unlockedBy: null,
+    },
+    {
+        key: "hard", labelKey: "hard", pairs: 24, columns: 8, previewTime: 3000,
+        scoreMultiplier: 1.5, starScores: [7000, 11000], unlockedBy: "medium",
+    },
 ];
 
 /**

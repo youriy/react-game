@@ -40,7 +40,10 @@ export const languageList = {
         difficulty: "Сложность",
         easy: "Лёгкий",
         medium: "Средний",
-        hard: "Сложный"
+        hard: "Сложный",
+        stars: "Звёзды",
+        unlockAfter: "откроется после победы на уровне",
+        levelUnlocked: "🔓 Открыт новый уровень"
     },
     english: {
         win: "Victory!",
@@ -78,7 +81,10 @@ export const languageList = {
         difficulty: "Difficulty",
         easy: "Easy",
         medium: "Medium",
-        hard: "Hard"
+        hard: "Hard",
+        stars: "Stars",
+        unlockAfter: "unlocks after a win on",
+        levelUnlocked: "🔓 New level unlocked"
     },
     chine: {
         win: "勝利!",
@@ -116,7 +122,10 @@ export const languageList = {
         difficulty: "難度",
         easy: "簡單",
         medium: "中等",
-        hard: "困難"
+        hard: "困難",
+        stars: "星級",
+        unlockAfter: "在以下難度獲勝後解鎖",
+        levelUnlocked: "🔓 新難度已解鎖"
     },
     arabe: {
         win: "فوز!",
@@ -154,7 +163,10 @@ export const languageList = {
         difficulty: "الصعوبة",
         easy: "سهل",
         medium: "متوسط",
-        hard: "صعب"
+        hard: "صعب",
+        stars: "النجوم",
+        unlockAfter: "يُفتح بعد الفوز في مستوى",
+        levelUnlocked: "🔓 تم فتح مستوى جديد"
     },
     german: {
         win: "Sieg!",
@@ -192,7 +204,10 @@ export const languageList = {
         difficulty: "Schwierigkeit",
         easy: "Leicht",
         medium: "Mittel",
-        hard: "Schwer"
+        hard: "Schwer",
+        stars: "Sterne",
+        unlockAfter: "wird nach einem Sieg freigeschaltet auf",
+        levelUnlocked: "🔓 Neues Level freigeschaltet"
     },
     spanish: {
         win: "Victoria!",
@@ -230,7 +245,10 @@ export const languageList = {
         difficulty: "Dificultad",
         easy: "Fácil",
         medium: "Media",
-        hard: "Difícil"
+        hard: "Difícil",
+        stars: "Estrellas",
+        unlockAfter: "se desbloquea al ganar en",
+        levelUnlocked: "🔓 Nuevo nivel desbloqueado"
     }
 }
 
