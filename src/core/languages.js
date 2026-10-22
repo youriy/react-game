@@ -1,6 +1,6 @@
 /**
  * Тексты интерфейса на всех языках: `languageList[язык][ключ]`.
- * Чтобы добавить язык — добавьте объект со всеми ключами и пункт в languageOptions.
+ * Чтобы добавить язык — добавьте объект со всеми ключами, пункт в languageOptions и коды в browserLanguageCodes.
  * Чтобы добавить текст — добавьте ключ во все языки. В компонентах тексты берутся через useTranslation().
  */
 export const languageList = {
@@ -52,7 +52,13 @@ export const languageList = {
         soundOn: "Включить звук",
         errorTitle: "Что-то пошло не так",
         errorText: "В игре произошла ошибка. Сохранённые результаты и настройки не пострадали.",
-        errorRestart: "Начать заново"
+        errorRestart: "Начать заново",
+        howToPlay: "Как играть",
+        howToPlayStep1: "Выбери уровень и нажми «Начать игру». Первые секунды все карточки открыты — запоминай, где что лежит.",
+        howToPlayStep2: "Открывай по две карточки. Одинаковые — пара исчезает, разные — закрываются обратно.",
+        howToPlayStep3: "Пары подряд дают больше очков 🔥. Чем быстрее и меньше попыток, тем выше счёт и больше звёзд.",
+        howToPlayStep4: "Застрял? «Подсказка» раз за партию покажет все карточки (−{penalty} очков). Убери все пары — победа!",
+        howToPlayOk: "Понятно!"
     },
     english: {
         win: "Victory!",
@@ -102,7 +108,13 @@ export const languageList = {
         soundOn: "Turn on sound",
         errorTitle: "Something went wrong",
         errorText: "The game ran into an error. Your saved results and settings are safe.",
-        errorRestart: "Start over"
+        errorRestart: "Start over",
+        howToPlay: "How to play",
+        howToPlayStep1: "Pick a level and press “Start the game”. For the first few seconds all cards are face up — memorize them.",
+        howToPlayStep2: "Flip two cards at a time. If they match, the pair disappears; if not, they flip back.",
+        howToPlayStep3: "Pairs in a row earn more points 🔥. The faster you are and the fewer attempts you make, the higher your score and the more stars.",
+        howToPlayStep4: "Stuck? “Hint” shows all cards once per game (−{penalty} points). Clear all pairs to win!",
+        howToPlayOk: "Got it!"
     },
     chine: {
         win: "勝利!",
@@ -152,7 +164,13 @@ export const languageList = {
         soundOn: "開啟音效",
         errorTitle: "出了點問題",
         errorText: "遊戲發生錯誤。已儲存的成績和設定不受影響。",
-        errorRestart: "重新開始"
+        errorRestart: "重新開始",
+        howToPlay: "遊戲說明",
+        howToPlayStep1: "選擇難度並點擊「開始遊戲」。開始的幾秒內所有卡片都是翻開的——記住它們的位置。",
+        howToPlayStep2: "每次翻開兩張卡片。相同則配對消失，不同則翻回去。",
+        howToPlayStep3: "連續配對可獲得更多分數 🔥。越快、嘗試次數越少，分數越高、星星越多。",
+        howToPlayStep4: "卡住了？「提示」每局可用一次，會顯示所有卡片（−{penalty} 分）。消除所有配對即可獲勝！",
+        howToPlayOk: "明白了！"
     },
     arabe: {
         win: "فوز!",
@@ -202,7 +220,13 @@ export const languageList = {
         soundOn: "تشغيل الصوت",
         errorTitle: "حدث خطأ ما",
         errorText: "حدث خطأ في اللعبة. نتائجك وإعداداتك المحفوظة لم تتأثر.",
-        errorRestart: "ابدأ من جديد"
+        errorRestart: "ابدأ من جديد",
+        howToPlay: "طريقة اللعب",
+        howToPlayStep1: "اختر المستوى واضغط «ابدأ اللعبة». في الثواني الأولى تكون كل البطاقات مكشوفة — احفظ أماكنها.",
+        howToPlayStep2: "اقلب بطاقتين في كل مرة. إذا تطابقتا يختفي الزوج، وإلا تُقلبان من جديد.",
+        howToPlayStep3: "الأزواج المتتالية تمنح نقاطًا أكثر 🔥. كلما كنت أسرع وبمحاولات أقل، زادت نتيجتك ونجومك.",
+        howToPlayStep4: "علقت؟ «تلميح» يكشف كل البطاقات مرة واحدة في كل لعبة (−{penalty} نقطة). أزل كل الأزواج لتفوز!",
+        howToPlayOk: "فهمت!"
     },
     german: {
         win: "Sieg!",
@@ -252,7 +276,13 @@ export const languageList = {
         soundOn: "Ton einschalten",
         errorTitle: "Etwas ist schiefgelaufen",
         errorText: "Im Spiel ist ein Fehler aufgetreten. Gespeicherte Ergebnisse und Einstellungen sind erhalten.",
-        errorRestart: "Neu starten"
+        errorRestart: "Neu starten",
+        howToPlay: "So wird gespielt",
+        howToPlayStep1: "Wähle ein Level und drücke „Starte das Spiel“. In den ersten Sekunden sind alle Karten aufgedeckt — merk sie dir.",
+        howToPlayStep2: "Decke immer zwei Karten auf. Gleiche verschwinden als Paar, ungleiche werden wieder umgedreht.",
+        howToPlayStep3: "Paare in Folge bringen mehr Punkte 🔥. Je schneller und mit weniger Versuchen, desto höher die Punktzahl und mehr Sterne.",
+        howToPlayStep4: "Nicht weiter? „Tipp“ zeigt einmal pro Spiel alle Karten (−{penalty} Punkte). Räume alle Paare ab, um zu gewinnen!",
+        howToPlayOk: "Verstanden!"
     },
     spanish: {
         win: "Victoria!",
@@ -302,7 +332,13 @@ export const languageList = {
         soundOn: "Activar sonido",
         errorTitle: "Algo salió mal",
         errorText: "Se produjo un error en el juego. Tus resultados y ajustes guardados no se han perdido.",
-        errorRestart: "Empezar de nuevo"
+        errorRestart: "Empezar de nuevo",
+        howToPlay: "Cómo jugar",
+        howToPlayStep1: "Elige un nivel y pulsa «Empieza el juego». Durante los primeros segundos todas las cartas están boca arriba: memorízalas.",
+        howToPlayStep2: "Gira dos cartas cada vez. Si son iguales, la pareja desaparece; si no, se vuelven a cerrar.",
+        howToPlayStep3: "Las parejas seguidas dan más puntos 🔥. Cuanto más rápido y con menos intentos, más puntuación y más estrellas.",
+        howToPlayStep4: "¿Atascado? «Pista» muestra todas las cartas una vez por partida (−{penalty} puntos). ¡Quita todas las parejas para ganar!",
+        howToPlayOk: "¡Entendido!"
     }
 }
 
@@ -318,3 +354,37 @@ export const languageOptions = [
     {code: "german", label: "German"},
     {code: "spanish", label: "Español"},
 ];
+
+/**
+ * Коды языков браузера (ISO 639-1, `navigator.languages`) для каждого языка игры:
+ * по ним при первом запуске выбирается язык (см. detectBrowserLanguage).
+ * @type {Object<string, string>} код браузера → ключ в languageList
+ */
+const browserLanguageCodes = {
+    ru: "russian",
+    en: "english",
+    zh: "chine",
+    ar: "arabe",
+    de: "german",
+    es: "spanish",
+};
+
+/**
+ * Язык игры по настройкам браузера: первый из `navigator.languages`, который есть в игре.
+ * Регион не важен: "de-AT" → немецкий, "zh-TW" → китайский.
+ * Нужен, пока игрок сам не выбрал язык в шапке (его выбор сохраняется и важнее).
+ * @returns {string|null} ключ в languageList или null, если подходящего языка нет
+ */
+export const detectBrowserLanguage = () => {
+    if (typeof navigator === "undefined") {
+        return null;
+    }
+
+    const codes = navigator.languages?.length ? navigator.languages : [navigator.language];
+    const found = codes
+        .filter(Boolean)
+        .map(code => browserLanguageCodes[code.toLowerCase().split("-")[0]])
+        .find(Boolean);
+
+    return found || null;
+};

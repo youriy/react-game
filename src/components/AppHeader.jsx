@@ -9,6 +9,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import HelpIcon from '@mui/icons-material/HelpOutline';
 import LanguageIcon from '@mui/icons-material/Language';
 import PaletteIcon from '@mui/icons-material/Palette';
 // Brightness4 — «луна» (включить тёмную тему), Brightness7 — «солнце» (включить светлую)
@@ -20,7 +21,7 @@ import VibrationOffIcon from '@mui/icons-material/MobileOff';
 // Иконка звука тоже показывает текущее состояние: динамик с волнами — включён, перечёркнутый — выключен
 import SoundIcon from '@mui/icons-material/VolumeUp';
 import SoundOffIcon from '@mui/icons-material/VolumeOff';
-import {setLanguage, setTheme, toggleDarkMode, toggleSound, toggleVibration} from "../store/gameSlice.js";
+import {setHowToPlay, setLanguage, setTheme, toggleDarkMode, toggleSound, toggleVibration} from "../store/gameSlice.js";
 import {canVibrate} from "../core/vibration.js";
 import {canPlaySound} from "../core/sound.js";
 import {languageOptions} from "../core/languages.js";
@@ -104,7 +105,8 @@ const appBarSx = {
 };
 
 /**
- * Шапка: название игры, выбор языка, цвета, светлой/тёмной темы, звука и вибрации.
+ * Шапка: название игры, кнопка «?» (окно «Как играть»), выбор языка, цвета, светлой/тёмной темы, звука и вибрации.
+ * Выбранный здесь язык сохраняется и важнее языка браузера (см. detectBrowserLanguage в core/languages.js).
  * Кнопка звука видна, если браузер умеет Web Audio (см. canPlaySound) — то есть почти всегда.
  * Кнопка вибрации видна только там, где вибрация возможна (телефон/планшет с Vibration API, см. canVibrate).
  */
@@ -126,6 +128,17 @@ export default function AppHeader() {
                     </Typography>
                     <Box sx={{flexGrow: 1}}/>
                     <Box sx={{display: {md: 'flex'}}}>
+                        <Tooltip title={t.howToPlay} arrow>
+                            <IconButton
+                                size="large"
+                                edge="end"
+                                aria-label="how to play"
+                                onClick={() => dispatch(setHowToPlay(true))}
+                                color="inherit"
+                            >
+                                <HelpIcon/>
+                            </IconButton>
+                        </Tooltip>
                         <MenuButton
                             id="primary-language-menu"
                             title={t.changeLanguage}

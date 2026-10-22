@@ -2,6 +2,7 @@ import {createSlice} from "@reduxjs/toolkit";
 import {loadSetting} from "../core/storage.js";
 import {getMatchPoints} from "../core/score.js";
 import {DEFAULT_LEVEL} from "../core/levels.js";
+import {detectBrowserLanguage} from "../core/languages.js";
 
 /**
  * Срез Redux с состоянием партии и настройками интерфейса.
@@ -20,12 +21,15 @@ import {DEFAULT_LEVEL} from "../core/levels.js";
  * @property {string[]} newUnlocks - какие уровни открыла последняя победа (ключи уровней)
  * @property {boolean} win - последняя партия завершилась победой (показывается экран победы)
  * @property {boolean} clickable - можно ли сейчас открывать карточки (false, пока решается пара)
- * @property {string} language - ключ языка из core/languages.js (сохраняется в localStorage)
+ * @property {string} language - ключ языка из core/languages.js (сохраняется в localStorage, когда игрок выбирает его
+ *   в шапке; до этого берётся язык браузера, если он есть в игре, иначе русский)
  * @property {string} theme - имя темы из core/themes.js (сохраняется в localStorage)
  * @property {boolean} darkMode - тёмная тема (сохраняется в localStorage)
  * @property {boolean} vibration - вибрация на телефоне включена (сохраняется в localStorage)
  * @property {boolean} sound - звуки включены (сохраняется в localStorage)
  * @property {string} level - выбранный уровень сложности из core/levels.js (сохраняется в localStorage)
+ * @property {boolean} howToPlay - открыто окно «Как играть» (само открывается при первом запуске,
+ *   пока в localStorage нет флага `howToPlaySeen`, см. HowToPlay.jsx)
  * @property {string} roundLevel - уровень текущей/последней партии; фиксируется при старте,
  *   чтобы переключение уровня на стартовом экране не меняло результаты уже сыгранной партии
  */
@@ -47,12 +51,14 @@ const gameSlice = createSlice({
         newUnlocks: [],
         win: false,
         clickable: true,
-        language: loadSetting("language", "russian"),
+        // Язык, выбранный игроком, важнее языка браузера; если не подошёл ни один — русский
+        language: loadSetting("language", detectBrowserLanguage() || "russian"),
         theme: loadSetting("theme", "indigoTheme"),
         darkMode: loadSetting("darkMode", "false") === "true",
         vibration: loadSetting("vibration", "true") === "true",
         sound: loadSetting("sound", "true") === "true",
         level: loadSetting("level", DEFAULT_LEVEL),
+        howToPlay: loadSetting("howToPlaySeen", "false") !== "true",
         roundLevel: DEFAULT_LEVEL
     },
     reducers: {
@@ -154,9 +160,13 @@ const gameSlice = createSlice({
         /** payload: ключ уровня, например 'hard'. Сохраняется в localStorage (см. store.js). */
         setLevel(state, action) {
             state.level = action.payload;
+        },
+        /** payload: true — открыть окно «Как играть», false — закрыть. */
+        setHowToPlay(state, action) {
+            state.howToPlay = action.payload;
         }
     }
 });
 
 export default gameSlice.reducer
-export const {incrementTry, registerPair, incrementTime, setGaming, setWin, setClickable, startNewRound, giveUp, setNewRecords, setNewUnlocks, takeHint, setPaused, setLanguage, setTheme, setLevel, toggleDarkMode, toggleVibration, toggleSound} = gameSlice.actions
+export const {incrementTry, registerPair, incrementTime, setGaming, setWin, setClickable, startNewRound, giveUp, setNewRecords, setNewUnlocks, takeHint, setPaused, setLanguage, setTheme, setLevel, setHowToPlay, toggleDarkMode, toggleVibration, toggleSound} = gameSlice.actions
