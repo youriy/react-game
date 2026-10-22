@@ -3,11 +3,11 @@ import {GridOverlay, DataGrid} from '@mui/x-data-grid';
 import {styled} from '@mui/material/styles';
 import {Box, Paper} from "@mui/material";
 import {useSelector} from "react-redux";
-import useIsMobile from "../core/useIsMobile.js";
+import useIsMobile from "../hooks/useIsMobile.js";
 import {loadSortedResults} from "../core/storage.js";
 import {getResultStars} from "../core/progress.js";
 import {MAX_STARS} from "../core/score.js";
-import useTranslation from "../core/useTranslation.js";
+import useTranslation from "../hooks/useTranslation.js";
 
 /** Контейнер заглушки «нет данных» с цветами картинки под светлую/тёмную тему. */
 const StyledGridOverlay = styled(GridOverlay)(({theme}) => {

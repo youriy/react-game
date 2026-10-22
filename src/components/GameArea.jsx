@@ -10,9 +10,9 @@ import Attempts from "./Attempts.jsx";
 import Score from "./Score.jsx";
 import GameControls from "./GameControls.jsx";
 import MemoryCard from "./MemoryCard.jsx";
-import useMemoryGame from "../core/useMemoryGame.js";
-import useTranslation from "../core/useTranslation.js";
-import useIsMobile from "../core/useIsMobile.js";
+import useMemoryGame from "../hooks/useMemoryGame.js";
+import useTranslation from "../hooks/useTranslation.js";
+import useIsMobile from "../hooks/useIsMobile.js";
 import {setPaused} from "../store/gameSlice.js";
 
 // На телефоне надписи статуса переносятся и не держат фиксированную ширину

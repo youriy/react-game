@@ -2,7 +2,7 @@ import React from 'react';
 import {useDispatch, useSelector} from "react-redux";
 import {formatTime} from "../core/utils.js";
 import {incrementTime} from "../store/gameSlice.js";
-import useTranslation from "../core/useTranslation.js";
+import useTranslation from "../hooks/useTranslation.js";
 import StatusText from "./StatusText.jsx";
 
 /**

@@ -13,8 +13,8 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogTitle from '@mui/material/DialogTitle';
 import {giveUp, setPaused} from "../store/gameSlice.js";
 import {startNewGame} from "../store/thunks.js";
-import useTranslation from "../core/useTranslation.js";
-import useIsMobile from "../core/useIsMobile.js";
+import useTranslation from "../hooks/useTranslation.js";
+import useIsMobile from "../hooks/useIsMobile.js";
 import {HINT_PENALTY} from "../core/score.js";
 
 /**

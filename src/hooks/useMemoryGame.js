@@ -3,8 +3,8 @@ import {shallowEqual, useDispatch, useSelector} from "react-redux";
 import {closePair, deletePair, setOpen} from "../store/itemsSlice.js";
 import {incrementTry, registerPair, setClickable, takeHint} from "../store/gameSlice.js";
 import {finishGame} from "../store/thunks.js";
-import {getOpenIndexes, isBoardCleared, isPairMatch} from "./rules.js";
-import {getLevel} from "./levels.js";
+import {getOpenIndexes, isBoardCleared, isPairMatch} from "../core/rules.js";
+import {getLevel} from "../core/levels.js";
 
 /** Сколько открытая пара остаётся на экране перед удалением/закрытием, мс. */
 const PAIR_DELAY = 800;
@@ -30,7 +30,7 @@ export const HINT_TIME = 1000;
  *
  * @returns {{
  *   items: import("../store/itemsSlice.js").CardItem[],
- *   level: import("./levels.js").Level,
+ *   level: import("../core/levels.js").Level,
  *   preview: boolean,
  *   hinting: boolean,
  *   paused: boolean,

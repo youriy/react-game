@@ -14,7 +14,7 @@ import PaletteIcon from '@mui/icons-material/Palette';
 import {setLanguage, setTheme} from "../store/gameSlice.js";
 import {languageOptions} from "../core/languages.js";
 import {themeList} from "../core/themes.js";
-import useTranslation from "../core/useTranslation.js";
+import useTranslation from "../hooks/useTranslation.js";
 
 const menuOrigin = {
     vertical: 'top',

@@ -1,5 +1,5 @@
 import {useSelector} from "react-redux";
-import {languageList} from "./languages.js";
+import {languageList} from "../core/languages.js";
 
 /**
  * Хук: тексты интерфейса на языке, выбранном в настройках.

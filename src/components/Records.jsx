@@ -3,7 +3,7 @@ import Paper from '@mui/material/Paper';
 import Stack from "@mui/material/Stack";
 import Typography from '@mui/material/Typography';
 import {formatTime} from "../core/utils.js";
-import useTranslation from "../core/useTranslation.js";
+import useTranslation from "../hooks/useTranslation.js";
 
 /**
  * Один показатель в плашке рекордов.

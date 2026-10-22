@@ -1,6 +1,6 @@
 import React from 'react';
 import {useSelector} from "react-redux";
-import useTranslation from "../core/useTranslation.js";
+import useTranslation from "../hooks/useTranslation.js";
 import StatusText from "./StatusText.jsx";
 
 /** Число попыток в текущей партии. */
