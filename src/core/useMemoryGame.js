@@ -3,9 +3,8 @@ import {useDispatch, useSelector} from "react-redux";
 import {closePair, deletePair, setOpen} from "../store/itemsSlice.jsx";
 import {incrementTry, registerPair, setClickable, setGaming, setNewRecords, setWin, takeHint} from "../store/gameSlice.jsx";
 import {getRecords, saveResult} from "./storage.js";
+import {getLevel} from "./levels.js";
 
-/** Сколько карточки показываются в начале партии, мс. */
-export const PREVIEW_TIME = 2000;
 /** Сколько открытая пара остаётся на экране перед удалением/закрытием, мс. */
 const PAIR_DELAY = 800;
 /** Сколько карточки показываются по подсказке, мс. */
@@ -15,7 +14,8 @@ export const HINT_TIME = 1000;
  * Хук со всей игровой логикой одной партии.
  *
  * Как идёт партия:
- * 1. Первые PREVIEW_TIME мс все карточки открыты (`preview`), клики заблокированы.
+ * 1. В начале все карточки открыты (`preview`) на время показа уровня (previewTime в core/levels.js),
+ *    клики заблокированы.
  * 2. Игрок открывает карточки (`openItem`). Когда открыты две, засчитывается попытка,
  *    пара подсвечивается (`getHighlight`) и через PAIR_DELAY мс удаляется или закрывается.
  * 3. Раз за партию можно взять подсказку (`showHint`): все карточки открываются на HINT_TIME мс.
@@ -26,6 +26,7 @@ export const HINT_TIME = 1000;
  *
  * @returns {{
  *   items: import("../store/itemsSlice.jsx").CardItem[],
+ *   level: import("./levels.js").Level,
  *   preview: boolean,
  *   hinting: boolean,
  *   paused: boolean,
@@ -34,7 +35,7 @@ export const HINT_TIME = 1000;
  *   openItem: function(number): void,
  *   getHighlight: function(number): ('match'|'mismatch'|null)
  * }}
- * - items — колода; preview — идёт показ в начале; hinting — идёт подсказка; paused — пауза;
+ * - items — колода; level — настройки уровня партии; preview — идёт показ в начале; hinting — идёт подсказка; paused — пауза;
  * - canHint / showHint — доступна ли подсказка и как её взять;
  * - openItem(index) — открыть карточку (игнорируется, если сейчас нельзя);
  * - getHighlight(index) — как подсветить карточку: угадана, не угадана или никак.
@@ -43,6 +44,7 @@ export default function useMemoryGame() {
     const dispatch = useDispatch();
     const items = useSelector(state => state.items.items);
     const game = useSelector(state => state.game);
+    const level = getLevel(game.roundLevel);
     const [preview, setPreview] = React.useState(true);
     // Подсветка последней открытой пары: {indexes: [i, j], match: true/false}
     const [pairResult, setPairResult] = React.useState(null);
@@ -53,7 +55,7 @@ export default function useMemoryGame() {
     const hintTimeout = React.useRef(null);
 
     React.useEffect(() => {
-        const timeout = setTimeout(() => setPreview(false), PREVIEW_TIME);
+        const timeout = setTimeout(() => setPreview(false), level.previewTime);
 
         return () => {
             clearTimeout(timeout);
@@ -111,10 +113,10 @@ export default function useMemoryGame() {
         }
 
         if (items.every(item => item.delete)) {
-            // Рекорд считается новым, только если до этого уже были результаты и он улучшен
-            const previous = getRecords();
-            saveResult(game);
-            const current = getRecords();
+            // Рекорд уровня считается новым, только если до этого уже были результаты и он улучшен
+            const previous = getRecords(game.roundLevel);
+            saveResult({...game, level: game.roundLevel});
+            const current = getRecords(game.roundLevel);
             const newRecords = ["score", "time", "streak"]
                 .filter(key => previous[key] !== undefined && current[key] !== previous[key]);
 
@@ -137,5 +139,5 @@ export default function useMemoryGame() {
         return pairResult.match ? "match" : "mismatch";
     };
 
-    return {items, preview, hinting, paused: game.paused, canHint, showHint, openItem, getHighlight};
+    return {items, level, preview, hinting, paused: game.paused, canHint, showHint, openItem, getHighlight};
 }

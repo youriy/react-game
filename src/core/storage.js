@@ -1,9 +1,10 @@
 import moment from "moment";
 import Helper from "./Helper.jsx";
 import {calculateScore} from "./score.js";
+import {DEFAULT_LEVEL} from "./levels.js";
 
 /**
- * Работа с localStorage: настройки (язык, тема), результаты игр и рекорды.
+ * Работа с localStorage: настройки (язык, тема, уровень), результаты игр и рекорды.
  *
  * Результат игры хранится в массиве по ключу "results":
  * @typedef {Object} GameResult
@@ -13,13 +14,14 @@ import {calculateScore} from "./score.js";
  * @property {number} [seconds] - длительность в секундах (нет у старых результатов)
  * @property {number} [bestStreak] - лучшая серия партии (нет у старых результатов)
  * @property {number} [score] - итоговый счёт (нет у результатов до появления очков)
+ * @property {string} [level] - ключ уровня (нет у результатов до появления уровней — они считаются средним)
  */
 
 const RESULTS_KEY = "results";
 
 /**
  * Читает настройку из localStorage.
- * @param {string} key - ключ настройки ("language", "theme")
+ * @param {string} key - ключ настройки ("language", "theme", "level")
  * @param {string} defaultValue - значение, если настройки нет
  * @returns {string}
  */
@@ -67,18 +69,28 @@ const getSeconds = (result) => {
 };
 
 /**
- * Результаты, отсортированные по очкам от лучшего; игры без очков — в конце.
+ * Результаты одного уровня. Старые результаты без уровня относятся к уровню по умолчанию.
+ * @param {string} level - ключ уровня
  * @returns {GameResult[]}
  */
-export const loadSortedResults = () => [...loadResults()].sort((a, b) => (b.score ?? -1) - (a.score ?? -1));
+const loadLevelResults = (level) => loadResults().filter(result => (result.level || DEFAULT_LEVEL) === level);
 
 /**
- * Рекорды по всем сохранённым играм. Значение undefined — по этому показателю данных ещё нет.
+ * Результаты уровня, отсортированные по очкам от лучшего; игры без очков — в конце.
+ * @param {string} level - ключ уровня
+ * @returns {GameResult[]}
+ */
+export const loadSortedResults = (level) =>
+    loadLevelResults(level).sort((a, b) => (b.score ?? -1) - (a.score ?? -1));
+
+/**
+ * Рекорды уровня по всем сохранённым играм. Значение undefined — по этому показателю данных ещё нет.
+ * @param {string} level - ключ уровня
  * @returns {{score: (number|undefined), time: (number|undefined), streak: (number|undefined)}}
  * score — лучший итоговый счёт, time — лучшее (наименьшее) время в секундах, streak — лучшая серия.
  */
-export const getRecords = () => {
-    const results = loadResults();
+export const getRecords = (level) => {
+    const results = loadLevelResults(level);
     const pick = (values, best) => {
         const defined = values.filter(value => typeof value === "number");
 
@@ -100,8 +112,9 @@ export const getRecords = () => {
  * @param {number} game.score - очки за пары
  * @param {boolean} game.hintUsed - использована ли подсказка
  * @param {number} game.bestStreak - лучшая серия
+ * @param {string} game.level - ключ уровня
  */
-export const saveResult = ({count, time, score, hintUsed, bestStreak}) => {
+export const saveResult = ({count, time, score, hintUsed, bestStreak, level}) => {
     const results = loadResults();
 
     results.push({
@@ -110,7 +123,8 @@ export const saveResult = ({count, time, score, hintUsed, bestStreak}) => {
         time: Helper.formatTime(time),
         seconds: time,
         bestStreak,
-        score: calculateScore({score, time, count, hintUsed}).total
+        level,
+        score: calculateScore({score, time, count, hintUsed, level}).total
     });
 
     localStorage.setItem(RESULTS_KEY, JSON.stringify(results));

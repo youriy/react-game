@@ -4,13 +4,10 @@
  * Во время партии: каждая угаданная пара даёт MATCH_POINTS, а каждая следующая подряд —
  * на STREAK_BONUS больше (100, 150, 200…). Промах обнуляет серию.
  *
- * Итоговый счёт = очки за пары + бонус за время + бонус за точность − штраф за подсказку
- * (не меньше нуля).
+ * Итоговый счёт = (очки за пары + бонус за время + бонус за точность − штраф за подсказку)
+ * × множитель уровня (core/levels.js), округлённый и не меньше нуля.
  */
-import {cardIcons} from "./icons.js";
-
-// Количество пар в игре (= минимально возможное число попыток)
-export const PAIRS_COUNT = Object.keys(cardIcons).length;
+import {getLevel} from "./levels.js";
 
 // Очки за угаданную пару и прибавка за каждую следующую пару в серии
 export const MATCH_POINTS = 100;
@@ -21,6 +18,7 @@ export const TIME_BONUS_MAX = 3000;
 export const TIME_PENALTY_PER_SECOND = 10;
 
 // Бонус за точность: максимум и сколько отнимается за каждую лишнюю попытку
+// (лишняя — сверх минимума, равного числу пар на уровне)
 export const ACCURACY_BONUS_MAX = 2000;
 export const MISS_PENALTY = 50;
 
@@ -41,14 +39,17 @@ export const getMatchPoints = (streak) => MATCH_POINTS + STREAK_BONUS * (streak 
  * @param {number} params.time - время партии в секундах
  * @param {number} params.count - число попыток
  * @param {boolean} [params.hintUsed=false] - использована ли подсказка
- * @returns {{pairsPoints: number, timeBonus: number, accuracyBonus: number, hintPenalty: number, total: number}}
+ * @param {string} [params.level] - ключ уровня (по умолчанию — средний)
+ * @returns {{pairsPoints: number, timeBonus: number, accuracyBonus: number, hintPenalty: number,
+ *            multiplier: number, total: number}}
  * @example
- * calculateScore({score: 550, time: 120, count: 30})
- * // → {pairsPoints: 550, timeBonus: 1800, accuracyBonus: 1400, hintPenalty: 0, total: 3750}
+ * calculateScore({score: 550, time: 120, count: 30, level: "medium"})
+ * // → {pairsPoints: 550, timeBonus: 1800, accuracyBonus: 1400, hintPenalty: 0, multiplier: 1, total: 3750}
  */
-export const calculateScore = ({score, time, count, hintUsed = false}) => {
+export const calculateScore = ({score, time, count, hintUsed = false, level}) => {
+    const {pairs, scoreMultiplier} = getLevel(level);
     const timeBonus = Math.max(0, TIME_BONUS_MAX - time * TIME_PENALTY_PER_SECOND);
-    const misses = Math.max(0, count - PAIRS_COUNT);
+    const misses = Math.max(0, count - pairs);
     const accuracyBonus = Math.max(0, ACCURACY_BONUS_MAX - misses * MISS_PENALTY);
     const hintPenalty = hintUsed ? HINT_PENALTY : 0;
 
@@ -57,6 +58,7 @@ export const calculateScore = ({score, time, count, hintUsed = false}) => {
         timeBonus,
         accuracyBonus,
         hintPenalty,
-        total: Math.max(0, score + timeBonus + accuracyBonus - hintPenalty),
+        multiplier: scoreMultiplier,
+        total: Math.max(0, Math.round((score + timeBonus + accuracyBonus - hintPenalty) * scoreMultiplier)),
     };
 };

@@ -2,7 +2,6 @@ import React from 'react';
 import {useDispatch} from "react-redux";
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
 import Stack from "@mui/material/Stack";
 import Typography from '@mui/material/Typography';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -40,12 +39,15 @@ function PauseOverlay() {
     );
 }
 
+/** Ширина одной колонки поля, px: поле уровня занимает columns × CARD_WIDTH, но не шире экрана. */
+const CARD_WIDTH = 150;
+
 /**
  * Игровой экран: строка статуса (время, попытки, очки), кнопки управления и поле карточек.
- * Логика партии — в хуке useMemoryGame.
+ * Число колонок поля зависит от уровня. Логика партии — в хуке useMemoryGame.
  */
 export default function GameArea() {
-    const {items, preview, hinting, paused, canHint, showHint, openItem, getHighlight} = useMemoryGame();
+    const {items, level, preview, hinting, paused, canHint, showHint, openItem, getHighlight} = useMemoryGame();
 
     return (
         <Stack spacing={1}>
@@ -58,21 +60,30 @@ export default function GameArea() {
             <GameControls canPause={!preview && !hinting} canHint={canHint} onHint={showHint}/>
             <Box sx={{position: "relative"}}>
                 {/* На паузе поле скрыто (но занимает место), чтобы нельзя было запоминать карточки */}
-                <Grid container spacing={2} sx={{visibility: paused ? "hidden" : "visible"}}>
+                <Box
+                    sx={{
+                        display: "grid",
+                        gridTemplateColumns: `repeat(${level.columns}, minmax(0, 1fr))`,
+                        gap: 2,
+                        width: level.columns * CARD_WIDTH,
+                        maxWidth: "100%",
+                        mx: "auto",
+                        visibility: paused ? "hidden" : "visible",
+                    }}
+                >
                     {
                         items.map((item, index) =>
-                            <Grid item xs={2} key={item.id}>
-                                <MemoryCard
-                                    item={item}
-                                    revealed={item.open || preview || hinting}
-                                    disabled={preview || hinting || paused}
-                                    highlight={getHighlight(index)}
-                                    onClick={() => openItem(index)}
-                                />
-                            </Grid>
+                            <MemoryCard
+                                key={item.id}
+                                item={item}
+                                revealed={item.open || preview || hinting}
+                                disabled={preview || hinting || paused}
+                                highlight={getHighlight(index)}
+                                onClick={() => openItem(index)}
+                            />
                         )
                     }
-                </Grid>
+                </Box>
                 {paused && <PauseOverlay/>}
             </Box>
         </Stack>

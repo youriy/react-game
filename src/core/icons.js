@@ -16,12 +16,18 @@ import MoodIcon from "@mui/icons-material/Mood";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import ParkIcon from "@mui/icons-material/Park";
 import SchoolIcon from "@mui/icons-material/School";
+import PetsIcon from "@mui/icons-material/Pets";
+import StarIcon from "@mui/icons-material/Star";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import MusicNoteIcon from "@mui/icons-material/MusicNote";
+import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
+import LocalCafeIcon from "@mui/icons-material/LocalCafe";
 
 /**
  * Иконки для карточек: имя → компонент иконки MUI.
- * Каждая иконка попадает в колоду дважды (одна пара).
- * Чтобы добавить новую пару карточек, достаточно импортировать иконку и добавить её сюда;
- * число пар в подсчёте очков (PAIRS_COUNT) пересчитается автоматически.
+ * Каждая иконка в колоде — одна пара (две карточки). Для партии берётся столько случайных
+ * иконок, сколько пар на выбранном уровне (core/levels.js), поэтому иконок должно быть
+ * не меньше, чем пар на самом сложном уровне (сейчас 24).
  * @type {Object<string, React.ComponentType>}
  */
 export const cardIcons = {
@@ -43,4 +49,10 @@ export const cardIcons = {
     NotificationsIcon,
     ParkIcon,
     SchoolIcon,
+    PetsIcon,
+    StarIcon,
+    FavoriteIcon,
+    MusicNoteIcon,
+    SportsSoccerIcon,
+    LocalCafeIcon,
 };

@@ -36,7 +36,11 @@ export const languageList = {
         newRecord: "🏆 Новый рекорд!",
         giveUpConfirm: "Сдаться? Результат этой партии не сохранится.",
         cancel: "Отмена",
-        restartConfirm: "Начать заново? Прогресс этой партии будет потерян."
+        restartConfirm: "Начать заново? Прогресс этой партии будет потерян.",
+        difficulty: "Сложность",
+        easy: "Лёгкий",
+        medium: "Средний",
+        hard: "Сложный"
     },
     english: {
         win: "Victory!",
@@ -70,7 +74,11 @@ export const languageList = {
         newRecord: "🏆 New record!",
         giveUpConfirm: "Give up? This game's result won't be saved.",
         cancel: "Cancel",
-        restartConfirm: "Restart? This game's progress will be lost."
+        restartConfirm: "Restart? This game's progress will be lost.",
+        difficulty: "Difficulty",
+        easy: "Easy",
+        medium: "Medium",
+        hard: "Hard"
     },
     chine: {
         win: "勝利!",
@@ -104,7 +112,11 @@ export const languageList = {
         newRecord: "🏆 新紀錄!",
         giveUpConfirm: "放棄？本局結果將不會保存。",
         cancel: "取消",
-        restartConfirm: "重新開始？本局進度將會遺失。"
+        restartConfirm: "重新開始？本局進度將會遺失。",
+        difficulty: "難度",
+        easy: "簡單",
+        medium: "中等",
+        hard: "困難"
     },
     arabe: {
         win: "فوز!",
@@ -138,7 +150,11 @@ export const languageList = {
         newRecord: "🏆 رقم قياسي جديد!",
         giveUpConfirm: "هل تريد الاستسلام؟ لن يتم حفظ نتيجة هذه اللعبة.",
         cancel: "إلغاء",
-        restartConfirm: "إعادة البدء؟ سيتم فقدان تقدم هذه اللعبة."
+        restartConfirm: "إعادة البدء؟ سيتم فقدان تقدم هذه اللعبة.",
+        difficulty: "الصعوبة",
+        easy: "سهل",
+        medium: "متوسط",
+        hard: "صعب"
     },
     german: {
         win: "Sieg!",
@@ -172,7 +188,11 @@ export const languageList = {
         newRecord: "🏆 Neuer Rekord!",
         giveUpConfirm: "Aufgeben? Das Ergebnis dieses Spiels wird nicht gespeichert.",
         cancel: "Abbrechen",
-        restartConfirm: "Neu starten? Der Fortschritt dieses Spiels geht verloren."
+        restartConfirm: "Neu starten? Der Fortschritt dieses Spiels geht verloren.",
+        difficulty: "Schwierigkeit",
+        easy: "Leicht",
+        medium: "Mittel",
+        hard: "Schwer"
     },
     spanish: {
         win: "Victoria!",
@@ -206,7 +226,11 @@ export const languageList = {
         newRecord: "🏆 ¡Nuevo récord!",
         giveUpConfirm: "¿Rendirse? El resultado de esta partida no se guardará.",
         cancel: "Cancelar",
-        restartConfirm: "¿Reiniciar? Se perderá el progreso de esta partida."
+        restartConfirm: "¿Reiniciar? Se perderá el progreso de esta partida.",
+        difficulty: "Dificultad",
+        easy: "Fácil",
+        medium: "Media",
+        hard: "Difícil"
     }
 }
 

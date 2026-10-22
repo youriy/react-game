@@ -1,6 +1,7 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {loadSetting} from "../core/storage.js";
 import {getMatchPoints} from "../core/score.js";
+import {DEFAULT_LEVEL} from "../core/levels.js";
 
 /**
  * Срез Redux с состоянием партии и настройками интерфейса.
@@ -20,6 +21,9 @@ import {getMatchPoints} from "../core/score.js";
  * @property {boolean} clickable - можно ли сейчас открывать карточки (false, пока решается пара)
  * @property {string} language - ключ языка из core/Language.js (сохраняется в localStorage)
  * @property {string} theme - имя темы из core/themes.js (сохраняется в localStorage)
+ * @property {string} level - выбранный уровень сложности из core/levels.js (сохраняется в localStorage)
+ * @property {string} roundLevel - уровень текущей/последней партии; фиксируется при старте,
+ *   чтобы переключение уровня на стартовом экране не меняло результаты уже сыгранной партии
  */
 const gameSlice = createSlice({
     name: "game",
@@ -39,7 +43,9 @@ const gameSlice = createSlice({
         win: false,
         clickable: true,
         language: loadSetting("language", "russian"),
-        theme: loadSetting("theme", "indigoTheme")
+        theme: loadSetting("theme", "indigoTheme"),
+        level: loadSetting("level", DEFAULT_LEVEL),
+        roundLevel: DEFAULT_LEVEL
     },
     reducers: {
         /** Увеличивает число попыток на 1. */
@@ -76,10 +82,11 @@ const gameSlice = createSlice({
             state.clickable = action.payload;
         },
         /**
-         * Начинает новую партию с нуля: обнуляет счётчики, снимает паузу и подсказку,
-         * увеличивает `round`. Колоду нужно перемешать отдельно (`resetItems`).
+         * Начинает новую партию с нуля на выбранном уровне: обнуляет счётчики, снимает паузу
+         * и подсказку, увеличивает `round`. Колоду нужно перемешать отдельно (`resetItems(level)`).
          */
         startNewRound(state) {
+            state.roundLevel = state.level;
             state.count = 0;
             state.time = 0;
             state.score = 0;
@@ -118,9 +125,13 @@ const gameSlice = createSlice({
         /** payload: имя темы, например 'greenTheme'. Сохраняется в localStorage (см. store.jsx). */
         setTheme(state, action) {
             state.theme = action.payload;
+        },
+        /** payload: ключ уровня, например 'hard'. Сохраняется в localStorage (см. store.jsx). */
+        setLevel(state, action) {
+            state.level = action.payload;
         }
     }
 });
 
 export default gameSlice.reducer
-export const {incrementTry, registerPair, incrementTime, setGaming, setWin, setClickable, startNewRound, giveUp, setNewRecords, takeHint, setPaused, setLanguage, setTheme} = gameSlice.actions
+export const {incrementTry, registerPair, incrementTime, setGaming, setWin, setClickable, startNewRound, giveUp, setNewRecords, takeHint, setPaused, setLanguage, setTheme, setLevel} = gameSlice.actions

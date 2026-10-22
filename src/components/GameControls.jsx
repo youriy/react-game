@@ -29,6 +29,7 @@ import {HINT_PENALTY} from "../core/score.js";
 export default function GameControls({canPause, canHint, onHint}) {
     const dispatch = useDispatch();
     const paused = useSelector(state => state.game.paused);
+    const level = useSelector(state => state.game.level);
     const t = useTranslation();
     // Окно подтверждения: open — показано ли, action — для какой кнопки,
     // wasPaused — стояла ли игра на паузе до открытия окна.
@@ -56,9 +57,9 @@ export default function GameControls({canPause, canHint, onHint}) {
         }
     };
 
-    /** Новая партия: свежая колода и обнулённые счётчики. */
+    /** Новая партия на том же уровне: свежая колода и обнулённые счётчики. */
     const handleRestart = () => {
-        dispatch(resetItems());
+        dispatch(resetItems(level));
         dispatch(startNewRound());
     };
 

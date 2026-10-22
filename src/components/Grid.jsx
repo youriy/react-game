@@ -2,6 +2,7 @@ import React from 'react';
 import {GridOverlay, DataGrid} from '@mui/x-data-grid';
 import {styled} from '@mui/material/styles';
 import {Box, Paper} from "@mui/material";
+import {useSelector} from "react-redux";
 import {loadSortedResults} from "../core/storage.js";
 import useTranslation from "../core/useTranslation.js";
 
@@ -81,11 +82,12 @@ function CustomNoRowsOverlay() {
 }
 
 /**
- * Таблица статистики: дата, попытки, время и очки прошлых игр,
+ * Таблица статистики выбранного уровня: дата, попытки, время и очки прошлых игр,
  * отсортированные по очкам (лучшие сверху), по 10 на страницу.
  */
 export default function Grid() {
     const t = useTranslation();
+    const level = useSelector(state => state.game.level);
 
     const columns = [
         {field: 'date', headerName: t.date, width: 250},
@@ -100,7 +102,7 @@ export default function Grid() {
             <DataGrid
                 rowHeight={35}
                 getRowId={row => row.date}
-                rows={loadSortedResults()}
+                rows={loadSortedResults(level)}
                 columns={columns}
                 pageSize={10}
                 rowsPerPageOptions={[10]}

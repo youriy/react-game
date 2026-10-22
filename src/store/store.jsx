@@ -6,6 +6,7 @@ import {saveSetting} from "../core/storage.js";
 /**
  * Redux-хранилище приложения.
  * state.items — колода (itemsSlice.jsx), state.game — партия и настройки (gameSlice.jsx).
+ * Язык, тема и уровень сохраняются в localStorage подпиской ниже.
  */
 const rootReducer = combineReducers({
     items: itemsSlice,
@@ -16,20 +17,20 @@ export const store = configureStore({
     reducer: rootReducer,
 });
 
-// Сохраняем язык и тему в localStorage при их изменении
+// Настройки, которые сохраняются в localStorage при изменении
 // (побочные эффекты не должны выполняться внутри редьюсеров)
-let {language, theme} = store.getState().game;
+const PERSISTED_SETTINGS = ["language", "theme", "level"];
+
+let savedSettings = {...store.getState().game};
 
 store.subscribe(() => {
     const game = store.getState().game;
 
-    if (game.language !== language) {
-        language = game.language;
-        saveSetting("language", language);
-    }
+    PERSISTED_SETTINGS.forEach(key => {
+        if (game[key] !== savedSettings[key]) {
+            saveSetting(key, game[key]);
+        }
+    });
 
-    if (game.theme !== theme) {
-        theme = game.theme;
-        saveSetting("theme", theme);
-    }
+    savedSettings = game;
 });

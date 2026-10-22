@@ -1,6 +1,7 @@
 import {createSlice} from "@reduxjs/toolkit";
 import Helper from "../core/Helper.jsx";
 import {cardIcons} from "../core/icons.js";
+import {DEFAULT_LEVEL, getLevel} from "../core/levels.js";
 
 /**
  * Срез Redux с колодой карточек.
@@ -17,11 +18,15 @@ import {cardIcons} from "../core/icons.js";
  */
 
 /**
- * Создаёт новую перемешанную колоду: по две карточки на каждую иконку из `cardIcons`.
+ * Создаёт новую перемешанную колоду для уровня: берёт нужное число случайных иконок
+ * из `cardIcons` и кладёт по две карточки на каждую.
+ * @param {string} levelKey - ключ уровня из core/levels.js
  * @returns {CardItem[]}
  */
-const createDeck = () => {
-    const deck = Object.keys(cardIcons).flatMap((icon, index) => [0, 1].map(copy => ({
+const createDeck = (levelKey) => {
+    const {pairs} = getLevel(levelKey);
+    const icons = Helper.shuffle(Object.keys(cardIcons)).slice(0, pairs);
+    const deck = icons.flatMap((icon, index) => [0, 1].map(copy => ({
         id: index * 2 + copy,
         type: index + 1,
         icon,
@@ -35,7 +40,7 @@ const createDeck = () => {
 const itemsSlice = createSlice({
     name: "items",
     initialState: {
-        items: createDeck()
+        items: createDeck(DEFAULT_LEVEL)
     },
     reducers: {
         /** Открывает карточку. payload: индекс карточки. */
@@ -55,9 +60,9 @@ const itemsSlice = createSlice({
                 state.items[index].delete = true;
             });
         },
-        /** Заменяет колоду новой перемешанной. */
-        resetItems(state) {
-            state.items = createDeck();
+        /** Заменяет колоду новой перемешанной. payload: ключ уровня, например 'hard'. */
+        resetItems(state, action) {
+            state.items = createDeck(action.payload);
         }
     }
 });
