@@ -85,7 +85,7 @@ function LevelSelect() {
                             <ToggleButton key={item.key} value={item.key} disabled={locked} sx={{px: 3, flexDirection: "column"}}>
                                 <span>
                                     {locked && <LockIcon fontSize="inherit" sx={{mr: 0.5, verticalAlign: "-2px"}}/>}
-                                    {/* Размер поля — как на этом экране (на телефоне у сложного 6×8) */}
+                                    {/* Размер поля — как на этом экране (на телефоне у среднего 4×9, у сложного 6×8) */}
                                     {t[item.labelKey]} {getFieldSize(item, isMobile)}
                                 </span>
                                 <Stars value={getBestStars(item.key)} size="small"/>
