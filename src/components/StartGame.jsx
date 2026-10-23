@@ -62,7 +62,9 @@ const levelGridSx = {
     width: "100%",
     "& .MuiToggleButtonGroup-grouped, & .MuiToggleButtonGroup-grouped:not(:first-of-type), & .MuiToggleButtonGroup-grouped:not(:last-of-type)": {
         m: 0,
-        minHeight: 64,
+        // На телефоне плашки ниже и с меньшими отступами по вертикали
+        minHeight: {xs: 56, sm: 64},
+        py: {xs: 0.75, sm: 1.375},
         border: 2,
         borderColor: "transparent",
         borderRadius: "20px",

@@ -72,6 +72,40 @@ const modeColors = {
 };
 
 /**
+ * Размеры шрифта на телефоне (уже 600 px, брейкпоинт `sm`). На широких экранах размеры не меняются.
+ * Основной текст — 14 px вместо 16, заголовки — примерно на 20–25% меньше, чем дал бы `responsiveFontSizes`
+ * (h1 56 → 44 px, h4 25 → 20 px, h5 20 → 16 px). Не мельче 14 px для текста и 12 px для подписей (caption).
+ * body2, button и caption на телефоне такие же, как на компьютере (14, 14 и 12 px).
+ */
+const mobileFontSizes = {
+    h1: "2.75rem",
+    h2: "1.875rem",
+    h3: "1.5rem",
+    h4: "1.25rem",
+    h5: "1rem",
+    h6: "0.9375rem",
+    subtitle1: "0.9375rem",
+    body1: "0.875rem",
+};
+
+/**
+ * Дописывает в типографику темы размеры шрифта для телефона (mobileFontSizes).
+ * Вызывается после `responsiveFontSizes`, чтобы её размеры для узкого экрана заменить своими.
+ * Правило с max-width не пересекается с её правилами min-width, так что на широких экранах всё как раньше.
+ * @param {import('@mui/material/styles').Theme} theme
+ * @returns {import('@mui/material/styles').Theme} та же тема
+ */
+const applyMobileFontSizes = (theme) => {
+    const mobile = theme.breakpoints.down("sm");
+
+    Object.entries(mobileFontSizes).forEach(([variant, fontSize]) => {
+        theme.typography[variant] = {...theme.typography[variant], [mobile]: {fontSize}};
+    });
+
+    return theme;
+};
+
+/**
  * Основной цвет кнопки по её color: primary, error, warning… Для color="inherit" — цвет текста.
  * @param {import('@mui/material/styles').Theme} theme
  * @param {string} color - ownerState.color кнопки
@@ -89,7 +123,9 @@ const getButtonColor = (theme, color) => theme.palette[color]?.main ?? theme.pal
  * - заголовки жирные (800).
  * Цвет подписи на кнопках с заливкой (contrastText) MUI выбирает сам: белый в светлом режиме, чёрный в тёмном.
  * `responsiveFontSizes` уменьшает крупные заголовки (h1–h6) на узких экранах,
- * на широких размеры остаются стандартными.
+ * на широких размеры остаются стандартными. На телефоне шрифты ещё мельче — см. mobileFontSizes;
+ * там же кнопки ниже и с меньшими отступами, большая кнопка — 16 px вместо 18.
+ * Маленькая кнопка (size="small") — 14 px на всех экранах: стандартные 13 px мельче нашего минимума.
  * @param {string} name - имя темы из themeList, например 'greenTheme'
  * @param {boolean} darkMode - тёмный режим
  * @returns {import('@mui/material/styles').Theme}
@@ -98,7 +134,7 @@ export const createAppTheme = (name, darkMode) => {
     const mode = darkMode ? "dark" : "light";
     const {palette, shadow, dialogShadow} = modeColors[mode];
 
-    return responsiveFontSizes(createTheme({
+    return applyMobileFontSizes(responsiveFontSizes(createTheme({
         palette: {
             mode,
             primary: {
@@ -120,8 +156,20 @@ export const createAppTheme = (name, darkMode) => {
         components: {
             MuiButton: {
                 styleOverrides: {
-                    root: {borderRadius: 999, paddingLeft: 20, paddingRight: 20},
-                    sizeLarge: {minHeight: 56, paddingLeft: 32, paddingRight: 32, fontSize: "1.125rem"},
+                    root: ({theme}) => ({
+                        borderRadius: 999,
+                        paddingLeft: 20,
+                        paddingRight: 20,
+                        [theme.breakpoints.down("sm")]: {paddingLeft: 16, paddingRight: 16},
+                    }),
+                    sizeSmall: {fontSize: "0.875rem"},
+                    sizeLarge: ({theme}) => ({
+                        minHeight: 56,
+                        paddingLeft: 32,
+                        paddingRight: 32,
+                        fontSize: "1.125rem",
+                        [theme.breakpoints.down("sm")]: {minHeight: 48, fontSize: "1rem"},
+                    }),
                     contained: ({theme, ownerState}) => ({
                         boxShadow: `0 6px 16px ${alpha(getButtonColor(theme, ownerState.color), 0.3)}`,
                         "&:hover": {boxShadow: `0 8px 20px ${alpha(getButtonColor(theme, ownerState.color), 0.4)}`},
@@ -166,5 +214,5 @@ export const createAppTheme = (name, darkMode) => {
                 },
             },
         },
-    }));
+    })));
 };
