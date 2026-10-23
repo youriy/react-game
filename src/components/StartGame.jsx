@@ -22,6 +22,7 @@ import {getBestStars, getLastUnlockedLevel, isLevelUnlocked} from "../core/progr
 import Stars from "./Stars.jsx";
 import Records from "./Records.jsx";
 import ResultsTable from "./ResultsTable.jsx";
+import AchievementToast from "./AchievementToast.jsx";
 
 /** Отступ между блоками стартового экрана (spacing у Stack); плашке рекордов он передаётся отдельно. */
 const SECTION_SPACING = {xs: 3, sm: 6};
@@ -146,7 +147,8 @@ function LevelSelect() {
 
 /**
  * Стартовый экран: результаты последней партии (если она выиграна: конфетти, звёзды, открытые уровни, рекорды,
- * разбивка счёта), выбор уровня, рекорды и статистика выбранного уровня, кнопка «Начать игру».
+ * разбивка счёта, всплывашка с новыми достижениями), выбор уровня, рекорды и статистика выбранного уровня,
+ * кнопка «Начать игру».
  */
 export default function StartGame() {
     const dispatch = useDispatch();
@@ -213,6 +215,7 @@ export default function StartGame() {
                 </Button>
                 <ResultsTable/>
             </Stack>
+            {win && <AchievementToast/>}
         </Box>
     );
 }

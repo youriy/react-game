@@ -26,12 +26,17 @@ const defaultLanguage = detectBrowserLanguage() || "russian";
  * @property {number} score - очки за угаданные пары (без итоговых бонусов, см. core/score.js)
  * @property {number} streak - текущая серия угаданных пар подряд
  * @property {number} bestStreak - лучшая серия в текущей партии
+ * @property {number} seenMisses - промахи партии, когда второй открыли уже открывавшуюся карточку (для «Идеальной памяти»)
+ * @property {number} luckyPairs - пары партии, угаданные с первого раза: обе карточки ещё не открывались (для «Везунчика»)
  * @property {number} round - номер партии; используется как key у GameArea, чтобы поле пересоздавалось
  * @property {boolean} gaming - идёт партия (true) или показан стартовый экран (false)
  * @property {boolean} paused - партия на паузе
  * @property {boolean} hintUsed - подсказка в этой партии уже использована
  * @property {Array<'score'|'time'|'streak'>} newRecords - какие рекорды побиты в последней партии
  * @property {string[]} newUnlocks - какие уровни открыла последняя победа (ключи уровней)
+ * @property {Array<{key: string, tier: number}>} newAchievements - какие достижения получены или улучшены
+ *   последней победой (ключи и ступени из core/achievements.js); показываются всплывашкой на экране победы
+ * @property {boolean} achievements - открыто окно «Достижения»
  * @property {boolean} win - последняя партия завершилась победой (показывается экран победы)
  * @property {boolean} clickable - можно ли сейчас открывать карточки (false, пока решается пара)
  * @property {string} language - ключ языка из dictionary/languages.js (сохраняется в localStorage, когда игрок выбирает его
@@ -54,6 +59,8 @@ const gameSlice = createSlice({
         score: 0,
         streak: 0,
         bestStreak: 0,
+        seenMisses: 0,
+        luckyPairs: 0,
         // Номер партии: меняется при каждом старте, чтобы игровое поле создавалось заново
         round: 0,
         gaming: false,
@@ -62,6 +69,8 @@ const gameSlice = createSlice({
         // Какие рекорды побиты в последней партии: 'score' | 'time' | 'streak'
         newRecords: [],
         newUnlocks: [],
+        newAchievements: [],
+        achievements: false,
         win: false,
         clickable: true,
         // Язык, выбранный игроком, важнее языка браузера; если не подошёл ни один — русский.
@@ -81,16 +90,22 @@ const gameSlice = createSlice({
             state.count++;
         },
         /**
-         * Учитывает результат открытой пары: очки и серию.
-         * payload: true — пара угадана (серия растёт, начисляются очки), false — промах (серия обнуляется).
+         * Учитывает результат открытой пары: очки, серию и счётчики для достижений.
+         * payload: {match, lucky, seenMiss}: match — пара угадана (серия растёт, начисляются очки),
+         * иначе промах (серия обнуляется); lucky — угадана с первого раза (обе карточки ещё не открывались);
+         * seenMiss — промах, и вторая карточка уже открывалась раньше.
          */
         registerPair(state, action) {
-            if (action.payload) {
+            const {match, lucky, seenMiss} = action.payload;
+
+            if (match) {
                 state.streak++;
                 state.score += getMatchPoints(state.streak);
                 state.bestStreak = Math.max(state.bestStreak, state.streak);
+                state.luckyPairs += lucky ? 1 : 0;
             } else {
                 state.streak = 0;
+                state.seenMisses += seenMiss ? 1 : 0;
             }
         },
         /** payload: прошедшее время партии в целых секундах (выставляет таймер, см. Timer.jsx). */
@@ -120,12 +135,15 @@ const gameSlice = createSlice({
             state.score = 0;
             state.streak = 0;
             state.bestStreak = 0;
+            state.seenMisses = 0;
+            state.luckyPairs = 0;
             state.clickable = true;
             state.win = false;
             state.paused = false;
             state.hintUsed = false;
             state.newRecords = [];
             state.newUnlocks = [];
+            state.newAchievements = [];
             state.gaming = true;
             state.round++;
         },
@@ -142,6 +160,14 @@ const gameSlice = createSlice({
         /** payload: ключи уровней, которые открыла последняя победа, например ['hard']. */
         setNewUnlocks(state, action) {
             state.newUnlocks = action.payload;
+        },
+        /** payload: улучшенные последней победой достижения, [{key: 'speed.medium', tier: 2}]. */
+        setNewAchievements(state, action) {
+            state.newAchievements = action.payload;
+        },
+        /** payload: true — открыть окно «Достижения», false — закрыть. */
+        setAchievementsOpen(state, action) {
+            state.achievements = action.payload;
         },
         /** Отмечает, что подсказка в этой партии использована. */
         takeHint(state) {
@@ -183,4 +209,4 @@ const gameSlice = createSlice({
 });
 
 export default gameSlice.reducer
-export const {incrementTry, registerPair, setTime, setGaming, setWin, setClickable, startNewRound, giveUp, setNewRecords, setNewUnlocks, takeHint, setPaused, setLanguage, setTheme, setLevel, setHowToPlay, toggleDarkMode, toggleVibration, toggleSound} = gameSlice.actions
+export const {incrementTry, registerPair, setTime, setGaming, setWin, setClickable, startNewRound, giveUp, setNewRecords, setNewUnlocks, setNewAchievements, setAchievementsOpen, takeHint, setPaused, setLanguage, setTheme, setLevel, setHowToPlay, toggleDarkMode, toggleVibration, toggleSound} = gameSlice.actions

@@ -7,6 +7,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
 import HelpIcon from '@mui/icons-material/HelpOutline';
+import TrophyIcon from '@mui/icons-material/EmojiEvents';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LanguageIcon from '@mui/icons-material/Language';
 import PaletteIcon from '@mui/icons-material/Palette';
@@ -19,7 +20,7 @@ import VibrationOffIcon from '@mui/icons-material/MobileOff';
 // Иконка звука тоже показывает текущее состояние: динамик с волнами — включён, перечёркнутый — выключен
 import SoundIcon from '@mui/icons-material/VolumeUp';
 import SoundOffIcon from '@mui/icons-material/VolumeOff';
-import {setHowToPlay, setLanguage, setTheme, toggleDarkMode, toggleSound, toggleVibration} from "../store/gameSlice.js";
+import {setAchievementsOpen, setHowToPlay, setLanguage, setTheme, toggleDarkMode, toggleSound, toggleVibration} from "../store/gameSlice.js";
 import {canVibrate} from "../core/vibration.js";
 import {canPlaySound} from "../core/sound.js";
 import {languageOptions} from "../dictionary/languages.js";
@@ -152,7 +153,7 @@ const gearSx = (open) => ({
 
 /**
  * Шапка: одна кнопка-шестерёнка (крайняя справа). По нажатию слева от неё выезжают спрятанные кнопки:
- * «?» (окно «Как играть»), выбор языка, цвета, светлой/тёмной темы, звука и вибрации.
+ * «?» (окно «Как играть»), кубок (окно «Достижения»), выбор языка, цвета, светлой/тёмной темы, звука и вибрации.
  * Открыта ли панель — только состояние компонента, не запоминается (после перезагрузки кнопки спрятаны).
  * Выбранный здесь язык сохраняется и важнее языка браузера (см. detectBrowserLanguage в dictionary/languages.js).
  * Кнопка звука видна, если браузер умеет Web Audio (см. canPlaySound) — то есть почти всегда.
@@ -181,6 +182,17 @@ export default function AppHeader() {
                             color="inherit"
                         >
                             <HelpIcon/>
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t.achievements} arrow>
+                        <IconButton
+                            size="large"
+                            edge="end"
+                            aria-label="achievements"
+                            onClick={() => dispatch(setAchievementsOpen(true))}
+                            color="inherit"
+                        >
+                            <TrophyIcon/>
                         </IconButton>
                     </Tooltip>
                     <MenuButton

@@ -15,6 +15,8 @@ import {DEFAULT_LEVEL, getLevel} from "../core/levels.js";
  * @property {string} icon - имя иконки из `cardIcons` (icons/icons.js)
  * @property {boolean} open - карточка сейчас открыта игроком
  * @property {boolean} delete - пара угадана, карточка убрана с поля
+ * @property {boolean} seen - карточку уже открывали в этой партии (или её показала подсказка);
+ *   показ в начале партии не считается. Нужно для достижений «Идеальная память» и «Везунчик»
  */
 
 /**
@@ -32,6 +34,7 @@ const createDeck = (levelKey) => {
         icon,
         open: false,
         delete: false,
+        seen: false,
     })));
 
     return shuffle(deck);
@@ -51,6 +54,7 @@ const itemsSlice = createSlice({
         closePair(state, action) {
             action.payload.forEach(index => {
                 state.items[index].open = false;
+                state.items[index].seen = true;
             });
         },
         /** Убирает угаданную пару с поля. payload: массив индексов карточек. */
@@ -58,6 +62,12 @@ const itemsSlice = createSlice({
             action.payload.forEach(index => {
                 state.items[index].open = false;
                 state.items[index].delete = true;
+            });
+        },
+        /** Отмечает все карточки увиденными (подсказка показала поле). */
+        markAllSeen(state) {
+            state.items.forEach(item => {
+                item.seen = true;
             });
         },
         /** Заменяет колоду новой перемешанной. payload: ключ уровня, например 'hard'. */
@@ -68,4 +78,4 @@ const itemsSlice = createSlice({
 });
 
 export default itemsSlice.reducer
-export const {setOpen, closePair, deletePair, resetItems} = itemsSlice.actions
+export const {setOpen, closePair, deletePair, markAllSeen, resetItems} = itemsSlice.actions

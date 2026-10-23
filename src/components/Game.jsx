@@ -9,6 +9,7 @@ import AppHeader from './AppHeader.jsx';
 import GameArea from "./GameArea.jsx";
 import StartGame from "./StartGame.jsx";
 import HowToPlay from "./HowToPlay.jsx";
+import Achievements from "./Achievements.jsx";
 import {createAppTheme} from "../core/themes.js";
 
 /** Длительность появления экрана, мс. */
@@ -42,7 +43,8 @@ const screenSx = {
 
 /**
  * Корневой компонент: тема оформления (цвет + светлый/тёмный режим), шапка и либо игровое поле, либо стартовый экран.
- * Поверх них — окно «Как играть» (HowToPlay), открывается при первом запуске и кнопкой «?» в шапке.
+ * Поверх них — окно «Как играть» (HowToPlay), открывается при первом запуске и кнопкой «?» в шапке,
+ * и окно «Достижения» (Achievements), открывается кнопкой-кубком в шапке.
  * Игровое поле получает key={round}, чтобы при новой партии создаваться заново.
  * При смене экрана (старт ↔ игра, новая партия) новый экран плавно появляется (screenAppear).
  */
@@ -71,6 +73,7 @@ export default function Game() {
                 </Box>
             </Container>
             <HowToPlay/>
+            <Achievements/>
         </ThemeProvider>
     );
 }

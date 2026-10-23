@@ -1,6 +1,6 @@
 import React from 'react';
 import {shallowEqual, useDispatch, useSelector, useStore} from "react-redux";
-import {closePair, deletePair, setOpen} from "../store/itemsSlice.js";
+import {closePair, deletePair, markAllSeen, setOpen} from "../store/itemsSlice.js";
 import {incrementTry, registerPair, setClickable, takeHint} from "../store/gameSlice.js";
 import {finishGame} from "../store/thunks.js";
 import {getOpenIndexes, isBoardCleared, isPairMatch} from "../core/rules.js";
@@ -27,7 +27,10 @@ export const HINT_TIME = 2000;
  *    Звуки (core/sound.js, выключаются кнопкой в шапке — state.game.sound): щелчок при перевороте карточки,
  *    две ноты вверх за угаданную пару (с каждой парой серии — выше), две ноты вниз за промах.
  *    Над последней открытой карточкой угаданной пары всплывают очки за неё (`getPopup`, PointsPopup.jsx).
- * 3. Раз за партию можно взять подсказку (`showHint`): все карточки открываются на HINT_TIME мс, со звуком.
+ *    Для достижений (core/achievements.js) считается, угадана ли пара с первого раза (обе карточки ещё не
+ *    открывались — `seen` в CardItem) и не открыта ли второй уже виденная карточка при промахе.
+ * 3. Раз за партию можно взять подсказку (`showHint`): все карточки открываются на HINT_TIME мс, со звуком,
+ *    и считаются увиденными.
  * 4. Когда убраны все карточки — звук и вибрация победы, thunk `finishGame` сохраняет результат и показывает победу.
  *
  * Хук читает из стора только нужные поля — время партии (меняется каждую секунду) он не читает,
@@ -126,6 +129,7 @@ export default function useMemoryGame() {
         }
 
         dispatch(takeHint());
+        dispatch(markAllSeen());
         if (sound) {
             playSound("hint");
         }
@@ -142,17 +146,23 @@ export default function useMemoryGame() {
         }
 
         const isMatch = isPairMatch(items, openIndexes);
+        // Вторая открытая карточка — последняя по клику; seen — открывали ли её (и первую) раньше в этой партии
+        const second = openIndexes.includes(lastOpened.current) ? lastOpened.current : openIndexes[1];
 
         dispatch(setClickable(false));
         dispatch(incrementTry());
-        dispatch(registerPair(isMatch));
+        dispatch(registerPair({
+            match: isMatch,
+            lucky: isMatch && openIndexes.every(index => !items[index].seen),
+            seenMiss: !isMatch && items[second].seen,
+        }));
 
         // dispatch синхронный: серия в сторе уже учитывает эту пару
         const {streak} = store.getState().game;
         setPairResult({
             indexes: openIndexes,
             match: isMatch,
-            popupIndex: openIndexes.includes(lastOpened.current) ? lastOpened.current : openIndexes[1],
+            popupIndex: second,
             popup: isMatch ? {points: getMatchPoints(streak), streak} : null,
         });
         if (vibration) {

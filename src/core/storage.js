@@ -3,7 +3,7 @@ import {calculateScore, calculateStars} from "./score.js";
 import {LEGACY_LEVEL} from "./levels.js";
 
 /**
- * Работа с localStorage: настройки (язык, тема, уровень), результаты игр и рекорды.
+ * Работа с localStorage: настройки (язык, тема, уровень), результаты игр, рекорды и достижения (ключ "achievements").
  * Все обращения к localStorage — только через readItem/writeItem: если он недоступен или переполнен,
  * данные хранятся в памяти (memoryStorage) и игра продолжает работать.
  *
@@ -179,4 +179,31 @@ export const saveResult = ({count, time, score, hintUsed, bestStreak, level}) =>
     });
 
     writeItem(RESULTS_KEY, JSON.stringify(results));
+};
+
+const ACHIEVEMENTS_KEY = "achievements";
+
+/**
+ * Сохранённый прогресс достижений по итогам партий (см. core/achievements.js).
+ * Повреждённые данные дают пустой прогресс, нечисловые значения пропускаются.
+ * @returns {Object<string, number>} ключ достижения (например, "speed.medium") → ступень 1–3
+ */
+export const loadAchievements = () => {
+    try {
+        const saved = JSON.parse(readItem(ACHIEVEMENTS_KEY));
+
+        return saved && typeof saved === "object" && !Array.isArray(saved)
+            ? Object.fromEntries(Object.entries(saved).filter(([, tier]) => typeof tier === "number"))
+            : {};
+    } catch (e) {
+        return {};
+    }
+};
+
+/**
+ * Сохраняет прогресс достижений.
+ * @param {Object<string, number>} achievements - ключ достижения → ступень 1–3
+ */
+export const saveAchievements = (achievements) => {
+    writeItem(ACHIEVEMENTS_KEY, JSON.stringify(achievements));
 };
