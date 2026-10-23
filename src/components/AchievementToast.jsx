@@ -26,7 +26,7 @@ const DELAY_MS = 900;
  */
 export default function AchievementToast() {
     const dispatch = useDispatch();
-    const {newAchievements, round, sound} = useSelector(state => state.game);
+    const {newAchievements, round, sound, achievements} = useSelector(state => state.game);
     const t = useTranslation();
     const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
     const [open, setOpen] = React.useState(false);
@@ -45,6 +45,13 @@ export default function AchievementToast() {
 
         return () => clearTimeout(timeout);
     }, [round]);
+
+    // Окно «Достижения» открыли кнопкой в шапке — всплывашка не должна висеть поверх него
+    React.useEffect(() => {
+        if (achievements) {
+            setOpen(false);
+        }
+    }, [achievements]);
 
     const close = (event, reason) => {
         // Клик мимо всплывашки её не закрывает — только крестик, кнопка или время

@@ -71,7 +71,7 @@ npm run build    # сборка в public/bundle.js (файл лежит в git 
   Изменение числа пар уровня делает его старые рекорды несравнимыми — предупредить владельца.
   Ключи уровней (`veryEasy`, `easy`, `belowMedium`, `medium`, `aboveMedium`, `hard`) лежат в результатах
   и в настройке `level` — не переименовывать; результаты без ключа уровня считаются средним (`LEGACY_LEVEL`).
-  Так же в `localStorage` (ключ `achievements`) лежат ключи достижений (`id` из `core/achievements.js`,
+  Так же в `localStorage` (ключи `achievements` и `pairsFound`) лежат ключи и прогресс достижений (`id` из `core/achievements.js`,
   у достижений по уровням — `id.уровень`) — их тоже не переименовывать.
 - `public/bundle.js` лежит в git; пересобирать его (`npm run build`) только когда владелец просит.
 - Файлы на диске — с CRLF, в репозитории — LF (`core.autocrlf=true`). Из WSL/Linux git запускать

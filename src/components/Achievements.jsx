@@ -13,11 +13,11 @@ import {
     achievementList,
     getAchievementEntries,
     getAchievementTiers,
+    getHistorySummary,
     getMaxTier,
     getTextKeys,
     MEDALS
 } from "../core/achievements.js";
-import {loadResults} from "../core/storage.js";
 import {getLevel, levelList} from "../core/levels.js";
 import useTranslation from "../hooks/useTranslation.js";
 
@@ -99,9 +99,9 @@ function LevelTable({achievement, tiers}) {
  * @param {Object} props
  * @param {import("../core/achievements.js").Achievement} props.achievement
  * @param {Object<string, number>} props.tiers - прогресс (getAchievementTiers)
- * @param {number} props.wins - всего побед (для прогресса «Ветерана»)
+ * @param {import("../core/achievements.js").HistorySummary} props.history - сводка по истории (для подписи прогресса)
  */
-function AchievementRow({achievement, tiers, wins}) {
+function AchievementRow({achievement, tiers, history}) {
     const t = useTranslation();
     const {title, description} = getTextKeys(achievement.id);
     const maxTier = getMaxTier(achievement);
@@ -115,7 +115,9 @@ function AchievementRow({achievement, tiers, wins}) {
     } else if (achievement.levels) {
         tierLine = formatTierLine(achievement.levels.map(key => `«${t[getLevel(key).labelKey]}»`));
     }
-    const nextWins = achievement.id === "wins" ? achievement.tiers.find(value => value > wins) : undefined;
+    // Подпись «сейчас / следующий порог» (у «Ветерана» и «Коллекционера»), пока не взято золото
+    const progress = achievement.progress && achievement.progress(history);
+    const nextTier = achievement.progress ? achievement.tiers.find(value => value > progress) : undefined;
 
     return (
         <Box component="li" sx={{display: "flex", alignItems: "flex-start", gap: 1.5, py: 1.5, borderTop: 1, borderColor: "divider"}}>
@@ -136,7 +138,7 @@ function AchievementRow({achievement, tiers, wins}) {
                 !achievement.perLevel &&
                 <Box sx={{flexShrink: 0, textAlign: "center", fontSize: 24, lineHeight: 1.2}}>
                     <Medal tier={tier} maxTier={maxTier}/>
-                    {nextWins && <Typography variant="caption" component="div" color="text.secondary">{wins} / {nextWins}</Typography>}
+                    {nextTier && <Typography variant="caption" component="div" color="text.secondary">{progress} / {nextTier}</Typography>}
                 </Box>
             }
         </Box>
@@ -157,9 +159,9 @@ export default function Achievements() {
     }), shallowEqual);
     const t = useTranslation();
     const pausedByDialog = React.useRef(false);
-    // Прогресс и число побед — один раз при открытии, а не на каждую перерисовку
-    const {tiers, wins} = React.useMemo(
-        () => (open ? {tiers: getAchievementTiers(), wins: loadResults().length} : {tiers: {}, wins: 0}),
+    // Прогресс и сводка по истории — один раз при открытии, а не на каждую перерисовку
+    const {tiers, history} = React.useMemo(
+        () => (open ? {tiers: getAchievementTiers(), history: getHistorySummary()} : {tiers: {}, history: {}}),
         [open]
     );
     const entries = getAchievementEntries();
@@ -204,7 +206,7 @@ export default function Achievements() {
             <DialogContent sx={{py: 0}}>
                 <Box component="ul" sx={{m: 0, p: 0, listStyle: "none"}}>
                     {achievementList.map(achievement =>
-                        <AchievementRow key={achievement.id} achievement={achievement} tiers={tiers} wins={wins}/>
+                        <AchievementRow key={achievement.id} achievement={achievement} tiers={tiers} history={history}/>
                     )}
                 </Box>
             </DialogContent>

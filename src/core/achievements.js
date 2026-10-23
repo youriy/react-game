@@ -9,16 +9,16 @@
  * Откуда берётся прогресс:
  * - достижения по итогам партии (`fromGame`) проверяются после каждой победы (evaluateGame) и хранятся
  *   в localStorage по ключу "achievements" (loadAchievements/saveAchievements в storage.js);
- * - достижения по истории (`fromHistory`: победы, первые ★★★, все уровни) считаются по сохранённым
- *   результатам при каждом показе, поэтому у тех, кто играл до появления достижений, они уже открыты.
+ * - достижения по истории (`fromHistory`: победы, первые ★★★, все уровни, найденные пары) считаются по сохранённым
+ *   результатам (и счётчику пар) при каждом показе, поэтому у тех, кто играл до появления достижений, они уже открыты.
  *
  * Пороги подобраны симуляцией партий (23.10.2026): бронзу получают ~80 % побед, серебро ~30 %, золото ~5 %.
  *
  * Чтобы добавить достижение — добавьте элемент в achievementList и тексты (ключи `ach<Id>` и `ach<Id>Desc`,
  * см. getTextKeys) во все языки в dictionary/languages.js.
  */
-import {LEGACY_LEVEL, levelList} from "./levels.js";
-import {loadAchievements, loadResults, saveAchievements} from "./storage.js";
+import {getLevel, LEGACY_LEVEL, levelList} from "./levels.js";
+import {loadAchievements, loadPairsFound, loadResults, saveAchievements} from "./storage.js";
 import {getResultStars} from "./progress.js";
 
 /** Медали ступеней: 1 — бронза, 2 — серебро, 3 — золото. */
@@ -49,6 +49,7 @@ export const MEDALS = ["🥉", "🥈", "🥇"];
  * @property {function(GameSummary, number[], string[]): number} [fromGame] - ступень (0–3) за партию
  *   (аргументы: итоги, пороги getTiers, уровни `levels`)
  * @property {function(HistorySummary, number[]): number} [fromHistory] - ступень (0–3) по истории
+ * @property {function(HistorySummary): number} [progress] - текущее значение для подписи «сейчас / следующий порог»
  */
 
 /**
@@ -87,6 +88,13 @@ export const achievementList = [
     {
         id: "wins", icon: "🏁", tiers: [10, 50, 100],
         fromHistory: ({wins}, tiers) => tierAtLeast(wins, tiers),
+        progress: ({wins}) => wins,
+    },
+    {
+        // Найдено пар за все партии, включая брошенные; подсказка не мешает
+        id: "collector", icon: "🃏", tiers: [200, 1000, 3000],
+        fromHistory: ({pairsFound}, tiers) => tierAtLeast(pairsFound, tiers),
+        progress: ({pairsFound}) => pairsFound,
     },
     {
         id: "streak", icon: "🔥", tiers: [3, 5, 8],
@@ -157,20 +165,28 @@ export const getAchievementEntries = () => achievementList.flatMap(achievement =
  * @property {number} wins - всего побед
  * @property {boolean} threeStars - хоть раз получены ★★★
  * @property {number} levelsWon - на скольких уровнях есть победы
+ * @property {number} pairsFound - найдено пар всего: счётчик (core/storage.js, loadPairsFound) плюс пары побед,
+ *   сохранённых до появления счётчика (по числу пар их уровня)
  */
 
 /**
  * Сводка по всем сохранённым результатам.
  * @returns {HistorySummary}
  */
-const getHistorySummary = () => {
+export const getHistorySummary = () => {
     const results = loadResults();
     const levels = new Set(results.map(result => result.level || LEGACY_LEVEL));
+    const pairs = loadPairsFound();
+    // Даты в формате "YYYY-MM-DD HH:mm:ss" сравниваются как строки
+    const earlierPairs = results
+        .filter(result => typeof result.date === "string" && result.date < pairs.since)
+        .reduce((sum, result) => sum + getLevel(result.level || LEGACY_LEVEL).pairs, 0);
 
     return {
         wins: results.length,
         threeStars: results.some(result => getResultStars(result, result.level || LEGACY_LEVEL) === 3),
         levelsWon: levelList.filter(level => levels.has(level.key)).length,
+        pairsFound: pairs.count + earlierPairs,
     };
 };
 

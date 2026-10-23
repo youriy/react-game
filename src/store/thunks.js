@@ -4,8 +4,8 @@
  * Thunk-middleware уже включён в configureStore (store.js).
  */
 import {resetItems} from "./itemsSlice.js";
-import {setGaming, setLevel, setNewAchievements, setNewRecords, setNewUnlocks, setWin, startNewRound} from "./gameSlice.js";
-import {getRecords, saveResult} from "../core/storage.js";
+import {giveUp, setGaming, setLevel, setNewAchievements, setNewRecords, setNewUnlocks, setWin, startNewRound} from "./gameSlice.js";
+import {addPairsFound, getRecords, saveResult} from "../core/storage.js";
 import {getLevel} from "../core/levels.js";
 import {evaluateGame, getAchievementTiers, getImproved} from "../core/achievements.js";
 import {getLastUnlockedLevel, getUnlockedLevels, isLevelUnlocked} from "../core/progress.js";
@@ -14,11 +14,25 @@ import {getLastUnlockedLevel, getUnlockedLevels, isLevelUnlocked} from "../core/
 const RECORD_KEYS = ["score", "time", "streak"];
 
 /**
+ * Засчитывает «Коллекционеру» пары, найденные в прерванной партии («Заново», «Сдаться»).
+ * Убранные с поля карточки — найденные пары, по две карточки на пару.
+ * @param {function} getState
+ */
+const countAbandonedPairs = (getState) => {
+    if (getState().game.gaming) {
+        addPairsFound(getState().items.items.filter(item => item.delete).length / 2);
+    }
+};
+
+/**
  * Начинает новую партию на выбранном уровне: свежая перемешанная колода + обнулённые счётчики.
  * Используется кнопками «Начать игру» и «Заново».
  * Если выбранный уровень закрыт (например, сохранён в настройках раньше), партия идёт на самом сложном из открытых.
+ * Если партия уже шла («Заново»), найденные в ней пары засчитываются «Коллекционеру».
  */
 export const startNewGame = () => (dispatch, getState) => {
+    countAbandonedPairs(getState);
+
     if (!isLevelUnlocked(getState().game.level)) {
         dispatch(setLevel(getLastUnlockedLevel()));
     }
@@ -40,6 +54,7 @@ export const finishGame = () => (dispatch, getState) => {
     const unlockedBefore = getUnlockedLevels();
     const achievementsBefore = getAchievementTiers();
     saveResult({...game, level});
+    addPairsFound(getLevel(level).pairs);
     evaluateGame({
         level,
         time: game.time,
@@ -57,4 +72,12 @@ export const finishGame = () => (dispatch, getState) => {
     dispatch(setNewAchievements(getImproved(achievementsBefore, getAchievementTiers())));
     dispatch(setGaming(false));
     dispatch(setWin(true));
+};
+
+/**
+ * «Сдаться»: выйти из партии без победы и без сохранения результата. Найденные пары засчитываются «Коллекционеру».
+ */
+export const giveUpGame = () => (dispatch, getState) => {
+    countAbandonedPairs(getState);
+    dispatch(giveUp());
 };

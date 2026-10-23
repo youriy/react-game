@@ -11,8 +11,8 @@ import Tooltip from '@mui/material/Tooltip';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogTitle from '@mui/material/DialogTitle';
-import {giveUp, setPaused} from "../store/gameSlice.js";
-import {startNewGame} from "../store/thunks.js";
+import {setPaused} from "../store/gameSlice.js";
+import {giveUpGame, startNewGame} from "../store/thunks.js";
 import useTranslation from "../hooks/useTranslation.js";
 import useIsMobile from "../hooks/useIsMobile.js";
 import {HINT_PENALTY} from "../core/score.js";
@@ -75,7 +75,7 @@ export default function GameControls({canPause, canHint, onHint}) {
             label: t.giveUp,
             icon: <FlagIcon/>,
             color: "error",
-            onConfirm: () => dispatch(giveUp()),
+            onConfirm: () => dispatch(giveUpGame()),
         },
     };
     const current = confirmActions[confirm.action];

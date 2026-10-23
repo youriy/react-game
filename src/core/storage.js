@@ -3,7 +3,7 @@ import {calculateScore, calculateStars} from "./score.js";
 import {LEGACY_LEVEL} from "./levels.js";
 
 /**
- * Работа с localStorage: настройки (язык, тема, уровень), результаты игр, рекорды и достижения (ключ "achievements").
+ * Работа с localStorage: настройки (язык, тема, уровень), результаты игр, рекорды и достижения (ключи "achievements" и "pairsFound").
  * Все обращения к localStorage — только через readItem/writeItem: если он недоступен или переполнен,
  * данные хранятся в памяти (memoryStorage) и игра продолжает работать.
  *
@@ -206,4 +206,41 @@ export const loadAchievements = () => {
  */
 export const saveAchievements = (achievements) => {
     writeItem(ACHIEVEMENTS_KEY, JSON.stringify(achievements));
+};
+
+const PAIRS_FOUND_KEY = "pairsFound";
+
+/**
+ * Счётчик найденных пар для достижения «Коллекционер»: пары из всех партий (выигранных, брошенных кнопкой
+ * «Сдаться» и начатых заново), с момента `since` — когда счётчик появился у игрока. Пары побед до этого
+ * момента досчитываются по сохранённым результатам (см. getHistorySummary в core/achievements.js).
+ * Если счётчика ещё нет или он повреждён, он создаётся с нулём и текущим временем.
+ * @returns {{count: number, since: string}} since — дата в формате результатов, "YYYY-MM-DD HH:mm:ss"
+ */
+export const loadPairsFound = () => {
+    try {
+        const saved = JSON.parse(readItem(PAIRS_FOUND_KEY));
+
+        if (saved && typeof saved.count === "number" && typeof saved.since === "string") {
+            return saved;
+        }
+    } catch (e) {
+        // повреждённые данные — создаём счётчик заново
+    }
+
+    const created = {count: 0, since: formatDate()};
+    writeItem(PAIRS_FOUND_KEY, JSON.stringify(created));
+
+    return created;
+};
+
+/**
+ * Прибавляет найденные пары к счётчику «Коллекционера».
+ * @param {number} pairs - сколько пар найдено в партии
+ */
+export const addPairsFound = (pairs) => {
+    if (pairs > 0) {
+        const saved = loadPairsFound();
+        writeItem(PAIRS_FOUND_KEY, JSON.stringify({...saved, count: saved.count + pairs}));
+    }
 };
