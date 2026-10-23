@@ -7,6 +7,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
 import HelpIcon from '@mui/icons-material/HelpOutline';
+import SettingsIcon from '@mui/icons-material/Settings';
 import LanguageIcon from '@mui/icons-material/Language';
 import PaletteIcon from '@mui/icons-material/Palette';
 // Brightness4 — «луна» (включить тёмную тему), Brightness7 — «солнце» (включить светлую)
@@ -107,8 +108,48 @@ const headerSx = {
     color: "primary.main",
 };
 
+// Время выезда кнопок и поворота шестерёнки
+const SLIDE_MS = 300;
+
+const reducedMotion = "@media (prefers-reduced-motion: reduce)";
+
 /**
- * Шапка: кнопка «?» (окно «Как играть»), выбор языка, цвета, светлой/тёмной темы, звука и вибрации.
+ * Окно, из которого выезжают кнопки: всё, что правее его края, обрезается, поэтому кнопки
+ * появляются как будто из-под шестерёнки. Отрицательный отступ справа с таким же внутренним отступом
+ * не дают обрезать последнюю кнопку (у неё edge="end" и отступ −12px).
+ * Закрытая панель невидима (visibility: hidden) — её кнопки не получают фокус с клавиатуры;
+ * при закрытии visibility меняется только после того, как кнопки уехали.
+ */
+const panelSx = (open) => ({
+    display: "flex",
+    overflow: "hidden",
+    mr: "-12px",
+    pr: "12px",
+    visibility: open ? "visible" : "hidden",
+    transition: `visibility 0s linear ${open ? 0 : SLIDE_MS}ms`,
+    [reducedMotion]: {transition: "none"},
+});
+
+const panelInnerSx = (open) => ({
+    display: "flex",
+    alignItems: "center",
+    gap: "2px",
+    transform: open ? "translateX(0)" : "translateX(100%)",
+    transition: `transform ${SLIDE_MS}ms ease`,
+    [reducedMotion]: {transition: "none"},
+});
+
+// Открытие — поворот против часовой стрелки, закрытие — обратно по часовой
+const gearSx = (open) => ({
+    transform: open ? "rotate(-180deg)" : "rotate(0deg)",
+    transition: `transform ${SLIDE_MS}ms ease`,
+    [reducedMotion]: {transition: "none"},
+});
+
+/**
+ * Шапка: одна кнопка-шестерёнка (крайняя справа). По нажатию слева от неё выезжают спрятанные кнопки:
+ * «?» (окно «Как играть»), выбор языка, цвета, светлой/тёмной темы, звука и вибрации.
+ * Открыта ли панель — только состояние компонента, не запоминается (после перезагрузки кнопки спрятаны).
  * Выбранный здесь язык сохраняется и важнее языка браузера (см. detectBrowserLanguage в dictionary/languages.js).
  * Кнопка звука видна, если браузер умеет Web Audio (см. canPlaySound) — то есть почти всегда.
  * Кнопка вибрации видна только там, где вибрация возможна (телефон/планшет с Vibration API, см. canVibrate).
@@ -121,75 +162,93 @@ export default function AppHeader() {
     const showVibration = React.useMemo(canVibrate, []);
     const showSound = React.useMemo(canPlaySound, []);
     const t = useTranslation();
+    const [open, setOpen] = React.useState(false);
 
     return (
         <Box component="header" sx={headerSx}>
-            <Tooltip title={t.howToPlay} arrow>
+            <Box id="header-settings-panel" sx={panelSx(open)}>
+                <Box sx={panelInnerSx(open)}>
+                    <Tooltip title={t.howToPlay} arrow>
+                        <IconButton
+                            size="large"
+                            edge="end"
+                            aria-label="how to play"
+                            onClick={() => dispatch(setHowToPlay(true))}
+                            color="inherit"
+                        >
+                            <HelpIcon/>
+                        </IconButton>
+                    </Tooltip>
+                    <MenuButton
+                        id="primary-language-menu"
+                        title={t.changeLanguage}
+                        ariaLabel="language change"
+                        icon={<LanguageIcon/>}
+                        options={languageMenuOptions}
+                        onSelect={(lang) => dispatch(setLanguage(lang))}
+                    />
+                    <MenuButton
+                        id="primary-theme-menu"
+                        title={t.theme}
+                        ariaLabel="theme change"
+                        icon={<PaletteIcon/>}
+                        options={themeMenuOptions}
+                        onSelect={(theme) => dispatch(setTheme(theme))}
+                    />
+                    <Tooltip title={darkMode ? t.lightMode : t.darkMode} arrow>
+                        <IconButton
+                            size="large"
+                            edge="end"
+                            aria-label="dark mode toggle"
+                            onClick={() => dispatch(toggleDarkMode())}
+                            color="inherit"
+                        >
+                            {darkMode ? <LightModeIcon/> : <DarkModeIcon/>}
+                        </IconButton>
+                    </Tooltip>
+                    {showSound &&
+                        <Tooltip title={sound ? t.soundOff : t.soundOn} arrow>
+                            <IconButton
+                                size="large"
+                                edge="end"
+                                aria-label="sound toggle"
+                                aria-pressed={sound}
+                                onClick={() => dispatch(toggleSound())}
+                                color="inherit"
+                            >
+                                {sound ? <SoundIcon/> : <SoundOffIcon/>}
+                            </IconButton>
+                        </Tooltip>
+                    }
+                    {showVibration &&
+                        <Tooltip title={vibration ? t.vibrationOff : t.vibrationOn} arrow>
+                            <IconButton
+                                size="large"
+                                edge="end"
+                                aria-label="vibration toggle"
+                                aria-pressed={vibration}
+                                onClick={() => dispatch(toggleVibration())}
+                                color="inherit"
+                            >
+                                {vibration ? <VibrationIcon/> : <VibrationOffIcon/>}
+                            </IconButton>
+                        </Tooltip>
+                    }
+                </Box>
+            </Box>
+            <Tooltip title={t.settings} arrow>
                 <IconButton
                     size="large"
                     edge="end"
-                    aria-label="how to play"
-                    onClick={() => dispatch(setHowToPlay(true))}
+                    aria-label="settings"
+                    aria-controls="header-settings-panel"
+                    aria-expanded={open}
+                    onClick={() => setOpen(value => !value)}
                     color="inherit"
                 >
-                    <HelpIcon/>
+                    <SettingsIcon sx={gearSx(open)}/>
                 </IconButton>
             </Tooltip>
-            <MenuButton
-                id="primary-language-menu"
-                title={t.changeLanguage}
-                ariaLabel="language change"
-                icon={<LanguageIcon/>}
-                options={languageMenuOptions}
-                onSelect={(lang) => dispatch(setLanguage(lang))}
-            />
-            <MenuButton
-                id="primary-theme-menu"
-                title={t.theme}
-                ariaLabel="theme change"
-                icon={<PaletteIcon/>}
-                options={themeMenuOptions}
-                onSelect={(theme) => dispatch(setTheme(theme))}
-            />
-            <Tooltip title={darkMode ? t.lightMode : t.darkMode} arrow>
-                <IconButton
-                    size="large"
-                    edge="end"
-                    aria-label="dark mode toggle"
-                    onClick={() => dispatch(toggleDarkMode())}
-                    color="inherit"
-                >
-                    {darkMode ? <LightModeIcon/> : <DarkModeIcon/>}
-                </IconButton>
-            </Tooltip>
-            {showSound &&
-                <Tooltip title={sound ? t.soundOff : t.soundOn} arrow>
-                    <IconButton
-                        size="large"
-                        edge="end"
-                        aria-label="sound toggle"
-                        aria-pressed={sound}
-                        onClick={() => dispatch(toggleSound())}
-                        color="inherit"
-                    >
-                        {sound ? <SoundIcon/> : <SoundOffIcon/>}
-                    </IconButton>
-                </Tooltip>
-            }
-            {showVibration &&
-                <Tooltip title={vibration ? t.vibrationOff : t.vibrationOn} arrow>
-                    <IconButton
-                        size="large"
-                        edge="end"
-                        aria-label="vibration toggle"
-                        aria-pressed={vibration}
-                        onClick={() => dispatch(toggleVibration())}
-                        color="inherit"
-                    >
-                        {vibration ? <VibrationIcon/> : <VibrationOffIcon/>}
-                    </IconButton>
-                </Tooltip>
-            }
         </Box>
     );
 }
