@@ -72,7 +72,7 @@ export default function HowToPlay() {
                     )}
                 </Box>
             </DialogContent>
-            <DialogActions sx={{px: 3, pb: 2}}>
+            <DialogActions>
                 <Button variant="contained" onClick={close} autoFocus>
                     {t.howToPlayOk}
                 </Button>

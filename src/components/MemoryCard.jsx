@@ -133,10 +133,26 @@ const flipperSx = {
     [reducedMotion]: {transition: "none"},
 };
 
+// Скругление мягкое, на телефоне (карточки мельче) — поменьше
 const faceSx = {
     backfaceVisibility: "hidden",
     WebkitBackfaceVisibility: "hidden",
+    borderRadius: {xs: "14px", sm: "18px"},
+    // Тень легче, чем у плашек: карточки стоят плотно, и общая тень темы сливалась бы в дымку.
+    // В тёмном режиме карточку отделяет цвет, тень не нужна
+    boxShadow: (theme) => (theme.palette.mode === "dark" ? "none" : "0 2px 8px rgba(31, 42, 68, 0.08)"),
     transition: "background-color 150ms ease-out, box-shadow 150ms ease-out",
+};
+
+// Рубашка — светлый тон основного цвета темы, чтобы закрытые карточки отличались от открытых (белых).
+// Тон — полупрозрачный слой поверх цвета окна, поэтому рубашка непрозрачная в обеих темах
+const backFaceSx = {
+    ...faceSx,
+    backgroundImage: (theme) => {
+        const tint = alpha(theme.palette.primary.main, 0.2);
+
+        return `linear-gradient(${tint}, ${tint})`;
+    },
 };
 
 // Лицевая сторона (с иконкой) изначально развёрнута «спиной» к игроку
@@ -250,7 +266,7 @@ function MemoryCard({item, index, revealed, disabled, highlight, popup, iconSize
                             >
                                 <Box sx={{...flipperSx, transform: flipped ? "rotateY(-180deg)" : "rotateY(0deg)"}}>
                                     {/* Рубашка: иконка скрыта, нужна только чтобы задать размер карточки */}
-                                    <CardFace sx={faceSx} Icon={Icon} iconSize={iconSize} compact={compact} hidden/>
+                                    <CardFace sx={backFaceSx} Icon={Icon} iconSize={iconSize} compact={compact} hidden/>
                                     <CardFace sx={{...frontFaceSx, ...getHighlightSx(highlight)}} Icon={Icon} iconSize={iconSize} compact={compact}/>
                                 </Box>
                             </Box>

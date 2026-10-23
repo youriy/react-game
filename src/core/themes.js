@@ -1,4 +1,4 @@
-import {createTheme, responsiveFontSizes} from '@mui/material/styles';
+import {alpha, createTheme, responsiveFontSizes} from '@mui/material/styles';
 
 /**
  * Цветовые темы оформления.
@@ -7,10 +7,10 @@ import {createTheme, responsiveFontSizes} from '@mui/material/styles';
  * name — ключ темы (хранится в настройках), light / dark — основной цвет в светлом и тёмном режиме,
  * label — подпись в меню.
  *
- * Цвета подобраны по контрасту WCAG AA: основной цвет как текст — не меньше 4,5:1 на фоне страницы,
- * на белом окне и на выбранной кнопке уровня (подложка 8% основного цвета); текст на кнопке с заливкой —
- * тоже не меньше 4,5:1. В светлом режиме это тёмные оттенки (подпись на кнопке белая), в тёмном — светлые
- * оттенки палитры MUI 200–300 (подпись чёрная), проверены на фоне #121212 и на окне #3a3a3a.
+ * Цвета подобраны по контрасту WCAG AA: основной цвет как текст — не меньше 4,5:1 на фоне страницы (#eef3fb),
+ * на белом окне и на контурной кнопке (подложка 6% основного цвета); текст на кнопке с заливкой
+ * (и на выбранной кнопке уровня) — тоже не меньше 4,5:1. В светлом режиме это тёмные оттенки (подпись на кнопке
+ * белая), в тёмном — светлые оттенки палитры MUI 200–300 (подпись чёрная), проверены на фоне #121826 и на окне #1c2333.
  * Насыщенные «пятисотые» цвета MUI на светло-сером фоне не читаются (жёлтый #ffeb3b — 1,1:1).
  * Цвета — только кодами (см. «Темы оформления» в README). Таблица контрастов — в CHANGELOG.
  */
@@ -41,8 +41,52 @@ export const getThemeColor = (name, darkMode) => {
     return darkMode ? item.dark : item.light;
 };
 
+/** Шрифт игры: Nunito (круглый, с кириллицей) лежит в public/fonts и подключается в public/index.html. */
+const FONT_FAMILY = '"Nunito Variable", "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+
 /**
- * Создаёт тему MUI: основной цвет из themeList (свой оттенок для каждого режима) + светлый или тёмный режим.
+ * Цвета, которые отличаются в светлом и тёмном режиме, кроме основного.
+ * Фон — мягкий голубоватый (в тёмном — тёмно-синий), окна и плашки — белые (в тёмном — чуть светлее фона).
+ * warning и error заменены на более тёмные (в тёмном режиме error — на более светлый): их текст на кнопках
+ * с подложкой (подсказка, «Сдаться») должен читаться с контрастом не меньше 4,5:1.
+ * Только коды цветов: названия MUI не понимает (ошибка MUI #9).
+ */
+const modeColors = {
+    light: {
+        palette: {
+            background: {default: "#eef3fb", paper: "#ffffff"},
+            warning: {main: "#9a4a00"},
+            error: {main: "#b71c1c"},
+        },
+        shadow: "0 6px 24px rgba(31, 42, 68, 0.08)",
+        dialogShadow: "0 20px 50px rgba(31, 42, 68, 0.25)",
+    },
+    dark: {
+        palette: {
+            background: {default: "#121826", paper: "#1c2333"},
+            error: {main: "#e57373"},
+        },
+        shadow: "0 6px 24px rgba(0, 0, 0, 0.35)",
+        dialogShadow: "0 20px 50px rgba(0, 0, 0, 0.5)",
+    },
+};
+
+/**
+ * Основной цвет кнопки по её color: primary, error, warning… Для color="inherit" — цвет текста.
+ * @param {import('@mui/material/styles').Theme} theme
+ * @param {string} color - ownerState.color кнопки
+ * @returns {string} код цвета
+ */
+const getButtonColor = (theme, color) => theme.palette[color]?.main ?? theme.palette.text.primary;
+
+/**
+ * Создаёт тему MUI в мягком стиле: основной цвет из themeList (свой оттенок для каждого режима),
+ * светлый или тёмный режим, шрифт Nunito, скругления, мягкие тени.
+ * Почти весь стиль игры задаётся здесь, а не в компонентах:
+ * - кнопки-«таблетки» без капслока; с заливкой — с цветной мягкой тенью; контурные (outlined) —
+ *   без рамки, на светлой подложке своего цвета (6%, при наведении 12%: контраст текста остаётся ≥ 4,5:1);
+ * - плашки (Paper, Card) скруглены на 20 px с мягкой тенью, окна (Dialog) — на 24 px, меню — на 16 px;
+ * - заголовки жирные (800).
  * Цвет подписи на кнопках с заливкой (contrastText) MUI выбирает сам: белый в светлом режиме, чёрный в тёмном.
  * `responsiveFontSizes` уменьшает крупные заголовки (h1–h6) на узких экранах,
  * на широких размеры остаются стандартными.
@@ -50,14 +94,77 @@ export const getThemeColor = (name, darkMode) => {
  * @param {boolean} darkMode - тёмный режим
  * @returns {import('@mui/material/styles').Theme}
  */
-export const createAppTheme = (name, darkMode) => responsiveFontSizes(createTheme({
-    palette: {
-        mode: darkMode ? "dark" : "light",
-        primary: {
-            main: getThemeColor(name, darkMode),
+export const createAppTheme = (name, darkMode) => {
+    const mode = darkMode ? "dark" : "light";
+    const {palette, shadow, dialogShadow} = modeColors[mode];
+
+    return responsiveFontSizes(createTheme({
+        palette: {
+            mode,
+            primary: {
+                main: getThemeColor(name, darkMode),
+            },
+            ...palette,
         },
-        // Фон страницы: в светлом режиме светло-серый #f5f5f5 (как было всегда), в тёмном — стандартный тёмный MUI.
-        // Только код цвета: названия вроде "whitesmoke" MUI не понимает и падает при запуске (ошибка MUI #9)
-        ...(darkMode ? {} : {background: {default: "#f5f5f5"}}),
-    },
-}));
+        shape: {borderRadius: 12},
+        typography: {
+            fontFamily: FONT_FAMILY,
+            h1: {fontWeight: 800},
+            h2: {fontWeight: 800},
+            h3: {fontWeight: 800},
+            h4: {fontWeight: 800},
+            h5: {fontWeight: 700},
+            h6: {fontWeight: 700},
+            button: {textTransform: "none", fontWeight: 800},
+        },
+        components: {
+            MuiButton: {
+                styleOverrides: {
+                    root: {borderRadius: 999, paddingLeft: 20, paddingRight: 20},
+                    sizeLarge: {minHeight: 56, paddingLeft: 32, paddingRight: 32, fontSize: "1.125rem"},
+                    contained: ({theme, ownerState}) => ({
+                        boxShadow: `0 6px 16px ${alpha(getButtonColor(theme, ownerState.color), 0.3)}`,
+                        "&:hover": {boxShadow: `0 8px 20px ${alpha(getButtonColor(theme, ownerState.color), 0.4)}`},
+                        "&.Mui-disabled": {boxShadow: "none"},
+                    }),
+                    outlined: ({theme, ownerState}) => ({
+                        // Рамка прозрачная, а не убрана: так размер кнопки не меняется
+                        borderColor: "transparent",
+                        backgroundColor: alpha(getButtonColor(theme, ownerState.color), 0.06),
+                        "&:hover": {
+                            borderColor: "transparent",
+                            backgroundColor: alpha(getButtonColor(theme, ownerState.color), 0.12),
+                        },
+                        "&.Mui-disabled": {borderColor: "transparent", backgroundColor: theme.palette.action.disabledBackground},
+                    }),
+                },
+            },
+            MuiPaper: {
+                styleOverrides: {
+                    rounded: {borderRadius: 20},
+                    elevation1: {boxShadow: shadow},
+                },
+            },
+            MuiDialog: {
+                styleOverrides: {
+                    paper: {borderRadius: 24, boxShadow: dialogShadow},
+                },
+            },
+            MuiDialogTitle: {
+                styleOverrides: {
+                    root: {fontWeight: 800, paddingTop: 24},
+                },
+            },
+            MuiDialogActions: {
+                styleOverrides: {
+                    root: {padding: "8px 24px 20px"},
+                },
+            },
+            MuiMenu: {
+                styleOverrides: {
+                    paper: {borderRadius: 16},
+                },
+            },
+        },
+    }));
+};

@@ -2,11 +2,13 @@ import React from 'react';
 import {useDispatch, useSelector} from "react-redux";
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Paper from '@mui/material/Paper';
 import Stack from "@mui/material/Stack";
 import Typography from '@mui/material/Typography';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import LockIcon from '@mui/icons-material/Lock';
+import {alpha} from '@mui/material/styles';
 import {setLevel} from "../store/gameSlice.js";
 import {startNewGame} from "../store/thunks.js";
 import {formatTime} from "../core/utils.js";
@@ -50,7 +52,8 @@ const getFieldSize = (level, isMobile) => {
 
 /**
  * Кнопки переключателя стоят сеткой с промежутками (а не слитной полосой, как в ToggleButtonGroup
- * по умолчанию): у каждой своя рамка и скругление.
+ * по умолчанию). Каждая — отдельная мягкая плашка: на фоне окна с тенью, выбранная залита основным цветом,
+ * закрытая — прозрачная с пунктирной рамкой.
  */
 const levelGridSx = {
     display: "grid",
@@ -59,9 +62,27 @@ const levelGridSx = {
     width: "100%",
     "& .MuiToggleButtonGroup-grouped, & .MuiToggleButtonGroup-grouped:not(:first-of-type), & .MuiToggleButtonGroup-grouped:not(:last-of-type)": {
         m: 0,
-        border: 1,
-        borderColor: "divider",
-        borderRadius: 1,
+        minHeight: 64,
+        border: 2,
+        borderColor: "transparent",
+        borderRadius: "20px",
+        bgcolor: "background.paper",
+        // В тёмном режиме тень на тёмном фоне не видна — плашку отделяет более светлый цвет окна
+        boxShadow: (theme) => (theme.palette.mode === "dark" ? "none" : "0 3px 10px rgba(31, 42, 68, 0.07)"),
+        "&.Mui-selected": {
+            bgcolor: "primary.main",
+            color: "primary.contrastText",
+            boxShadow: (theme) => `0 6px 16px ${alpha(theme.palette.primary.main, 0.3)}`,
+            // Пустые звёзды на заливке — полупрозрачные цвета подписи, иначе их не видно
+            "& .MuiRating-iconEmpty": {color: (theme) => alpha(theme.palette.primary.contrastText, 0.6)},
+        },
+        "&.Mui-selected:hover": {bgcolor: "primary.dark"},
+        "&.Mui-disabled": {
+            bgcolor: "transparent",
+            borderStyle: "dashed",
+            borderColor: "divider",
+            boxShadow: "none",
+        },
     },
 };
 
@@ -152,7 +173,8 @@ export default function StartGame() {
                 <Stack spacing={{xs: 2, sm: 4}}>
                     {
                         win &&
-                        <Stack spacing={1}>
+                        // Итоги партии — на отдельной плашке, как окно победы
+                        <Paper component={Stack} spacing={1} sx={{p: {xs: 2, sm: 3}}}>
                             <WinText variant="h1">{t.win}</WinText>
                             <Box sx={{display: "flex", justifyContent: "center"}}>
                                 <Stars value={stars} size="large"/>
@@ -179,7 +201,7 @@ export default function StartGame() {
                                 {result.multiplier !== 1 && <> · ×{result.multiplier}</>}
                             </WinText>
                             <WinText variant="h3">{t.totalScore}: {result.total}</WinText>
-                        </Stack>
+                        </Paper>
                     }
                     <LevelSelect/>
                 </Stack>
