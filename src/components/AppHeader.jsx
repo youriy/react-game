@@ -23,7 +23,7 @@ import {setHowToPlay, setLanguage, setTheme, toggleDarkMode, toggleSound, toggle
 import {canVibrate} from "../core/vibration.js";
 import {canPlaySound} from "../core/sound.js";
 import {languageOptions} from "../dictionary/languages.js";
-import {themeList} from "../core/themes.js";
+import {getThemeColor, themeList} from "../core/themes.js";
 import useTranslation from "../hooks/useTranslation.js";
 
 const menuOrigin = {
@@ -87,9 +87,13 @@ function MenuButton({id, title, ariaLabel, icon, options, onSelect}) {
 
 const languageMenuOptions = languageOptions.map(({code, label}) => ({value: code, label}));
 
-const themeMenuOptions = themeList.map(({name, color, label}) => ({
+/**
+ * Пункты меню цвета: кружок того оттенка, который будет в текущем режиме (светлом или тёмном).
+ * @param {boolean} darkMode
+ */
+const getThemeMenuOptions = (darkMode) => themeList.map(({name, label}) => ({
     value: name,
-    label: <Avatar sx={{bgcolor: color}}>{label}</Avatar>,
+    label: <Avatar sx={{bgcolor: getThemeColor(name, darkMode)}}>{label}</Avatar>,
 }));
 
 /**
@@ -192,7 +196,7 @@ export default function AppHeader() {
                         title={t.theme}
                         ariaLabel="theme change"
                         icon={<PaletteIcon/>}
-                        options={themeMenuOptions}
+                        options={getThemeMenuOptions(darkMode)}
                         onSelect={(theme) => dispatch(setTheme(theme))}
                     />
                     <Tooltip title={darkMode ? t.lightMode : t.darkMode} arrow>
