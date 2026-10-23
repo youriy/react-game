@@ -25,6 +25,15 @@ import {getResultStars} from "./progress.js";
 export const MEDALS = ["🥉", "🥈", "🥇"];
 
 /**
+ * Баллы славы за каждую ступень: бронза, серебро, золото. Ступени суммируются: серебро = 10 + 25 = 35.
+ * Не путать с очками партии (core/score.js).
+ */
+export const TIER_GLORY = [10, 25, 50];
+
+/** Баллы славы за одноступенчатое достижение (первая победа, три звезды, «Сова»…). */
+export const SINGLE_GLORY = 10;
+
+/**
  * Итоги выигранной партии, по которым проверяются достижения.
  * @typedef {Object} GameSummary
  * @property {string} level - ключ уровня
@@ -242,10 +251,11 @@ export const evaluateGame = (game) => {
  * Что улучшилось между двумя снимками прогресса (getAchievementTiers до и после партии).
  * @param {Object<string, number>} before
  * @param {Object<string, number>} after
- * @returns {Array<{key: string, tier: number}>} в порядке achievementList
+ * @returns {Array<{key: string, tier: number, previous: number}>} в порядке achievementList;
+ *   previous — ступень до партии (0 — не было), чтобы посчитать прибавку баллов славы
  */
 export const getImproved = (before, after) =>
-    Object.keys(after).filter(key => after[key] > (before[key] || 0)).map(key => ({key, tier: after[key]}));
+    Object.keys(after).filter(key => after[key] > (before[key] || 0)).map(key => ({key, tier: after[key], previous: before[key] || 0}));
 
 /**
  * Достижение и уровень по ключу прогресса.
@@ -260,3 +270,23 @@ export const parseKey = (key) => {
 
 /** Максимальная ступень достижения: 3 у ступенчатых, 1 у одноступенчатых. */
 export const getMaxTier = (achievement) => (achievement.tiers || achievement.perLevel || achievement.levels ? 3 : 1);
+
+/**
+ * Баллы славы за достижение на данной ступени: сумма TIER_GLORY по полученным ступеням,
+ * у одноступенчатых — SINGLE_GLORY.
+ * @param {Achievement} achievement
+ * @param {number} tier - 0–3
+ * @returns {number} например, getGlory(серия, 2) → 35
+ */
+export const getGlory = (achievement, tier) => (getMaxTier(achievement) === 1
+    ? (tier > 0 ? SINGLE_GLORY : 0)
+    : TIER_GLORY.slice(0, tier).reduce((sum, value) => sum + value, 0));
+
+/**
+ * Всего баллов славы по прогрессу. Ничего не хранится — считается по ступеням, поэтому у прежних
+ * игроков баллы сразу учитывают уже полученные достижения.
+ * @param {Object<string, number>} tiers - getAchievementTiers()
+ * @returns {number}
+ */
+export const getTotalGlory = (tiers) =>
+    Object.entries(tiers).reduce((sum, [key, tier]) => sum + getGlory(parseKey(key).achievement, tier), 0);

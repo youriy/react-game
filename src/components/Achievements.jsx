@@ -13,10 +13,14 @@ import {
     achievementList,
     getAchievementEntries,
     getAchievementTiers,
+    getGlory,
     getHistorySummary,
+    getTotalGlory,
     getMaxTier,
     getTextKeys,
-    MEDALS
+    MEDALS,
+    SINGLE_GLORY,
+    TIER_GLORY
 } from "../core/achievements.js";
 import {getLevel, levelList} from "../core/levels.js";
 import useTranslation from "../hooks/useTranslation.js";
@@ -67,7 +71,13 @@ function LevelTable({achievement, tiers}) {
         >
             <Box role="row" sx={{display: "contents"}}>
                 <span role="columnheader"/>
-                {MEDALS.map(medal => <Box role="columnheader" key={medal} sx={{textAlign: "right"}}>{medal}</Box>)}
+                {/* Над столбцом — медаль и сколько баллов славы даёт ступень */}
+                {MEDALS.map((medal, index) =>
+                    <Box role="columnheader" key={medal} sx={{textAlign: "right", whiteSpace: "nowrap"}}>
+                        {medal}
+                        <Typography component="span" variant="caption" color="text.secondary"> +{TIER_GLORY[index]}</Typography>
+                    </Box>
+                )}
             </Box>
             {levelList.map(level => {
                 const tier = tiers[`${achievement.id}.${level.key}`];
@@ -94,7 +104,8 @@ function LevelTable({achievement, tiers}) {
 }
 
 /**
- * Одна строка списка: значок, название, условие и пороги; справа — полученная ступень.
+ * Одна строка списка: значок, название с баллами славы («🏆 получено / всего»), условие и пороги;
+ * справа — полученная ступень.
  * У достижений по уровням вместо значка справа — таблица порогов по уровням (LevelTable).
  * @param {Object} props
  * @param {import("../core/achievements.js").Achievement} props.achievement
@@ -117,6 +128,10 @@ function AchievementRow({achievement, tiers, history}) {
     }
     // Подпись «сейчас / следующий порог» (у «Ветерана» и «Коллекционера»), пока не взято золото
     const progress = achievement.progress && achievement.progress(history);
+    // Баллы славы: сколько уже получено и сколько можно получить всего (у достижений по уровням — по всем уровням)
+    const keys = achievement.perLevel ? levelList.map(level => `${achievement.id}.${level.key}`) : [achievement.id];
+    const glory = keys.reduce((sum, key) => sum + getGlory(achievement, tiers[key]), 0);
+    const maxGlory = keys.length * getGlory(achievement, maxTier);
     const nextTier = achievement.progress ? achievement.tiers.find(value => value > progress) : undefined;
 
     return (
@@ -126,7 +141,17 @@ function AchievementRow({achievement, tiers, history}) {
                 {achievement.icon}
             </Box>
             <Box sx={{flex: 1, minWidth: 0}}>
-                <Typography variant="subtitle1" sx={{fontWeight: 700, lineHeight: 1.3}}>{t[title]}</Typography>
+                <Typography variant="subtitle1" sx={{fontWeight: 700, lineHeight: 1.3}}>
+                    {t[title]}
+                    <Typography
+                        component="span"
+                        variant="caption"
+                        title={t.glory}
+                        sx={{ml: 1, whiteSpace: "nowrap", fontWeight: 700, color: glory ? "primary.main" : "text.secondary"}}
+                    >
+                        🏆 {glory} / {maxGlory}
+                    </Typography>
+                </Typography>
                 <Typography variant="body2" color="text.secondary">
                     {t[description]}
                     {tierLine && <> {tierLine}</>}
@@ -146,7 +171,8 @@ function AchievementRow({achievement, tiers, history}) {
 }
 
 /**
- * Окно «Достижения»: сколько получено и список всех достижений с условиями, порогами и полученными ступенями.
+ * Окно «Достижения»: сколько получено, сумма баллов славы и список всех достижений с условиями, порогами
+ * и полученными ступенями; внизу — сколько баллов славы даёт каждая ступень.
  * Открывается кнопкой-кубком в шапке и кнопкой во всплывашке после победы (AchievementToast).
  * Прогресс читается при открытии окна. Как и «Как играть», ставит партию на паузу и снимает её при закрытии.
  */
@@ -201,6 +227,8 @@ export default function Achievements() {
                 </Box>
                 <Typography variant="body2" color="text.secondary">
                     {t.achievementsCount.replace("{n}", earned).replace("{total}", entries.length)}
+                    {" · "}
+                    <Box component="span" sx={{color: "primary.main", fontWeight: 800}}>🏆 {t.glory}: {getTotalGlory(tiers)}</Box>
                 </Typography>
             </DialogTitle>
             <DialogContent sx={{py: 0}}>
@@ -209,6 +237,11 @@ export default function Achievements() {
                         <AchievementRow key={achievement.id} achievement={achievement} tiers={tiers} history={history}/>
                     )}
                 </Box>
+                <Typography variant="caption" component="p" color="text.secondary" sx={{py: 1.5, borderTop: 1, borderColor: "divider"}}>
+                    🏆 {t.gloryRule
+                        .replace("{tiers}", formatTierLine(TIER_GLORY.map(String)))
+                        .replace("{single}", SINGLE_GLORY)}
+                </Typography>
             </DialogContent>
             <DialogActions>
                 <Button variant="contained" onClick={close} autoFocus>

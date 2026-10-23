@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import useMediaQuery from "@mui/material/useMediaQuery";
 import CloseIcon from '@mui/icons-material/Close';
 import {setAchievementsOpen} from "../store/gameSlice.js";
-import {getMaxTier, getTextKeys, MEDALS, parseKey} from "../core/achievements.js";
+import {getGlory, getMaxTier, getTextKeys, MEDALS, parseKey} from "../core/achievements.js";
 import {getLevel} from "../core/levels.js";
 import {playSound} from "../core/sound.js";
 import useTranslation from "../hooks/useTranslation.js";
@@ -21,7 +21,7 @@ const DELAY_MS = 900;
 
 /**
  * Всплывашка «Новое достижение!» на экране победы: какие достижения получены или улучшены этой партией
- * (state.game.newAchievements), со звуком (если он включён) и кнопкой «Все достижения».
+ * (state.game.newAchievements) и сколько баллов славы они принесли, со звуком (если он включён) и кнопкой «Все достижения».
  * Во время партии ничего не всплывает: список заполняется в finishGame. Показывается один раз на партию (round).
  */
 export default function AchievementToast() {
@@ -53,6 +53,14 @@ export default function AchievementToast() {
         }
     }, [achievements]);
 
+    // Прибавка баллов славы: разница между новой ступенью и прежней
+    const gains = newAchievements.map(({key, tier, previous}) => {
+        const {achievement} = parseKey(key);
+
+        return getGlory(achievement, tier) - getGlory(achievement, previous);
+    });
+    const totalGain = gains.reduce((sum, value) => sum + value, 0);
+
     const close = (event, reason) => {
         // Клик мимо всплывашки её не закрывает — только крестик, кнопка или время
         if (reason !== "clickaway") {
@@ -75,9 +83,11 @@ export default function AchievementToast() {
         >
             <Paper elevation={6} role="status" sx={{p: 2, pr: 1, display: "flex", gap: 1, alignItems: "flex-start", minWidth: {xs: 0, sm: 340}}}>
                 <Box sx={{flex: 1}}>
-                    <Typography variant="subtitle1" color="primary" sx={{fontWeight: 700}}>🏅 {t.newAchievement}</Typography>
+                    <Typography variant="subtitle1" color="primary" sx={{fontWeight: 700}}>
+                        🏅 {t.newAchievement} +{totalGain} 🏆
+                    </Typography>
                     <Box component="ul" sx={{m: 0, mb: 1, p: 0, listStyle: "none"}}>
-                        {newAchievements.map(({key, tier}) => {
+                        {newAchievements.map(({key, tier}, index) => {
                             const {achievement, level} = parseKey(key);
 
                             return (
@@ -85,6 +95,7 @@ export default function AchievementToast() {
                                     {achievement.icon} {t[getTextKeys(achievement.id).title]}
                                     {level && <> · {t[getLevel(level).labelKey]}</>}
                                     {getMaxTier(achievement) > 1 && <> {MEDALS[tier - 1]}</>}
+                                    <Typography component="span" variant="body2" color="text.secondary"> +{gains[index]}</Typography>
                                 </Typography>
                             );
                         })}
