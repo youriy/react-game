@@ -21,6 +21,9 @@ import Stars from "./Stars.jsx";
 import Records from "./Records.jsx";
 import ResultsTable from "./ResultsTable.jsx";
 
+/** Отступ между блоками стартового экрана (spacing у Stack); плашке рекордов он передаётся отдельно. */
+const SECTION_SPACING = {xs: 3, sm: 6};
+
 /**
  * Строка текста на экране победы.
  * @param {{variant: string, children: React.ReactNode}} props - variant: вариант Typography (h1, h5…)
@@ -144,7 +147,7 @@ export default function StartGame() {
     return (
         // На телефоне — во всю ширину экрана, меньше отступы
         <Box sx={{marginTop: {xs: "16px", sm: "30px"}, width: {xs: "100%", sm: "auto"}, minWidth: {xs: 0, sm: 600}}}>
-            <Stack spacing={{xs: 3, sm: 6}}>
+            <Stack spacing={SECTION_SPACING}>
                 {/* Итоги партии и выбор уровня — в своей группе, с отступом меньше общего (32 px вместо 48) */}
                 <Stack spacing={{xs: 2, sm: 4}}>
                     {
@@ -180,7 +183,7 @@ export default function StartGame() {
                     }
                     <LevelSelect/>
                 </Stack>
-                <Records records={records}/>
+                <Records records={records} gap={SECTION_SPACING}/>
                 <Button variant="contained" size="large" onClick={() => dispatch(startNewGame())}>
                     {t.start}
                 </Button>
