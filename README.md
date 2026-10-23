@@ -13,7 +13,7 @@ npm start          # режим разработки: http://localhost:301 (от
 npm run build      # сборка в public/bundle.js
 ```
 
-Стек: React 17, Redux Toolkit, MUI 5 (Material UI), webpack 5 + Babel. Без полифилов: MUI v5 работает только
+Стек: React 18, Redux Toolkit 2 + react-redux 9, MUI 5 (Material UI), webpack 5 + Babel. Без полифилов: MUI v5 работает только
 в современных браузерах (Chrome 90+, Safari 14+, Firefox 78+, Edge 91+), где всё нужное есть встроенным.
 
 Игра работает на компьютере и на телефоне (проверена ширина экрана от 360 px).
@@ -138,7 +138,7 @@ public/
 └── bundle.js                собранная игра (npm run build)
 
 src/
-├── app.jsx                  точка входа: Redux Provider + ErrorBoundary + <Game/>
+├── app.jsx                  точка входа: createRoot (React 18), Redux Provider + ErrorBoundary + <Game/>
 ├── components/
 │   ├── Game.jsx             корень: тема, шапка, игровое поле или стартовый экран
 │   ├── ErrorBoundary.jsx    экран ошибки «Что-то пошло не так» вместо белого экрана
