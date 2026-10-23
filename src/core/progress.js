@@ -30,14 +30,23 @@ export const getBestStars = (level) =>
     loadLevelResults(level).reduce((best, result) => Math.max(best, getResultStars(result, level)), 0);
 
 /**
- * Открыт ли уровень: открыт сразу (unlockedBy = null) или есть победа на уровне unlockedBy.
+ * Открыт ли уровень: открыт сразу (unlockedBy = null), есть победа на уровне unlockedBy (предыдущем)
+ * или есть победы на этом уровне либо на более сложном. Последнее — чтобы у игроков, которые
+ * играли до появления последовательного открытия, не закрылись уровни, где у них уже есть рекорды
+ * (и все уровни перед ними).
  * @param {string} level - ключ уровня
  * @returns {boolean}
  */
 export const isLevelUnlocked = (level) => {
-    const {unlockedBy} = getLevel(level);
+    const current = getLevel(level);
 
-    return !unlockedBy || loadLevelResults(unlockedBy).length > 0;
+    if (!current.unlockedBy) {
+        return true;
+    }
+
+    const keys = [current.unlockedBy, ...levelList.slice(levelList.indexOf(current)).map(item => item.key)];
+
+    return keys.some(key => loadLevelResults(key).length > 0);
 };
 
 /**
@@ -45,3 +54,9 @@ export const isLevelUnlocked = (level) => {
  * @returns {string[]}
  */
 export const getUnlockedLevels = () => levelList.map(level => level.key).filter(isLevelUnlocked);
+
+/**
+ * Самый сложный из открытых уровней — на него переключаемся, если выбран закрытый.
+ * @returns {string} ключ уровня
+ */
+export const getLastUnlockedLevel = () => getUnlockedLevels().pop();

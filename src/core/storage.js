@@ -1,6 +1,6 @@
 import {formatDate, formatTime} from "./utils.js";
 import {calculateScore, calculateStars} from "./score.js";
-import {DEFAULT_LEVEL} from "./levels.js";
+import {LEGACY_LEVEL} from "./levels.js";
 
 /**
  * Работа с localStorage: настройки (язык, тема, уровень), результаты игр и рекорды.
@@ -73,7 +73,7 @@ export const getResultSeconds = (result) => {
  * @param {string} level - ключ уровня
  * @returns {GameResult[]}
  */
-export const loadLevelResults = (level) => loadResults().filter(result => (result.level || DEFAULT_LEVEL) === level);
+export const loadLevelResults = (level) => loadResults().filter(result => (result.level || LEGACY_LEVEL) === level);
 
 /**
  * Результаты уровня, отсортированные по очкам от лучшего; игры без очков — в конце.

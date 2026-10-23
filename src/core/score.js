@@ -41,7 +41,7 @@ export const getMatchPoints = (streak) => MATCH_POINTS + STREAK_BONUS * (streak 
  * @param {number} params.time - время партии в секундах
  * @param {number} params.count - число попыток
  * @param {boolean} [params.hintUsed=false] - использована ли подсказка
- * @param {string} [params.level] - ключ уровня (по умолчанию — средний)
+ * @param {string} [params.level] - ключ уровня (по умолчанию — очень лёгкий)
  * @returns {{pairsPoints: number, timeBonus: number, accuracyBonus: number, hintPenalty: number,
  *            multiplier: number, total: number}}
  * @example
@@ -71,7 +71,7 @@ export const MAX_STARS = 3;
 /**
  * Звёзды за выигранную партию: 1 — за победу, 2 и 3 — если итоговый счёт достиг порогов уровня.
  * @param {number} total - итоговый счёт (calculateScore(...).total)
- * @param {string} [level] - ключ уровня (по умолчанию — средний)
+ * @param {string} [level] - ключ уровня (по умолчанию — очень лёгкий)
  * @returns {number} 1, 2 или 3
  * @example
  * calculateStars(6000, "medium") // → 2 (порог 2 звёзд на среднем — 5000)

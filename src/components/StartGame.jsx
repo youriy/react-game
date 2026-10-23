@@ -15,8 +15,8 @@ import useIsMobile from "../hooks/useIsMobile.js";
 import useConfetti from "../hooks/useConfetti.js";
 import {calculateScore, calculateStars} from "../core/score.js";
 import {getRecords} from "../core/storage.js";
-import {DEFAULT_LEVEL, getLevel, levelList} from "../core/levels.js";
-import {getBestStars, isLevelUnlocked} from "../core/progress.js";
+import {getLevel, levelList} from "../core/levels.js";
+import {getBestStars, getLastUnlockedLevel, isLevelUnlocked} from "../core/progress.js";
 import Stars from "./Stars.jsx";
 import Records from "./Records.jsx";
 import ResultsTable from "./ResultsTable.jsx";
@@ -46,22 +46,38 @@ const getFieldSize = (level, isMobile) => {
 };
 
 /**
- * Переключатель уровня сложности: «Лёгкий 4×4», «Средний 5×6», «Сложный 7×6» (на телефоне 6×7).
- * На кнопке — лучшие звёзды уровня; закрытый уровень недоступен, под переключателем написано,
- * как его открыть. На телефоне кнопки стоят столбиком во всю ширину.
+ * Кнопки переключателя стоят сеткой с промежутками (а не слитной полосой, как в ToggleButtonGroup
+ * по умолчанию): у каждой своя рамка и скругление.
+ */
+const levelGridSx = {
+    display: "grid",
+    gridTemplateColumns: {xs: "repeat(2, minmax(0, 1fr))", sm: "repeat(3, minmax(0, 1fr))"},
+    gap: 1,
+    width: "100%",
+    "& .MuiToggleButtonGroup-grouped, & .MuiToggleButtonGroup-grouped:not(:first-of-type), & .MuiToggleButtonGroup-grouped:not(:last-of-type)": {
+        m: 0,
+        border: 1,
+        borderColor: "divider",
+        borderRadius: 1,
+    },
+};
+
+/**
+ * Переключатель уровня сложности: шесть кнопок от «Очень лёгкий 4×3» до «Сложный 7×6» (на телефоне 6×7),
+ * сеткой 3×2 (на телефоне 2×3). На кнопке — название, размер поля и лучшие звёзды уровня.
+ * Уровни открываются по очереди: закрытый недоступен, на его кнопке замок и подсказка «Пройдите предыдущий».
  * Выбранный уровень сохраняется в state.game.level (и в localStorage).
  */
 function LevelSelect() {
     const dispatch = useDispatch();
     const level = useSelector(state => state.game.level);
     const t = useTranslation();
-    const lockedLevels = levelList.filter(item => !isLevelUnlocked(item.key));
     const isMobile = useIsMobile();
 
-    // Если выбран закрытый уровень (например, сохранён в настройках раньше) — переключаемся на уровень по умолчанию
+    // Если выбран закрытый уровень (например, сохранён в настройках раньше) — переключаемся на самый сложный из открытых
     React.useEffect(() => {
         if (!isLevelUnlocked(level)) {
-            dispatch(setLevel(DEFAULT_LEVEL));
+            dispatch(setLevel(getLastUnlockedLevel()));
         }
     }, [level]);
 
@@ -71,36 +87,33 @@ function LevelSelect() {
             <ToggleButtonGroup
                 color="primary"
                 exclusive
-                orientation={isMobile ? "vertical" : "horizontal"}
-                fullWidth={isMobile}
+                sx={levelGridSx}
                 value={getLevel(level).key}
                 // null приходит при повторном клике по уже выбранной кнопке — уровень не сбрасываем
                 onChange={(event, value) => value && dispatch(setLevel(value))}
             >
                 {
                     levelList.map(item => {
-                        const locked = lockedLevels.includes(item);
+                        const locked = !isLevelUnlocked(item.key);
 
                         return (
-                            <ToggleButton key={item.key} value={item.key} disabled={locked} sx={{px: 3, flexDirection: "column"}}>
+                            <ToggleButton key={item.key} value={item.key} disabled={locked} sx={{px: 1, flexDirection: "column", lineHeight: 1.3}}>
                                 <span>
                                     {locked && <LockIcon fontSize="inherit" sx={{mr: 0.5, verticalAlign: "-2px"}}/>}
-                                    {/* Размер поля — как на этом экране (на телефоне у сложного 6×8) */}
-                                    {t[item.labelKey]} {getFieldSize(item, isMobile)}
+                                    {t[item.labelKey]}
                                 </span>
-                                <Stars value={getBestStars(item.key)} size="small"/>
+                                {/* Размер поля — как на этом экране (на телефоне у сложного 6×7) */}
+                                <Typography variant="caption" component="span">{getFieldSize(item, isMobile)}</Typography>
+                                {
+                                    locked
+                                        ? <Typography variant="caption" component="span" sx={{textTransform: "none"}}>{t.unlockHint}</Typography>
+                                        : <Stars value={getBestStars(item.key)} size="small"/>
+                                }
                             </ToggleButton>
                         );
                     })
                 }
             </ToggleButtonGroup>
-            {
-                lockedLevels.map(item =>
-                    <Typography key={item.key} variant="body2" color="text.secondary">
-                        🔒 {t[item.labelKey]} — {t.unlockAfter} «{t[getLevel(item.unlockedBy).labelKey]}»
-                    </Typography>
-                )
-            }
         </Stack>
     );
 }

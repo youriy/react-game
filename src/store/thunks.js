@@ -6,8 +6,7 @@
 import {resetItems} from "./itemsSlice.js";
 import {setGaming, setLevel, setNewRecords, setNewUnlocks, setWin, startNewRound} from "./gameSlice.js";
 import {getRecords, saveResult} from "../core/storage.js";
-import {getUnlockedLevels, isLevelUnlocked} from "../core/progress.js";
-import {DEFAULT_LEVEL} from "../core/levels.js";
+import {getLastUnlockedLevel, getUnlockedLevels, isLevelUnlocked} from "../core/progress.js";
 
 /** Какие показатели участвуют в рекордах. */
 const RECORD_KEYS = ["score", "time", "streak"];
@@ -15,11 +14,11 @@ const RECORD_KEYS = ["score", "time", "streak"];
 /**
  * Начинает новую партию на выбранном уровне: свежая перемешанная колода + обнулённые счётчики.
  * Используется кнопками «Начать игру» и «Заново».
- * Если выбранный уровень закрыт (например, сохранён в настройках раньше), партия идёт на уровне по умолчанию.
+ * Если выбранный уровень закрыт (например, сохранён в настройках раньше), партия идёт на самом сложном из открытых.
  */
 export const startNewGame = () => (dispatch, getState) => {
     if (!isLevelUnlocked(getState().game.level)) {
-        dispatch(setLevel(DEFAULT_LEVEL));
+        dispatch(setLevel(getLastUnlockedLevel()));
     }
 
     dispatch(resetItems(getState().game.level));
