@@ -163,6 +163,36 @@ const pressTransition = (theme, properties, duration) => [
 const pressStyle = {"&:active": {transform: PRESS_SCALE}};
 
 /**
+ * Полоса прокрутки в цвет темы для всей игры (окна, списки, страница): тонкая «таблетка» 6 px
+ * без стрелок, бегунок — основной цвет темы с прозрачностью 40%, при наведении мышью 75%, дорожка прозрачная.
+ * Ширина полосы 10 px, из них по 2 px с каждой стороны — прозрачная рамка, поэтому бегунок виден на 6 px.
+ * Chrome, Edge, Яндекс Браузер и Safari берут ::-webkit-scrollbar; Firefox (нет ::-webkit-scrollbar) —
+ * тонкую системную полосу того же цвета через scrollbar-color. На телефоне остаётся системная полоса.
+ * @param {import('@mui/material/styles').Theme} theme
+ * @returns {object} стили для MuiCssBaseline
+ */
+const scrollbarStyles = (theme) => {
+    const thumb = alpha(theme.palette.primary.main, 0.4);
+    return {
+        "*::-webkit-scrollbar": {width: 10, height: 10},
+        "*::-webkit-scrollbar-track, *::-webkit-scrollbar-corner": {background: "transparent"},
+        "*::-webkit-scrollbar-button": {display: "none", width: 0, height: 0},
+        "*::-webkit-scrollbar-thumb": {
+            backgroundColor: thumb,
+            backgroundClip: "padding-box",
+            border: "2px solid transparent",
+            borderRadius: 999,
+        },
+        [HOVER_MEDIA]: {
+            "*::-webkit-scrollbar-thumb:hover": {backgroundColor: alpha(theme.palette.primary.main, 0.75)},
+        },
+        "@supports not selector(::-webkit-scrollbar)": {
+            "*": {scrollbarWidth: "thin", scrollbarColor: `${thumb} transparent`},
+        },
+    };
+};
+
+/**
  * Создаёт тему MUI в мягком стиле: основной цвет из themeList (свой оттенок для каждого режима),
  * светлый или тёмный режим, шрифт Nunito, скругления, мягкие тени.
  * Почти весь стиль игры задаётся здесь, а не в компонентах:
@@ -171,7 +201,8 @@ const pressStyle = {"&:active": {transform: PRESS_SCALE}};
  * - наведение — только для мыши (HOVER_MEDIA); на сенсорном экране подсветки наведения MUI сняты, а кнопки
  *   (Button, IconButton, ToggleButton) при нажатии чуть уменьшаются (TOUCH_MEDIA, PRESS_SCALE);
  * - плашки (Paper, Card) скруглены на 20 px с мягкой тенью, окна (Dialog) — на 24 px, меню — на 16 px;
- * - заголовки жирные (800).
+ * - заголовки жирные (800);
+ * - полоса прокрутки — тонкая, в цвет темы (scrollbarStyles).
  * Цвет подписи на кнопках с заливкой (contrastText) MUI выбирает сам: белый в светлом режиме, чёрный в тёмном.
  * `responsiveFontSizes` уменьшает крупные заголовки (h1–h6) на узких экранах,
  * на широких размеры остаются стандартными. На телефоне шрифты ещё мельче — см. mobileFontSizes;
@@ -205,6 +236,9 @@ export const createAppTheme = (name, darkMode) => {
             button: {textTransform: "none", fontWeight: 800},
         },
         components: {
+            MuiCssBaseline: {
+                styleOverrides: (theme) => scrollbarStyles(theme),
+            },
             MuiButton: {
                 styleOverrides: {
                     root: ({theme}) => ({
