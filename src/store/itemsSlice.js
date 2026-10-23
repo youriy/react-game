@@ -1,6 +1,6 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {shuffle} from "../core/utils.js";
-import {cardIcons} from "../core/icons.js";
+import {cardIcons} from "../icons/icons.js";
 import {DEFAULT_LEVEL, getLevel} from "../core/levels.js";
 
 /**
@@ -12,7 +12,7 @@ import {DEFAULT_LEVEL, getLevel} from "../core/levels.js";
  * @typedef {Object} CardItem
  * @property {number} id - уникальный идентификатор (используется как React key)
  * @property {number} type - номер пары; у двух одинаковых карточек он совпадает
- * @property {string} icon - имя иконки из `cardIcons` (core/icons.js)
+ * @property {string} icon - имя иконки из `cardIcons` (icons/icons.js)
  * @property {boolean} open - карточка сейчас открыта игроком
  * @property {boolean} delete - пара угадана, карточка убрана с поля
  */

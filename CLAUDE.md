@@ -54,8 +54,9 @@ npm run build    # сборка в public/bundle.js (файл лежит в git 
 
 - `src/components/` — компоненты (экраны, карточка, кнопки)
 - `src/dictionary/` — словари: `languages.js` (тексты интерфейса на 6 языках, язык браузера)
+- `src/icons/` — иконки карточек: `icons.js` (`cardIcons`)
 - `src/hooks/` — хуки: `useMemoryGame` (логика партии), `useTranslation`, `useIsMobile`, `useConfetti`
-- `src/core/` — чистая логика и данные: уровни, очки, звёзды/прогресс, правила, хранилище, иконки, темы, вибрация, звуки
+- `src/core/` — чистая логика и данные: уровни, очки, звёзды/прогресс, правила, хранилище, темы, вибрация, звуки
 - `src/store/` — Redux: срезы `gameSlice`, `itemsSlice`, thunk'и `startNewGame` / `finishGame`
 
 ## Осторожно

@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import Zoom from '@mui/material/Zoom';
 import {alpha} from '@mui/material/styles';
 import {keyframes} from '@emotion/react';
-import {cardIcons} from "../core/icons.js";
+import {cardIcons} from "../icons/icons.js";
 import {PAIR_SOUND_DELAY} from "../core/sound.js";
 import PointsPopup from "./PointsPopup.jsx";
 
