@@ -28,6 +28,24 @@ export const themeList = [
 export const DEFAULT_THEME = "indigoTheme";
 
 /**
+ * Устройство с мышью (или тачпадом): эффекты наведения (`:hover`) — только под этим медиазапросом.
+ * На телефоне «наведение» залипает после касания, и кнопка или карточка остаётся подсвеченной.
+ */
+export const HOVER_MEDIA = "@media (hover: hover) and (pointer: fine)";
+
+/**
+ * Сенсорный экран — ровно противоположный HOVER_MEDIA запрос. Здесь вместо наведения отклик на нажатие
+ * (`:active`, PRESS_SCALE) и сброс подсветок наведения, которые MUI ставит сам.
+ */
+export const TOUCH_MEDIA = "@media not all and (hover: hover) and (pointer: fine)";
+
+/** Отклик на нажатие на сенсорном экране: элемент чуть «вдавливается» и сразу возвращается. */
+export const PRESS_SCALE = "scale(0.96)";
+
+/** Время «вдавливания» при нажатии, мс. */
+export const PRESS_MS = 100;
+
+/**
  * Медиазапрос тёмной темы системы или null, если браузер его не поддерживает.
  * @returns {MediaQueryList|null}
  */
@@ -130,11 +148,28 @@ const applyMobileFontSizes = (theme) => {
 const getButtonColor = (theme, color) => theme.palette[color]?.main ?? theme.palette.text.primary;
 
 /**
+ * Переход для кнопки: её обычные переходы MUI плюс быстрый transform для отклика на нажатие.
+ * @param {import('@mui/material/styles').Theme} theme
+ * @param {string[]} properties - свойства, которые MUI плавно меняет у этой кнопки
+ * @param {number} duration - их длительность, мс (как у MUI)
+ * @returns {string} значение transition
+ */
+const pressTransition = (theme, properties, duration) => [
+    theme.transitions.create(properties, {duration}),
+    theme.transitions.create("transform", {duration: PRESS_MS, easing: theme.transitions.easing.easeOut}),
+].join(", ");
+
+/** Отклик на нажатие для кнопок темы — только на сенсорном экране. */
+const pressStyle = {"&:active": {transform: PRESS_SCALE}};
+
+/**
  * Создаёт тему MUI в мягком стиле: основной цвет из themeList (свой оттенок для каждого режима),
  * светлый или тёмный режим, шрифт Nunito, скругления, мягкие тени.
  * Почти весь стиль игры задаётся здесь, а не в компонентах:
  * - кнопки-«таблетки» без капслока; с заливкой — с цветной мягкой тенью; контурные (outlined) —
  *   без рамки, на светлой подложке своего цвета (6%, при наведении 12%: контраст текста остаётся ≥ 4,5:1);
+ * - наведение — только для мыши (HOVER_MEDIA); на сенсорном экране подсветки наведения MUI сняты, а кнопки
+ *   (Button, IconButton, ToggleButton) при нажатии чуть уменьшаются (TOUCH_MEDIA, PRESS_SCALE);
  * - плашки (Paper, Card) скруглены на 20 px с мягкой тенью, окна (Dialog) — на 24 px, меню — на 16 px;
  * - заголовки жирные (800).
  * Цвет подписи на кнопках с заливкой (contrastText) MUI выбирает сам: белый в светлом режиме, чёрный в тёмном.
@@ -177,8 +212,15 @@ export const createAppTheme = (name, darkMode) => {
                         paddingLeft: 20,
                         paddingRight: 20,
                         [theme.breakpoints.down("sm")]: {paddingLeft: 16, paddingRight: 16},
+                        transition: pressTransition(
+                            theme,
+                            ["background-color", "box-shadow", "border-color", "color"],
+                            theme.transitions.duration.short,
+                        ),
+                        [TOUCH_MEDIA]: pressStyle,
                     }),
                     sizeSmall: {fontSize: "0.875rem"},
+                    text: {[TOUCH_MEDIA]: {"&:hover": {backgroundColor: "transparent"}}},
                     sizeLarge: ({theme}) => ({
                         minHeight: 56,
                         paddingLeft: 32,
@@ -186,21 +228,70 @@ export const createAppTheme = (name, darkMode) => {
                         fontSize: "1.125rem",
                         [theme.breakpoints.down("sm")]: {minHeight: 48, fontSize: "1rem"},
                     }),
-                    contained: ({theme, ownerState}) => ({
-                        boxShadow: `0 6px 16px ${alpha(getButtonColor(theme, ownerState.color), 0.3)}`,
-                        "&:hover": {boxShadow: `0 8px 20px ${alpha(getButtonColor(theme, ownerState.color), 0.4)}`},
-                        "&.Mui-disabled": {boxShadow: "none"},
-                    }),
+                    contained: ({theme, ownerState}) => {
+                        const shadow = `0 6px 16px ${alpha(getButtonColor(theme, ownerState.color), 0.3)}`;
+                        const main = theme.palette[ownerState.color]?.main;
+
+                        return {
+                            boxShadow: shadow,
+                            [HOVER_MEDIA]: {
+                                "&:hover": {boxShadow: `0 8px 20px ${alpha(getButtonColor(theme, ownerState.color), 0.4)}`},
+                            },
+                            // MUI при наведении затемняет фон и меняет тень — на сенсорном экране это залипает после касания
+                            [TOUCH_MEDIA]: {
+                                "&:hover": {boxShadow: shadow, ...(main && {backgroundColor: main})},
+                            },
+                            "&.Mui-disabled": {boxShadow: "none"},
+                        };
+                    },
                     outlined: ({theme, ownerState}) => ({
                         // Рамка прозрачная, а не убрана: так размер кнопки не меняется
                         borderColor: "transparent",
                         backgroundColor: alpha(getButtonColor(theme, ownerState.color), 0.06),
+                        // На сенсорном экране подложка при «наведении» не меняется, с мышью — темнее
                         "&:hover": {
                             borderColor: "transparent",
-                            backgroundColor: alpha(getButtonColor(theme, ownerState.color), 0.12),
+                            backgroundColor: alpha(getButtonColor(theme, ownerState.color), 0.06),
+                        },
+                        [HOVER_MEDIA]: {
+                            "&:hover": {backgroundColor: alpha(getButtonColor(theme, ownerState.color), 0.12)},
                         },
                         "&.Mui-disabled": {borderColor: "transparent", backgroundColor: theme.palette.action.disabledBackground},
                     }),
+                },
+            },
+            MuiIconButton: {
+                styleOverrides: {
+                    root: ({theme}) => ({
+                        transition: pressTransition(theme, ["background-color"], theme.transitions.duration.shortest),
+                        [TOUCH_MEDIA]: {"&:hover": {backgroundColor: "transparent"}, ...pressStyle},
+                    }),
+                },
+            },
+            MuiToggleButton: {
+                styleOverrides: {
+                    root: ({theme}) => ({
+                        transition: theme.transitions.create("transform", {
+                            duration: PRESS_MS,
+                            easing: theme.transitions.easing.easeOut,
+                        }),
+                        [TOUCH_MEDIA]: pressStyle,
+                    }),
+                },
+            },
+            MuiCardActionArea: {
+                styleOverrides: {
+                    root: {
+                        [TOUCH_MEDIA]: {"&:hover .MuiCardActionArea-focusHighlight": {opacity: 0}},
+                    },
+                },
+            },
+            MuiTableRow: {
+                styleOverrides: {
+                    // У строки с hover MUI не снимает подсветку на сенсорном экране — после касания она залипает
+                    root: {
+                        [TOUCH_MEDIA]: {"&.MuiTableRow-hover:hover": {backgroundColor: "transparent"}},
+                    },
                 },
             },
             MuiPaper: {

@@ -9,6 +9,7 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import LockIcon from '@mui/icons-material/Lock';
 import {alpha} from '@mui/material/styles';
+import {HOVER_MEDIA, TOUCH_MEDIA} from "../core/themes.js";
 import {setLevel} from "../store/gameSlice.js";
 import {startNewGame} from "../store/thunks.js";
 import {formatTime} from "../core/utils.js";
@@ -79,7 +80,12 @@ const levelGridSx = {
             // Пустые звёзды на заливке — полупрозрачные цвета подписи, иначе их не видно
             "& .MuiRating-iconEmpty": {color: (theme) => alpha(theme.palette.primary.contrastText, 0.6)},
         },
-        "&.Mui-selected:hover": {bgcolor: "primary.dark"},
+        [HOVER_MEDIA]: {"&.Mui-selected:hover": {bgcolor: "primary.dark"}},
+        // На сенсорном экране подсветка наведения залипает после касания — плашка остаётся своего цвета
+        [TOUCH_MEDIA]: {
+            "&:hover": {bgcolor: "background.paper"},
+            "&.Mui-selected:hover": {bgcolor: "primary.main"},
+        },
         "&.Mui-disabled": {
             bgcolor: "transparent",
             borderStyle: "dashed",

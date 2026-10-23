@@ -8,6 +8,7 @@ import Zoom from '@mui/material/Zoom';
 import {alpha} from '@mui/material/styles';
 import {keyframes} from '@emotion/react';
 import {cardIcons} from "../icons/icons.js";
+import {HOVER_MEDIA, PRESS_MS, PRESS_SCALE, TOUCH_MEDIA} from "../core/themes.js";
 import {PAIR_SOUND_DELAY} from "../core/sound.js";
 import PointsPopup from "./PointsPopup.jsx";
 
@@ -65,12 +66,23 @@ const flashFade = keyframes`
 // и если перебить его при наведении, карточка под курсором не уменьшается, а пропадает рывком
 const hoverSx = {
     transition: "transform 150ms ease-out",
-    "@media (hover: hover)": {
+    [HOVER_MEDIA]: {
         "&:hover": {
             transform: "scale(1.07)",
         },
     },
     [reducedMotion]: {transition: "none"},
+};
+
+// Отклик на касание вместо наведения — на сенсорном экране, на том же слое: карточка чуть вдавливается
+// и быстро возвращается. Только у закрытой карточки: открытую нажимать незачем
+const pressSx = {
+    [TOUCH_MEDIA]: {
+        "&:active": {
+            transform: PRESS_SCALE,
+            transitionDuration: `${PRESS_MS}ms`,
+        },
+    },
 };
 
 // Слой эффектов пары (встряска, прыжок, вспышка). Отдельный от переворота, чтобы анимации transform не спорили
@@ -255,7 +267,7 @@ function MemoryCard({item, index, revealed, disabled, highlight, popup, iconSize
                     onClick={() => onOpen(index)}
                     style={disabled ? {pointerEvents: "none"} : undefined}
                 >
-                    <Box sx={hoverSx}>
+                    <Box sx={flipped ? hoverSx : [hoverSx, pressSx]}>
                         <Box sx={getEffectSx(highlight)}>
                             <Box
                                 sx={{
