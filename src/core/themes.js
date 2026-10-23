@@ -28,6 +28,22 @@ export const themeList = [
 export const DEFAULT_THEME = "indigoTheme";
 
 /**
+ * Медиазапрос тёмной темы системы или null, если браузер его не поддерживает.
+ * @returns {MediaQueryList|null}
+ */
+export const getSystemDarkQuery = () => (
+    typeof window !== "undefined" && typeof window.matchMedia === "function"
+        ? window.matchMedia("(prefers-color-scheme: dark)")
+        : null
+);
+
+/**
+ * Включена ли тёмная тема в системе (prefers-color-scheme). Нужна, пока игрок сам не выбрал режим.
+ * @returns {boolean}
+ */
+export const systemPrefersDark = () => Boolean(getSystemDarkQuery()?.matches);
+
+/**
  * Основной цвет темы для режима: светлый или тёмный оттенок из themeList.
  * Неизвестное имя — цвет темы по умолчанию.
  * @param {string} name - имя темы из themeList

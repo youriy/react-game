@@ -2,7 +2,7 @@ import {createSlice} from "@reduxjs/toolkit";
 import {loadSetting} from "../core/storage.js";
 import {getMatchPoints} from "../core/score.js";
 import {DEFAULT_LEVEL, getLevel} from "../core/levels.js";
-import {DEFAULT_THEME, themeList} from "../core/themes.js";
+import {DEFAULT_THEME, systemPrefersDark, themeList} from "../core/themes.js";
 import {detectBrowserLanguage, languageList} from "../dictionary/languages.js";
 
 /**
@@ -16,6 +16,9 @@ import {detectBrowserLanguage, languageList} from "../dictionary/languages.js";
 const pickKnown = (value, allowed, defaultValue) => (allowed.includes(value) ? value : defaultValue);
 
 const defaultLanguage = detectBrowserLanguage() || "russian";
+
+// Пока игрок сам не переключал светлую/тёмную тему, режим берётся из системы
+const savedDarkMode = loadSetting("darkMode", "");
 
 /**
  * Срез Redux с состоянием партии и настройками интерфейса.
@@ -77,7 +80,7 @@ const gameSlice = createSlice({
         // Язык, тема и уровень проверяются при чтении: неизвестное значение заменяется значением по умолчанию
         language: pickKnown(loadSetting("language", defaultLanguage), Object.keys(languageList), defaultLanguage),
         theme: pickKnown(loadSetting("theme", DEFAULT_THEME), themeList.map(item => item.name), DEFAULT_THEME),
-        darkMode: loadSetting("darkMode", "false") === "true",
+        darkMode: savedDarkMode ? savedDarkMode === "true" : systemPrefersDark(),
         vibration: loadSetting("vibration", "true") === "true",
         sound: loadSetting("sound", "true") === "true",
         level: getLevel(loadSetting("level", DEFAULT_LEVEL)).key,
@@ -189,6 +192,10 @@ const gameSlice = createSlice({
         toggleDarkMode(state) {
             state.darkMode = !state.darkMode;
         },
+        /** payload: тёмная ли тема в системе. Не сохраняется: вызывается, только пока игрок сам не выбрал режим (см. store.js). */
+        setSystemDarkMode(state, action) {
+            state.darkMode = action.payload;
+        },
         /** Включает/выключает вибрацию. Сохраняется в localStorage (см. store.js). */
         toggleVibration(state) {
             state.vibration = !state.vibration;
@@ -209,4 +216,4 @@ const gameSlice = createSlice({
 });
 
 export default gameSlice.reducer
-export const {incrementTry, registerPair, setTime, setGaming, setWin, setClickable, startNewRound, giveUp, setNewRecords, setNewUnlocks, setNewAchievements, setAchievementsOpen, takeHint, setPaused, setLanguage, setTheme, setLevel, setHowToPlay, toggleDarkMode, toggleVibration, toggleSound} = gameSlice.actions
+export const {incrementTry, registerPair, setTime, setGaming, setWin, setClickable, startNewRound, giveUp, setNewRecords, setNewUnlocks, setNewAchievements, setAchievementsOpen, takeHint, setPaused, setLanguage, setTheme, setLevel, setHowToPlay, toggleDarkMode, setSystemDarkMode, toggleVibration, toggleSound} = gameSlice.actions
