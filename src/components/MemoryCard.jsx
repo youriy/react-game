@@ -60,13 +60,17 @@ const flashFade = keyframes`
     0%, 100% {opacity: 0;} 30% {opacity: 0.8;}
 `;
 
-// Увеличение при наведении — только для мыши: на телефоне «hover» залипает после касания
-const sceneSx = {
+// Увеличение при наведении — только для мыши: на телефоне «hover» залипает после касания.
+// Отдельный слой внутри Zoom: transform внешнего элемента принадлежит Zoom (исчезновение угаданной пары),
+// и если перебить его при наведении, карточка под курсором не уменьшается, а пропадает рывком
+const hoverSx = {
+    transition: "transform 150ms ease-out",
     "@media (hover: hover)": {
         "&:hover": {
-            transform: "scale(1.07)!important",
+            transform: "scale(1.07)",
         },
     },
+    [reducedMotion]: {transition: "none"},
 };
 
 // Слой эффектов пары (встряска, прыжок, вспышка). Отдельный от переворота, чтобы анимации transform не спорили
@@ -232,22 +236,23 @@ function MemoryCard({item, index, revealed, disabled, highlight, popup, iconSize
         <Box sx={{position: "relative"}}>
             <Zoom in={!item.delete}>
                 <Box
-                    sx={sceneSx}
                     onClick={() => onOpen(index)}
                     style={disabled ? {pointerEvents: "none"} : undefined}
                 >
-                    <Box sx={getEffectSx(highlight)}>
-                        <Box
-                            sx={{
-                                ...liftSx,
-                                animation: `${flipped ? liftOpen : liftClose} ${FLIP_TIME}ms ease-in-out`,
-                                [reducedMotion]: {animation: "none"},
-                            }}
-                        >
-                            <Box sx={{...flipperSx, transform: flipped ? "rotateY(-180deg)" : "rotateY(0deg)"}}>
-                                {/* Рубашка: иконка скрыта, нужна только чтобы задать размер карточки */}
-                                <CardFace sx={faceSx} Icon={Icon} iconSize={iconSize} compact={compact} hidden/>
-                                <CardFace sx={{...frontFaceSx, ...getHighlightSx(highlight)}} Icon={Icon} iconSize={iconSize} compact={compact}/>
+                    <Box sx={hoverSx}>
+                        <Box sx={getEffectSx(highlight)}>
+                            <Box
+                                sx={{
+                                    ...liftSx,
+                                    animation: `${flipped ? liftOpen : liftClose} ${FLIP_TIME}ms ease-in-out`,
+                                    [reducedMotion]: {animation: "none"},
+                                }}
+                            >
+                                <Box sx={{...flipperSx, transform: flipped ? "rotateY(-180deg)" : "rotateY(0deg)"}}>
+                                    {/* Рубашка: иконка скрыта, нужна только чтобы задать размер карточки */}
+                                    <CardFace sx={faceSx} Icon={Icon} iconSize={iconSize} compact={compact} hidden/>
+                                    <CardFace sx={{...frontFaceSx, ...getHighlightSx(highlight)}} Icon={Icon} iconSize={iconSize} compact={compact}/>
+                                </Box>
                             </Box>
                         </Box>
                     </Box>

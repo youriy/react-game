@@ -1,8 +1,21 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {loadSetting} from "../core/storage.js";
 import {getMatchPoints} from "../core/score.js";
-import {DEFAULT_LEVEL} from "../core/levels.js";
-import {detectBrowserLanguage} from "../dictionary/languages.js";
+import {DEFAULT_LEVEL, getLevel} from "../core/levels.js";
+import {DEFAULT_THEME, themeList} from "../core/themes.js";
+import {detectBrowserLanguage, languageList} from "../dictionary/languages.js";
+
+/**
+ * Сохранённое значение, если оно есть среди допустимых, иначе значение по умолчанию.
+ * Защищает от мусора в localStorage (ручная правка, ключ, удалённый в новой версии).
+ * @param {string} value - прочитанное значение
+ * @param {string[]} allowed - допустимые значения
+ * @param {string} defaultValue
+ * @returns {string}
+ */
+const pickKnown = (value, allowed, defaultValue) => (allowed.includes(value) ? value : defaultValue);
+
+const defaultLanguage = detectBrowserLanguage() || "russian";
 
 /**
  * Срез Redux с состоянием партии и настройками интерфейса.
@@ -51,13 +64,14 @@ const gameSlice = createSlice({
         newUnlocks: [],
         win: false,
         clickable: true,
-        // Язык, выбранный игроком, важнее языка браузера; если не подошёл ни один — русский
-        language: loadSetting("language", detectBrowserLanguage() || "russian"),
-        theme: loadSetting("theme", "indigoTheme"),
+        // Язык, выбранный игроком, важнее языка браузера; если не подошёл ни один — русский.
+        // Язык, тема и уровень проверяются при чтении: неизвестное значение заменяется значением по умолчанию
+        language: pickKnown(loadSetting("language", defaultLanguage), Object.keys(languageList), defaultLanguage),
+        theme: pickKnown(loadSetting("theme", DEFAULT_THEME), themeList.map(item => item.name), DEFAULT_THEME),
         darkMode: loadSetting("darkMode", "false") === "true",
         vibration: loadSetting("vibration", "true") === "true",
         sound: loadSetting("sound", "true") === "true",
-        level: loadSetting("level", DEFAULT_LEVEL),
+        level: getLevel(loadSetting("level", DEFAULT_LEVEL)).key,
         howToPlay: loadSetting("howToPlaySeen", "false") !== "true",
         roundLevel: DEFAULT_LEVEL
     },
@@ -79,9 +93,9 @@ const gameSlice = createSlice({
                 state.streak = 0;
             }
         },
-        /** Увеличивает время партии на 1 секунду (вызывается таймером). */
-        incrementTime(state) {
-            state.time++;
+        /** payload: прошедшее время партии в целых секундах (выставляет таймер, см. Timer.jsx). */
+        setTime(state, action) {
+            state.time = action.payload;
         },
         /** payload: true — показать игровое поле, false — стартовый экран. */
         setGaming(state, action) {
@@ -169,4 +183,4 @@ const gameSlice = createSlice({
 });
 
 export default gameSlice.reducer
-export const {incrementTry, registerPair, incrementTime, setGaming, setWin, setClickable, startNewRound, giveUp, setNewRecords, setNewUnlocks, takeHint, setPaused, setLanguage, setTheme, setLevel, setHowToPlay, toggleDarkMode, toggleVibration, toggleSound} = gameSlice.actions
+export const {incrementTry, registerPair, setTime, setGaming, setWin, setClickable, startNewRound, giveUp, setNewRecords, setNewUnlocks, takeHint, setPaused, setLanguage, setTheme, setLevel, setHowToPlay, toggleDarkMode, toggleVibration, toggleSound} = gameSlice.actions

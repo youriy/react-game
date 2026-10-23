@@ -59,7 +59,7 @@ export const HINT_TIME = 2000;
  */
 export default function useMemoryGame() {
     const dispatch = useDispatch();
-    // Для чтения серии сразу после registerPair, без подписки (серия меняется только вместе с колодой)
+    // Для чтения серии сразу после registerPair и карточки при клике — без подписки
     const store = useStore();
     const items = useSelector(state => state.items.items);
     const {clickable, paused, hintUsed, roundLevel, vibration, sound} = useSelector(state => ({
@@ -98,19 +98,23 @@ export default function useMemoryGame() {
     const canOpen = clickable && !preview && !hinting && !paused;
 
     /**
-     * Открывает карточку, если сейчас разрешено. Звук щелчка играет прямо в обработчике клика —
-     * браузер включает звук только по действию игрока (см. core/sound.js).
+     * Открывает карточку, если сейчас разрешено. Клик по уже открытой (или убранной) карточке ничего не делает:
+     * без щелчка и без переноса lastOpened, чтобы очки за пару всплыли над нужной карточкой.
+     * Звук щелчка играет прямо в обработчике клика — браузер включает звук только по действию игрока (см. core/sound.js).
+     * Карточка читается из стора напрямую, а не из `items`: так ссылка на openItem не меняется при каждом ходе.
      * @param {number} index
      */
     const openItem = React.useCallback((index) => {
-        if (canOpen) {
+        const item = store.getState().items.items[index];
+
+        if (canOpen && item && !item.open && !item.delete) {
             lastOpened.current = index;
             if (sound) {
                 playSound("flip");
             }
             dispatch(setOpen(index));
         }
-    }, [canOpen, sound, dispatch]);
+    }, [canOpen, sound, dispatch, store]);
 
     // Подсказка доступна раз за партию и не во время показа, паузы или проверки пары
     const canHint = !hintUsed && !preview && !hinting && !paused && clickable;

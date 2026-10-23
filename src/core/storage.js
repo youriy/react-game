@@ -4,6 +4,8 @@ import {LEGACY_LEVEL} from "./levels.js";
 
 /**
  * Работа с localStorage: настройки (язык, тема, уровень), результаты игр и рекорды.
+ * Все обращения к localStorage — только через readItem/writeItem: если он недоступен или переполнен,
+ * данные хранятся в памяти (memoryStorage) и игра продолжает работать.
  *
  * Результат игры хранится в массиве по ключу "results":
  * @typedef {Object} GameResult
@@ -20,29 +22,76 @@ import {LEGACY_LEVEL} from "./levels.js";
 const RESULTS_KEY = "results";
 
 /**
+ * Запасное хранилище в памяти. localStorage бывает недоступен (игра во фрейме площадки с заблокированными
+ * сторонними данными, sandbox без allow-same-origin, некоторые режимы инкогнито) или переполнен
+ * (QuotaExceededError). Тогда игра не падает, а помнит настройки и результаты до перезагрузки страницы.
+ * Всё, что записано за сессию, лежит здесь, поэтому чтение всегда видит последнюю запись,
+ * даже если в localStorage она не попала.
+ * @type {Map<string, string>}
+ */
+const memoryStorage = new Map();
+
+/**
+ * Читает строку: сначала из памяти (записи этой сессии), затем из localStorage.
+ * Любая ошибка доступа к localStorage даёт null.
+ * @param {string} key
+ * @returns {string|null}
+ */
+const readItem = (key) => {
+    if (memoryStorage.has(key)) {
+        return memoryStorage.get(key);
+    }
+
+    try {
+        return localStorage.getItem(key);
+    } catch (e) {
+        return null;
+    }
+};
+
+/**
+ * Записывает строку в память и пытается сохранить в localStorage. Ошибку записи не пробрасывает.
+ * Единая точка записи — сюда же потом подключается облачное хранилище SDK площадки.
+ * @param {string} key
+ * @param {string} value
+ */
+const writeItem = (key, value) => {
+    memoryStorage.set(key, value);
+
+    try {
+        localStorage.setItem(key, value);
+    } catch (e) {
+        // localStorage недоступен или переполнен — значение остаётся в памяти до перезагрузки
+    }
+};
+
+/**
  * Читает настройку из localStorage.
  * @param {string} key - ключ настройки ("language", "theme", "level")
  * @param {string} defaultValue - значение, если настройки нет
  * @returns {string}
  */
-export const loadSetting = (key, defaultValue) => localStorage.getItem(key) || defaultValue;
+export const loadSetting = (key, defaultValue) => readItem(key) || defaultValue;
 
 /**
- * Сохраняет настройку в localStorage.
+ * Сохраняет настройку в localStorage (значение приводится к строке, как это делает сам localStorage).
  * @param {string} key
- * @param {string} value
+ * @param {string|boolean} value
  */
 export const saveSetting = (key, value) => {
-    localStorage.setItem(key, value);
+    writeItem(key, String(value));
 };
 
 /**
- * Все сохранённые результаты в порядке сохранения. Повреждённые данные дают пустой список.
+ * Все сохранённые результаты в порядке сохранения. Повреждённые данные (не JSON, не массив)
+ * дают пустой список, элементы, которые не являются объектами, пропускаются.
  * @returns {GameResult[]}
  */
 export const loadResults = () => {
     try {
-        return JSON.parse(localStorage.getItem(RESULTS_KEY)) || [];
+        const results = JSON.parse(readItem(RESULTS_KEY));
+
+        return Array.isArray(results) ? results.filter(result => result && typeof result === "object") : [];
     } catch (e) {
         return [];
     }
@@ -129,5 +178,5 @@ export const saveResult = ({count, time, score, hintUsed, bestStreak, level}) =>
         stars: calculateStars(total, level),
     });
 
-    localStorage.setItem(RESULTS_KEY, JSON.stringify(results));
+    writeItem(RESULTS_KEY, JSON.stringify(results));
 };
