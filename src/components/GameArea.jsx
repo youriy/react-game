@@ -61,7 +61,7 @@ const getMobileIconSize = (columns) =>
     `min(${ICON_SIZE}px, calc((100vw - ${MOBILE_PAGE_PADDING + MOBILE_GAP * (columns - 1)}px) / ${columns} * 0.5))`;
 
 /**
- * Игровой экран: строка статуса (время, попытки, очки), кнопки управления и поле карточек.
+ * Игровой экран: кнопки управления, под ними строка статуса (время, попытки, очки) и поле карточек.
  * Число колонок поля зависит от уровня и ширины экрана (на телефоне — mobileColumns уровня,
  * мельче промежутки и иконки). Логика партии — в хуке useMemoryGame.
  */
@@ -74,14 +74,15 @@ export default function GameArea() {
     return (
         // width: 100% — иначе экран сжимается по содержимому, и поле (columns × CARD_WIDTH)
         // на узком экране вылезает за край вместо того, чтобы ужаться до maxWidth: 100%
-        <Stack spacing={1} sx={{width: "100%"}}>
+        <Stack spacing={{xs: 1, sm: 2}} sx={{width: "100%"}}>
+            {/* Сверху кнопки, под ними строка статуса — она ближе к полю, за которым игрок следит */}
+            <GameControls canPause={!preview && !hinting} canHint={canHint} onHint={showHint}/>
             <Stack sx={statusSx} spacing={{xs: 2, sm: 6}} direction="row">
                 {/* Таймер идёт только после показа карточек и не на паузе */}
                 <Timer running={!preview && !paused}/>
                 <Attempts/>
                 <Score/>
             </Stack>
-            <GameControls canPause={!preview && !hinting} canHint={canHint} onHint={showHint}/>
             <Box sx={{position: "relative"}}>
                 {/* На паузе поле скрыто (но занимает место), чтобы нельзя было запоминать карточки */}
                 <Box

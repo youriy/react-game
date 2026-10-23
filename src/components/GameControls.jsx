@@ -115,8 +115,9 @@ export default function GameControls({canPause, canHint, onHint}) {
     }, [canPause]);
 
     return (
-        // flexWrap + gap: на узком экране кнопки переносятся на вторую строку
-        <Box sx={{display: "flex", flexWrap: "wrap", justifyContent: "center", gap: {xs: 1, sm: 2}, pb: {xs: 1, sm: 2}}}>
+        // flexWrap + gap: на узком экране кнопки переносятся на вторую строку.
+        // pt — отступ от шапки на компьютере (на телефоне шестерёнка шапки стоит отдельной строкой и уже даёт отступ)
+        <Box sx={{display: "flex", flexWrap: "wrap", justifyContent: "center", gap: {xs: 1, sm: 2}, pt: {xs: 0, sm: 2}}}>
             <Button
                 size={buttonSize}
                 variant="outlined"
