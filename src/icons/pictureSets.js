@@ -41,8 +41,8 @@ export const pictureSetList = [
     {
         id: "fruits",
         glory: 80,
-        pictures: ["redApple", "greenApple", "pear", "tangerine", "lemon", "banana", "watermelon", "grapes", "strawberry",
-            "blueberries", "cherries", "peach", "mango", "pineapple", "coconut", "kiwi", "melon", "tomato", "avocado", "olive", "chestnut"],
+        pictures: ["redApple", "greenApple", "pear", "lime", "lemon", "banana", "watermelon", "grapes", "strawberry",
+            "blueberries", "cherries", "peach", "mango", "pineapple", "coconut", "kiwi", "melon", "eggplant", "avocado", "olive", "chestnut"],
         cover: ["strawberry", "banana", "watermelon", "cherries"],
     },
     {
