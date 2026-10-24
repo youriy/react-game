@@ -7,8 +7,9 @@ import {resetItems} from "./itemsSlice.js";
 import {giveUp, setGaming, setLevel, setNewAchievements, setNewRecords, setNewUnlocks, setWin, startNewRound} from "./gameSlice.js";
 import {addPairsFound, getRecords, saveResult} from "../core/storage.js";
 import {getLevel} from "../core/levels.js";
-import {evaluateGame, getAchievementTiers, getImproved} from "../core/achievements.js";
+import {evaluateGame, getAchievementTiers, getImproved, getTotalGlory} from "../core/achievements.js";
 import {getLastUnlockedLevel, getUnlockedLevels, isLevelUnlocked} from "../core/progress.js";
+import {DEFAULT_PICTURE_SET, getPictureSet, isPictureSetUnlocked, preloadPictureSet} from "../icons/pictureSets.js";
 
 /** Какие показатели участвуют в рекордах. */
 const RECORD_KEYS = ["score", "time", "streak"];
@@ -25,9 +26,10 @@ const countAbandonedPairs = (getState) => {
 };
 
 /**
- * Начинает новую партию на выбранном уровне: свежая перемешанная колода + обнулённые счётчики.
+ * Начинает новую партию на выбранном уровне с выбранным набором картинок: свежая перемешанная колода + обнулённые счётчики.
  * Используется кнопками «Начать игру» и «Заново».
- * Если выбранный уровень закрыт (например, сохранён в настройках раньше), партия идёт на самом сложном из открытых.
+ * Если выбранный уровень закрыт (например, сохранён в настройках раньше), партия идёт на самом сложном из открытых;
+ * если закрыт набор картинок (например, игрок очистил достижения) — с «Классикой».
  * Если партия уже шла («Заново»), найденные в ней пары засчитываются «Коллекционеру».
  */
 export const startNewGame = () => (dispatch, getState) => {
@@ -37,7 +39,12 @@ export const startNewGame = () => (dispatch, getState) => {
         dispatch(setLevel(getLastUnlockedLevel()));
     }
 
-    dispatch(resetItems(getState().game.level));
+    const {level, pictureSet} = getState().game;
+    const set = getPictureSet(pictureSet);
+    const playable = isPictureSetUnlocked(set, getTotalGlory(getAchievementTiers())) ? set.id : DEFAULT_PICTURE_SET;
+
+    preloadPictureSet(playable);
+    dispatch(resetItems({level, pictureSet: playable}));
     dispatch(startNewRound());
 };
 

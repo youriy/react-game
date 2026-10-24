@@ -1,6 +1,6 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {shuffle} from "../core/utils.js";
-import {cardIcons} from "../icons/icons.js";
+import {DEFAULT_PICTURE_SET, getPictureSet} from "../icons/pictureSets.js";
 import {DEFAULT_LEVEL, getLevel} from "../core/levels.js";
 
 /**
@@ -12,7 +12,8 @@ import {DEFAULT_LEVEL, getLevel} from "../core/levels.js";
  * @typedef {Object} CardItem
  * @property {number} id - уникальный идентификатор (используется как React key)
  * @property {number} type - номер пары; у двух одинаковых карточек он совпадает
- * @property {string} icon - имя иконки из `cardIcons` (icons/icons.js)
+ * @property {string} set - ключ набора картинок (icons/pictureSets.js), общий для всей колоды
+ * @property {string} icon - имя картинки в наборе (у «Классики» — имя иконки из `cardIcons`, icons/icons.js)
  * @property {boolean} open - карточка сейчас открыта игроком
  * @property {boolean} delete - пара угадана, карточка убрана с поля
  * @property {boolean} seen - карточку уже открывали в этой партии (или её показала подсказка);
@@ -20,17 +21,21 @@ import {DEFAULT_LEVEL, getLevel} from "../core/levels.js";
  */
 
 /**
- * Создаёт новую перемешанную колоду для уровня: берёт нужное число случайных иконок
- * из `cardIcons` и кладёт по две карточки на каждую.
+ * Создаёт новую перемешанную колоду для уровня: берёт нужное число случайных картинок
+ * из набора и кладёт по две карточки на каждую. Набор запоминается в карточках, поэтому смена
+ * настройки не меняет уже разложенное поле.
  * @param {string} levelKey - ключ уровня из core/levels.js
+ * @param {string} pictureSet - ключ набора картинок из icons/pictureSets.js
  * @returns {CardItem[]}
  */
-const createDeck = (levelKey) => {
+const createDeck = (levelKey, pictureSet) => {
     const {pairs} = getLevel(levelKey);
-    const icons = shuffle(Object.keys(cardIcons)).slice(0, pairs);
+    const set = getPictureSet(pictureSet);
+    const icons = shuffle(set.pictures).slice(0, pairs);
     const deck = icons.flatMap((icon, index) => [0, 1].map(copy => ({
         id: index * 2 + copy,
         type: index + 1,
+        set: set.id,
         icon,
         open: false,
         delete: false,
@@ -43,7 +48,7 @@ const createDeck = (levelKey) => {
 const itemsSlice = createSlice({
     name: "items",
     initialState: {
-        items: createDeck(DEFAULT_LEVEL)
+        items: createDeck(DEFAULT_LEVEL, DEFAULT_PICTURE_SET)
     },
     reducers: {
         /** Открывает карточку. payload: индекс карточки. */
@@ -70,9 +75,9 @@ const itemsSlice = createSlice({
                 item.seen = true;
             });
         },
-        /** Заменяет колоду новой перемешанной. payload: ключ уровня, например 'hard'. */
+        /** Заменяет колоду новой перемешанной. payload: {level, pictureSet}, например {level: 'hard', pictureSet: 'sea'}. */
         resetItems(state, action) {
-            state.items = createDeck(action.payload);
+            state.items = createDeck(action.payload.level, action.payload.pictureSet);
         }
     }
 });

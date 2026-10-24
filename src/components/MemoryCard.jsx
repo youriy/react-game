@@ -8,7 +8,7 @@ import Typography from '@mui/material/Typography';
 import Zoom from '@mui/material/Zoom';
 import {alpha} from '@mui/material/styles';
 import {keyframes} from '@emotion/react';
-import {cardIcons} from "../icons/icons.js";
+import CardPicture from "./CardPicture.jsx";
 import {HOVER_MEDIA, PRESS_MS, PRESS_SCALE, TOUCH_MEDIA} from "../core/themes.js";
 import {PAIR_SOUND_DELAY} from "../core/sound.js";
 import {getCardBackStyle} from "../core/cardBacks.js";
@@ -211,12 +211,12 @@ const getHighlightSx = (highlight) => {
  * Одна сторона карточки.
  * @param {Object} props
  * @param {Object} props.sx - стили стороны
- * @param {React.ComponentType} props.Icon - компонент иконки
- * @param {string} props.iconSize - CSS-размер иконки (например "60px")
+ * @param {import("../store/itemsSlice.js").CardItem} props.item - карточка: набор и имя картинки
+ * @param {string} props.iconSize - CSS-размер картинки (например "60px")
  * @param {boolean} [props.compact] - уменьшенные поля (телефон)
- * @param {boolean} [props.hidden] - скрыть иконку, сохранив размер (для рубашки)
+ * @param {boolean} [props.hidden] - скрыть картинку, сохранив размер (для рубашки)
  */
-function CardFace({sx, Icon, iconSize, compact, hidden}) {
+function CardFace({sx, item, iconSize, compact, hidden}) {
     return (
         <Card sx={sx}>
             <CardActionArea>
@@ -228,7 +228,7 @@ function CardFace({sx, Icon, iconSize, compact, hidden}) {
                         color="text.secondary"
                         sx={hidden ? {visibility: "hidden"} : undefined}
                     >
-                        <Icon sx={{fontSize: iconSize, display: "block", mx: "auto"}}/>
+                        <CardPicture set={item.set} picture={item.icon} size={iconSize}/>
                     </Typography>
                 </CardContent>
             </CardActionArea>
@@ -239,7 +239,7 @@ function CardFace({sx, Icon, iconSize, compact, hidden}) {
 /**
  * Одна карточка игрового поля.
  *
- * Состоит из двух сторон (рубашка и лицо с иконкой) в 3D-контейнере. Рубашка — выбранная игроком
+ * Состоит из двух сторон (рубашка и лицо с картинкой из набора, CardPicture) в 3D-контейнере. Рубашка — выбранная игроком
  * (настройка `cardBack`, core/cardBacks.js).
  * При открытии переворачивается справа налево (rotateY до -180°), при закрытии — обратно;
  * на перевороте чуть приподнимается и в конце пружинит. Неугаданная пара встряхивается,
@@ -262,7 +262,6 @@ function CardFace({sx, Icon, iconSize, compact, hidden}) {
  * @param {function(number): void} props.onOpen - открыть карточку по индексу
  */
 function MemoryCard({item, index, revealed, disabled, highlight, popup, iconSize, compact, onOpen}) {
-    const Icon = cardIcons[item.icon];
     const cardBack = useSelector(state => state.game.cardBack);
     // Объект стилей — один на рубашку, а не новый на каждую перерисовку
     const backFaceSx = React.useMemo(() => getBackFaceSx(cardBack), [cardBack]);
@@ -286,9 +285,9 @@ function MemoryCard({item, index, revealed, disabled, highlight, popup, iconSize
                                 }}
                             >
                                 <Box sx={{...flipperSx, transform: flipped ? "rotateY(-180deg)" : "rotateY(0deg)"}}>
-                                    {/* Рубашка: иконка скрыта, нужна только чтобы задать размер карточки */}
-                                    <CardFace sx={backFaceSx} Icon={Icon} iconSize={iconSize} compact={compact} hidden/>
-                                    <CardFace sx={{...frontFaceSx, ...getHighlightSx(highlight)}} Icon={Icon} iconSize={iconSize} compact={compact}/>
+                                    {/* Рубашка: картинка скрыта, нужна только чтобы задать размер карточки */}
+                                    <CardFace sx={backFaceSx} item={item} iconSize={iconSize} compact={compact} hidden/>
+                                    <CardFace sx={{...frontFaceSx, ...getHighlightSx(highlight)}} item={item} iconSize={iconSize} compact={compact}/>
                                 </Box>
                             </Box>
                         </Box>

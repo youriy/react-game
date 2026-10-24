@@ -5,6 +5,7 @@ import {DEFAULT_LEVEL, getLevel} from "../core/levels.js";
 import {DEFAULT_THEME, systemPrefersDark, themeList} from "../core/themes.js";
 import {detectBrowserLanguage, languageList} from "../dictionary/languages.js";
 import {cardBackList, DEFAULT_CARD_BACK} from "../core/cardBacks.js";
+import {DEFAULT_PICTURE_SET, pictureSetList} from "../icons/pictureSets.js";
 
 /**
  * Сохранённое значение, если оно есть среди допустимых, иначе значение по умолчанию.
@@ -43,6 +44,9 @@ const savedDarkMode = loadSetting("darkMode", "");
  * @property {boolean} achievements - открыто окно «Достижения»
  * @property {string} cardBack - ключ рубашки карточек из core/cardBacks.js (сохраняется в localStorage); выбирается
  *   на вкладке «Награды» окна «Достижения», только открытая баллами славы; при чтении проверяется лишь, что такая рубашка есть
+ * @property {string} pictureSet - ключ набора картинок из icons/pictureSets.js (сохраняется в localStorage); выбирается
+ *   на вкладке «Награды» окна «Достижения», только открытый баллами славы и только между партиями
+ *   (во время партии setPictureSet ничего не меняет)
  * @property {boolean} win - последняя партия завершилась победой (показывается экран победы)
  * @property {boolean} clickable - можно ли сейчас открывать карточки (false, пока решается пара)
  * @property {string} language - ключ языка из dictionary/languages.js (сохраняется в localStorage, когда игрок выбирает его
@@ -88,6 +92,7 @@ const gameSlice = createSlice({
         sound: loadSetting("sound", "true") === "true",
         level: getLevel(loadSetting("level", DEFAULT_LEVEL)).key,
         cardBack: pickKnown(loadSetting("cardBack", DEFAULT_CARD_BACK), cardBackList.map(back => back.id), DEFAULT_CARD_BACK),
+        pictureSet: pickKnown(loadSetting("pictureSet", DEFAULT_PICTURE_SET), pictureSetList.map(set => set.id), DEFAULT_PICTURE_SET),
         howToPlay: loadSetting("howToPlaySeen", "false") !== "true",
         roundLevel: DEFAULT_LEVEL
     },
@@ -133,7 +138,7 @@ const gameSlice = createSlice({
         },
         /**
          * Начинает новую партию с нуля на выбранном уровне: обнуляет счётчики, снимает паузу
-         * и подсказку, увеличивает `round`. Колоду нужно перемешать отдельно (`resetItems(level)`).
+         * и подсказку, увеличивает `round`. Колоду нужно перемешать отдельно (`resetItems({level, pictureSet})`).
          */
         startNewRound(state) {
             state.roundLevel = state.level;
@@ -180,6 +185,15 @@ const gameSlice = createSlice({
         setCardBack(state, action) {
             state.cardBack = action.payload;
         },
+        /**
+         * payload: ключ набора картинок, например 'sea'. Сохраняется в localStorage (см. store.js).
+         * Во время партии (в том числе на паузе) набор не меняется: поле уже разложено.
+         */
+        setPictureSet(state, action) {
+            if (!state.gaming) {
+                state.pictureSet = action.payload;
+            }
+        },
         /** Отмечает, что подсказка в этой партии использована. */
         takeHint(state) {
             state.hintUsed = true;
@@ -224,4 +238,4 @@ const gameSlice = createSlice({
 });
 
 export default gameSlice.reducer
-export const {incrementTry, registerPair, setTime, setGaming, setWin, setClickable, startNewRound, giveUp, setNewRecords, setNewUnlocks, setNewAchievements, setAchievementsOpen, setCardBack, takeHint, setPaused, setLanguage, setTheme, setLevel, setHowToPlay, toggleDarkMode, setSystemDarkMode, toggleVibration, toggleSound} = gameSlice.actions
+export const {incrementTry, registerPair, setTime, setGaming, setWin, setClickable, startNewRound, giveUp, setNewRecords, setNewUnlocks, setNewAchievements, setAchievementsOpen, setCardBack, setPictureSet, takeHint, setPaused, setLanguage, setTheme, setLevel, setHowToPlay, toggleDarkMode, setSystemDarkMode, toggleVibration, toggleSound} = gameSlice.actions
