@@ -188,13 +188,13 @@ const drawMarble = ({base, pattern, strong, deep}) => {
  */
 export const cardBackList = [
     {id: "plain", glory: 0},
-    {id: "question", glory: 20, centered: true, draw: drawQuestion},
-    {id: "hex", glory: 50, draw: drawHex},
-    {id: "bulb", glory: 100, centered: true, draw: drawBulb},
-    {id: "pixels", glory: 150, draw: drawPixels},
-    {id: "stars", glory: 250, draw: drawStars},
-    {id: "ornament", glory: 400, centered: true, draw: drawOrnament},
-    {id: "marble", glory: 600, draw: drawMarble},
+    {id: "question", glory: 100, centered: true, draw: drawQuestion},
+    {id: "hex", glory: 200, draw: drawHex},
+    {id: "bulb", glory: 320, centered: true, draw: drawBulb},
+    {id: "pixels", glory: 440, draw: drawPixels},
+    {id: "stars", glory: 560, draw: drawStars},
+    {id: "ornament", glory: 700, centered: true, draw: drawOrnament},
+    {id: "marble", glory: 800, draw: drawMarble},
 ];
 
 /**

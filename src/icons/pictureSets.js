@@ -33,21 +33,21 @@ export const pictureSetList = [
     },
     {
         id: "animals",
-        glory: 30,
+        glory: 150,
         pictures: ["cat", "dog", "fox", "panda", "owl", "rabbit", "bear", "koala", "tiger", "lion", "cow", "pig",
             "frog", "monkey", "penguin", "wolf", "raccoon", "hamster", "hedgehog", "giraffe", "elephant", "zebra", "parrot", "squirrel"],
         cover: ["cat", "fox", "panda", "owl"],
     },
     {
         id: "fruits",
-        glory: 80,
+        glory: 260,
         pictures: ["redApple", "greenApple", "pear", "lime", "lemon", "banana", "watermelon", "grapes", "strawberry",
             "blueberries", "cherries", "peach", "mango", "pineapple", "coconut", "kiwi", "melon", "eggplant", "avocado", "olive", "chestnut"],
         cover: ["strawberry", "banana", "watermelon", "cherries"],
     },
     {
         id: "food",
-        glory: 130,
+        glory: 380,
         pictures: ["pizza", "burger", "hotDog", "fries", "taco", "sandwich", "croissant", "pretzel", "cheese", "pancakes",
             "waffle", "friedEgg", "popcorn", "donut", "cookie", "cake", "shortcake", "cupcake", "iceCream", "chocolate",
             "candy", "lollipop", "pudding", "honey"],
@@ -55,7 +55,7 @@ export const pictureSetList = [
     },
     {
         id: "space",
-        glory: 200,
+        glory: 500,
         pictures: ["saturn", "earth", "crescent", "sun", "star", "comet", "rocket", "ufo", "satellite", "alien", "galaxy",
             "telescope", "astronaut", "newMoon", "fullMoon", "halfMoon", "shootingStar", "sparkles", "sunFace", "invader",
             "asteroid", "antenna"],
@@ -63,7 +63,7 @@ export const pictureSetList = [
     },
     {
         id: "sea",
-        glory: 320,
+        glory: 620,
         pictures: ["fish", "tropicalFish", "blowfish", "shark", "whale", "sailboat", "dolphin", "seal", "octopus", "squid",
             "crab", "lobster", "shrimp", "shell", "jellyfish", "turtle", "otter", "coral", "wave", "anchor", "island", "mask"],
         cover: ["octopus", "tropicalFish", "crab", "whale"],
