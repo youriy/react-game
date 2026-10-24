@@ -6,6 +6,8 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
+import Tab from '@mui/material/Tab';
+import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
 import TrophyIcon from '@mui/icons-material/EmojiEvents';
 import {setAchievementsOpen, setPaused} from "../store/gameSlice.js";
@@ -24,6 +26,7 @@ import {
 } from "../core/achievements.js";
 import {getLevel, levelList} from "../core/levels.js";
 import useTranslation from "../hooks/useTranslation.js";
+import Rewards from "./Rewards.jsx";
 
 /**
  * Порог для показа: время — «м:сс», остальное — числом.
@@ -171,8 +174,9 @@ function AchievementRow({achievement, tiers, history}) {
 }
 
 /**
- * Окно «Достижения»: сколько получено, сумма баллов славы и список всех достижений с условиями, порогами
- * и полученными ступенями; внизу — сколько баллов славы даёт каждая ступень.
+ * Окно «Достижения»: сколько получено, сумма баллов славы и две вкладки. «Достижения» — список всех достижений
+ * с условиями, порогами и полученными ступенями, внизу — сколько баллов славы даёт каждая ступень.
+ * «Награды» — награды за баллы славы, сгруппированные по видам (Rewards). При открытии окна — первая вкладка.
  * Открывается кнопкой-кубком в шапке и кнопкой во всплывашке после победы (AchievementToast).
  * Прогресс читается при открытии окна. Как и «Как играть», ставит партию на паузу и снимает её при закрытии.
  */
@@ -192,8 +196,15 @@ export default function Achievements() {
     );
     const entries = getAchievementEntries();
     const earned = entries.filter(({key}) => tiers[key] > 0).length;
+    const glory = getTotalGlory(tiers);
+    // Открытая вкладка: 0 — «Достижения», 1 — «Награды». Не запоминается, при каждом открытии окна — первая
+    const [tab, setTab] = React.useState(0);
 
     React.useEffect(() => {
+        if (open) {
+            setTab(0);
+        }
+
         if (open && gaming && !paused) {
             pausedByDialog.current = true;
             dispatch(setPaused(true));
@@ -228,20 +239,34 @@ export default function Achievements() {
                 <Typography variant="body2" color="text.secondary">
                     {t.achievementsCount.replace("{n}", earned).replace("{total}", entries.length)}
                     {" · "}
-                    <Box component="span" sx={{color: "primary.main", fontWeight: 800}}>🏆 {t.glory}: {getTotalGlory(tiers)}</Box>
+                    <Box component="span" sx={{color: "primary.main", fontWeight: 800}}>🏆 {t.glory}: {glory}</Box>
                 </Typography>
+                <Tabs
+                    value={tab}
+                    onChange={(event, value) => setTab(value)}
+                    variant="fullWidth"
+                    sx={{mt: 1, minHeight: 40, "& .MuiTab-root": {minHeight: 40, textTransform: "none", fontWeight: 800, fontSize: "1rem"}}}
+                >
+                    <Tab label={t.achievements} id="achievements-tab-0" aria-controls="achievements-panel-0"/>
+                    <Tab label={t.rewards} id="achievements-tab-1" aria-controls="achievements-panel-1"/>
+                </Tabs>
             </DialogTitle>
-            <DialogContent sx={{py: 0}}>
-                <Box component="ul" sx={{m: 0, p: 0, listStyle: "none"}}>
-                    {achievementList.map(achievement =>
-                        <AchievementRow key={achievement.id} achievement={achievement} tiers={tiers} history={history}/>
-                    )}
-                </Box>
-                <Typography variant="caption" component="p" color="text.secondary" sx={{py: 1.5, borderTop: 1, borderColor: "divider"}}>
-                    🏆 {t.gloryRule
-                        .replace("{tiers}", formatTierLine(TIER_GLORY.map(String)))
-                        .replace("{single}", SINGLE_GLORY)}
-                </Typography>
+            <DialogContent sx={{py: 0}} role="tabpanel" id={`achievements-panel-${tab}`} aria-labelledby={`achievements-tab-${tab}`}>
+                {tab === 0 &&
+                    <>
+                        <Box component="ul" sx={{m: 0, p: 0, listStyle: "none"}}>
+                            {achievementList.map(achievement =>
+                                <AchievementRow key={achievement.id} achievement={achievement} tiers={tiers} history={history}/>
+                            )}
+                        </Box>
+                        <Typography variant="caption" component="p" color="text.secondary" sx={{py: 1.5, borderTop: 1, borderColor: "divider"}}>
+                            🏆 {t.gloryRule
+                                .replace("{tiers}", formatTierLine(TIER_GLORY.map(String)))
+                                .replace("{single}", SINGLE_GLORY)}
+                        </Typography>
+                    </>
+                }
+                {tab === 1 && <Rewards glory={glory}/>}
             </DialogContent>
             <DialogActions>
                 <Button variant="contained" onClick={close} autoFocus>

@@ -4,6 +4,7 @@ import {getMatchPoints} from "../core/score.js";
 import {DEFAULT_LEVEL, getLevel} from "../core/levels.js";
 import {DEFAULT_THEME, systemPrefersDark, themeList} from "../core/themes.js";
 import {detectBrowserLanguage, languageList} from "../dictionary/languages.js";
+import {cardBackList, DEFAULT_CARD_BACK} from "../core/cardBacks.js";
 
 /**
  * Сохранённое значение, если оно есть среди допустимых, иначе значение по умолчанию.
@@ -40,6 +41,8 @@ const savedDarkMode = loadSetting("darkMode", "");
  * @property {Array<{key: string, tier: number}>} newAchievements - какие достижения получены или улучшены
  *   последней победой (ключи и ступени из core/achievements.js); показываются всплывашкой на экране победы
  * @property {boolean} achievements - открыто окно «Достижения»
+ * @property {string} cardBack - ключ рубашки карточек из core/cardBacks.js (сохраняется в localStorage); выбирается
+ *   на вкладке «Награды» окна «Достижения», только открытая баллами славы; при чтении проверяется лишь, что такая рубашка есть
  * @property {boolean} win - последняя партия завершилась победой (показывается экран победы)
  * @property {boolean} clickable - можно ли сейчас открывать карточки (false, пока решается пара)
  * @property {string} language - ключ языка из dictionary/languages.js (сохраняется в localStorage, когда игрок выбирает его
@@ -84,6 +87,7 @@ const gameSlice = createSlice({
         vibration: loadSetting("vibration", "true") === "true",
         sound: loadSetting("sound", "true") === "true",
         level: getLevel(loadSetting("level", DEFAULT_LEVEL)).key,
+        cardBack: pickKnown(loadSetting("cardBack", DEFAULT_CARD_BACK), cardBackList.map(back => back.id), DEFAULT_CARD_BACK),
         howToPlay: loadSetting("howToPlaySeen", "false") !== "true",
         roundLevel: DEFAULT_LEVEL
     },
@@ -172,6 +176,10 @@ const gameSlice = createSlice({
         setAchievementsOpen(state, action) {
             state.achievements = action.payload;
         },
+        /** payload: ключ рубашки, например 'stars'. Сохраняется в localStorage (см. store.js). */
+        setCardBack(state, action) {
+            state.cardBack = action.payload;
+        },
         /** Отмечает, что подсказка в этой партии использована. */
         takeHint(state) {
             state.hintUsed = true;
@@ -216,4 +224,4 @@ const gameSlice = createSlice({
 });
 
 export default gameSlice.reducer
-export const {incrementTry, registerPair, setTime, setGaming, setWin, setClickable, startNewRound, giveUp, setNewRecords, setNewUnlocks, setNewAchievements, setAchievementsOpen, takeHint, setPaused, setLanguage, setTheme, setLevel, setHowToPlay, toggleDarkMode, setSystemDarkMode, toggleVibration, toggleSound} = gameSlice.actions
+export const {incrementTry, registerPair, setTime, setGaming, setWin, setClickable, startNewRound, giveUp, setNewRecords, setNewUnlocks, setNewAchievements, setAchievementsOpen, setCardBack, takeHint, setPaused, setLanguage, setTheme, setLevel, setHowToPlay, toggleDarkMode, setSystemDarkMode, toggleVibration, toggleSound} = gameSlice.actions

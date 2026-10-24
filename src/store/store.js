@@ -7,7 +7,7 @@ import {getSystemDarkQuery} from "../core/themes.js";
 /**
  * Redux-хранилище приложения.
  * state.items — колода (itemsSlice.js), state.game — партия и настройки (gameSlice.js).
- * Язык, цвет, тёмная тема, вибрация, звук и уровень сохраняются в localStorage подпиской ниже.
+ * Язык, цвет, тёмная тема, вибрация, звук, уровень и рубашка карточек сохраняются в localStorage подпиской ниже.
  */
 const rootReducer = combineReducers({
     items: itemsSlice,
@@ -20,7 +20,7 @@ export const store = configureStore({
 
 // Настройки, которые сохраняются в localStorage при изменении
 // (побочные эффекты не должны выполняться внутри редьюсеров)
-const PERSISTED_SETTINGS = ["language", "theme", "darkMode", "vibration", "sound", "level"];
+const PERSISTED_SETTINGS = ["language", "theme", "darkMode", "vibration", "sound", "level", "cardBack"];
 
 let savedSettings = {...store.getState().game};
 

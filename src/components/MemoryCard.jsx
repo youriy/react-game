@@ -1,4 +1,5 @@
 import React from 'react';
+import {useSelector} from "react-redux";
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
@@ -10,6 +11,7 @@ import {keyframes} from '@emotion/react';
 import {cardIcons} from "../icons/icons.js";
 import {HOVER_MEDIA, PRESS_MS, PRESS_SCALE, TOUCH_MEDIA} from "../core/themes.js";
 import {PAIR_SOUND_DELAY} from "../core/sound.js";
+import {getCardBackStyle} from "../core/cardBacks.js";
 import PointsPopup from "./PointsPopup.jsx";
 
 /** Длительность переворота карточки, мс. */
@@ -156,16 +158,19 @@ const faceSx = {
     transition: "background-color 150ms ease-out, box-shadow 150ms ease-out",
 };
 
-// Рубашка — светлый тон основного цвета темы, чтобы закрытые карточки отличались от открытых (белых).
-// Тон — полупрозрачный слой поверх цвета окна, поэтому рубашка непрозрачная в обеих темах
-const backFaceSx = {
-    ...faceSx,
-    backgroundImage: (theme) => {
-        const tint = alpha(theme.palette.primary.main, 0.2);
-
-        return `linear-gradient(${tint}, ${tint})`;
+/**
+ * Стили рубашки. Обычная — светлый тон основного цвета темы, чтобы закрытые карточки отличались от открытых (белых);
+ * тон — полупрозрачный слой поверх цвета окна, поэтому рубашка непрозрачная в обеих темах.
+ * Остальные — SVG-узор из core/cardBacks.js в цвет темы (getCardBackStyle).
+ * @param {string} cardBack - ключ рубашки (настройка `cardBack`)
+ * @returns {Array} sx массивом: общие стили стороны и фон по теме
+ */
+const getBackFaceSx = (cardBack) => [
+    faceSx,
+    (theme) => getCardBackStyle(cardBack, theme.palette.primary.main, theme.palette.mode === "dark") || {
+        backgroundImage: `linear-gradient(${alpha(theme.palette.primary.main, 0.2)}, ${alpha(theme.palette.primary.main, 0.2)})`,
     },
-};
+];
 
 // Лицевая сторона (с иконкой) изначально развёрнута «спиной» к игроку
 const frontFaceSx = {
@@ -234,7 +239,8 @@ function CardFace({sx, Icon, iconSize, compact, hidden}) {
 /**
  * Одна карточка игрового поля.
  *
- * Состоит из двух сторон (рубашка и лицо с иконкой) в 3D-контейнере.
+ * Состоит из двух сторон (рубашка и лицо с иконкой) в 3D-контейнере. Рубашка — выбранная игроком
+ * (настройка `cardBack`, core/cardBacks.js).
  * При открытии переворачивается справа налево (rotateY до -180°), при закрытии — обратно;
  * на перевороте чуть приподнимается и в конце пружинит. Неугаданная пара встряхивается,
  * угаданная подпрыгивает со вспышкой (getEffectSx), затем исчезает через Zoom, оставаясь открытой.
@@ -257,6 +263,9 @@ function CardFace({sx, Icon, iconSize, compact, hidden}) {
  */
 function MemoryCard({item, index, revealed, disabled, highlight, popup, iconSize, compact, onOpen}) {
     const Icon = cardIcons[item.icon];
+    const cardBack = useSelector(state => state.game.cardBack);
+    // Объект стилей — один на рубашку, а не новый на каждую перерисовку
+    const backFaceSx = React.useMemo(() => getBackFaceSx(cardBack), [cardBack]);
     // Угаданная пара исчезает открытой, не переворачиваясь обратно
     const flipped = revealed || item.delete;
 
